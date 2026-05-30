@@ -32,6 +32,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Heart, Download, Send } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 
 type Folder = {
   id: string
@@ -61,6 +62,7 @@ export default function PublicFolderPage() {
   const router = useRouter()
   const params = useParams()
   const folderId = params.id as string
+  const padding = usePagePadding()
 
   const [folder, setFolder] = useState<Folder | null>(null)
   const [words, setWords] = useState<Word[]>([])
@@ -212,7 +214,7 @@ export default function PublicFolderPage() {
       paddingBottom: '100px',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
-      <div style={{ maxWidth: '480px', margin: '0 auto', padding: '52px 20px 0' }}>
+      <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding }}>
 
         {/* 헤더 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>

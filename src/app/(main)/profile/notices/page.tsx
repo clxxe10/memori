@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
+import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 
 const NOTICES = [
   {
@@ -17,10 +18,11 @@ const NOTICES = [
 export default function NoticesPage() {
   const router = useRouter()
   const [openNotice, setOpenNotice] = useState<number | null>(1)
+  const padding = usePagePadding()
 
   return (
     <main style={{ minHeight: '100vh', backgroundColor: 'var(--color-bg)', paddingBottom: '40px', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
-      <div style={{ maxWidth: '480px', margin: '0 auto', padding: '52px 20px 0' }}>
+      <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
           <button onClick={() => router.back()} style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer' }}>

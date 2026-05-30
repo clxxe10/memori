@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Play, BookOpen, Clock } from 'lucide-react'
+import { CONTENT_MAX_WIDTH, useIsDesktop, usePagePadding } from '@/lib/responsive'
 
 const DAYS = ['월', '화', '수', '목', '금', '토', '일']
 
@@ -18,6 +19,8 @@ export default function HomePage() {
   const [weeklyData, setWeeklyData] = useState<number[]>([0,0,0,0,0,0,0])
   const [todayWord, setTodayWord] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const pagePadding = usePagePadding()
+  const isDesktop = useIsDesktop()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,7 +41,7 @@ export default function HomePage() {
 
         if (words) {
           setTotalWords(words.length)
-          setMasteredWords(words.filter(w => (w.correct_count || 0) >= 3).length)
+          setMasteredWords(words.filter(w => (w.correct_count || 0) >= 1).length)
 
           const reviewWords = words.filter(w => {
             if (w.difficulty === 'hard') return true
@@ -126,7 +129,7 @@ export default function HomePage() {
       paddingBottom: '100px',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
-      <div style={{ maxWidth: '480px', margin: '0 auto', padding: '52px 20px 0' }}>
+      <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding: pagePadding }}>
 
         {/* 상단 인사말 */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
@@ -185,7 +188,7 @@ export default function HomePage() {
         </div>
 
         {/* 통계 카드 2개 */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isDesktop ? '1fr 1fr 1fr 1fr' : '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
           {[
             { icon: BookOpen, label: '마스터 단어', value: masteredWords.toString() },
             { icon: Clock, label: '총 학습시간', value: timeDisplay },

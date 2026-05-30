@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, Volume2, Play, Pause, RotateCcw } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { recordStudyProgress } from '@/lib/studyTracker'
+import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 
 type Word = {
   id: string
@@ -18,6 +19,7 @@ function BlinkContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const folderId = searchParams.get('folderId')
+  const padding = usePagePadding('100px')
 
   const [words, setWords] = useState<Word[]>([])
   const [current, setCurrent] = useState(0)
@@ -85,9 +87,15 @@ function BlinkContent() {
   const SPEEDS = [{ label: '0.5x', val: 3 }, { label: '1x', val: 1.5 }, { label: '2x', val: 0.8 }, { label: '3x', val: 0.4 }]
 
   const getPosStyle = (pos: string | null) => {
-    if (pos?.includes('동사')) return { bg: 'rgba(52,199,89,0.10)', color: '#1A7F3C' }
-    if (pos?.includes('형용사')) return { bg: 'rgba(255,149,0,0.10)', color: '#B86800' }
-    return { bg: 'rgba(28,28,30,0.07)', color: 'var(--color-text-primary)' }
+    if (!pos) return { bg: 'rgba(142,142,147,0.12)', color: '#636366' }
+    if (pos.includes('동사')) return { bg: 'rgba(52,199,89,0.12)', color: '#1A7F3C' }
+    if (pos.includes('명사')) return { bg: 'rgba(0,122,255,0.12)', color: '#0055B3' }
+    if (pos.includes('형용사')) return { bg: 'rgba(255,149,0,0.12)', color: '#B86800' }
+    if (pos.includes('부사')) return { bg: 'rgba(175,82,222,0.12)', color: '#7B2FBE' }
+    if (pos.includes('접속사')) return { bg: 'rgba(255,59,48,0.12)', color: '#C0392B' }
+    if (pos.includes('전치사')) return { bg: 'rgba(0,199,190,0.12)', color: '#007A76' }
+    if (pos.includes('감탄사')) return { bg: 'rgba(255,204,0,0.12)', color: '#8B6800' }
+    return { bg: 'rgba(142,142,147,0.12)', color: '#636366' }
   }
 
   if (loading) return <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif' }}><p style={{ color: 'var(--color-text-secondary)' }}>불러오는 중...</p></main>
@@ -119,7 +127,7 @@ function BlinkContent() {
 
   return (
     <main style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'var(--color-bg)', display: 'flex', flexDirection: 'column', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '52px 20px 100px', maxWidth: '480px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding, maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', flexShrink: 0 }}>
           <button onClick={() => { setIsPlaying(false); router.back() }} style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer' }}>

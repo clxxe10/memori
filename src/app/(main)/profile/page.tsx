@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation'
 import { ChevronRight, Pencil, Check, User } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { applyMyColor } from '@/lib/colorUtils'
+import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 
 export default function ProfilePage() {
   const router = useRouter()
+  const pagePadding = usePagePadding()
   const [user, setUser] = useState<any>(null)
   const [stats, setStats] = useState({ mastered: 0, streak: 0, total: 0 })
   const [theme, setTheme] = useState('시스템')
@@ -43,7 +45,7 @@ export default function ProfilePage() {
         .from('user_learning_stats').select('*').eq('user_id', user.id).single()
 
       setStats({
-        mastered: words?.filter(w => (w.correct_count || 0) >= 3).length || 0,
+        mastered: words?.filter(w => (w.correct_count || 0) >= 1).length || 0,
         streak: statsData?.streak_days || 0,
         total: words?.length || 0,
       })
@@ -117,7 +119,7 @@ export default function ProfilePage() {
       paddingBottom: '100px',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
-      <div style={{ maxWidth: '480px', margin: '0 auto', padding: '52px 20px 0' }}>
+      <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding: pagePadding }}>
 
         {/* 헤더 */}
         <h1 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.5px', marginBottom: '20px' }}>

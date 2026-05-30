@@ -6,6 +6,7 @@ import { ArrowLeft, Volume2, RotateCcw, ChevronLeft, ChevronRight } from 'lucide
 import { createClient } from '@/lib/supabase/client'
 import { calculateNextReview } from '@/lib/srs'
 import { recordStudyProgress } from '@/lib/studyTracker'
+import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 
 type Word = {
   id: string
@@ -24,6 +25,7 @@ function FlashcardContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const folderId = searchParams.get('folderId')
+  const padding = usePagePadding('100px')
 
   const [words, setWords] = useState<Word[]>([])
   const [current, setCurrent] = useState(0)
@@ -148,11 +150,15 @@ function FlashcardContent() {
   }
 
   const getPosStyle = (pos: string | null) => {
-    if (!pos) return { bg: 'rgba(28,28,30,0.08)', color: 'var(--color-text-primary)' }
-    if (pos.includes('동사')) return { bg: 'rgba(52,199,89,0.10)', color: '#1A7F3C' }
-    if (pos.includes('형용사')) return { bg: 'rgba(255,149,0,0.10)', color: '#B86800' }
-    if (pos.includes('부사')) return { bg: 'rgba(175,82,222,0.10)', color: '#7B2FBE' }
-    return { bg: 'rgba(28,28,30,0.08)', color: 'var(--color-text-primary)' }
+    if (!pos) return { bg: 'rgba(142,142,147,0.12)', color: '#636366' }
+    if (pos.includes('동사')) return { bg: 'rgba(52,199,89,0.12)', color: '#1A7F3C' }
+    if (pos.includes('명사')) return { bg: 'rgba(0,122,255,0.12)', color: '#0055B3' }
+    if (pos.includes('형용사')) return { bg: 'rgba(255,149,0,0.12)', color: '#B86800' }
+    if (pos.includes('부사')) return { bg: 'rgba(175,82,222,0.12)', color: '#7B2FBE' }
+    if (pos.includes('접속사')) return { bg: 'rgba(255,59,48,0.12)', color: '#C0392B' }
+    if (pos.includes('전치사')) return { bg: 'rgba(0,199,190,0.12)', color: '#007A76' }
+    if (pos.includes('감탄사')) return { bg: 'rgba(255,204,0,0.12)', color: '#8B6800' }
+    return { bg: 'rgba(142,142,147,0.12)', color: '#636366' }
   }
 
   if (loading) return (
@@ -212,8 +218,8 @@ function FlashcardContent() {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        padding: '52px 20px 100px',
-        maxWidth: '480px',
+        padding,
+        maxWidth: CONTENT_MAX_WIDTH,
         margin: '0 auto',
         width: '100%',
         boxSizing: 'border-box',

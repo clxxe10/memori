@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronRight, Star } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 
 const ALL_MODES = [
   {
@@ -76,6 +77,7 @@ export default function StudyPage() {
   const [selectedMode, setSelectedMode] = useState<string | null>(null)
   const [folders, setFolders] = useState<Array<{ id: string; name: string; icon: string; word_count?: number; color?: string }>>([])
   const [loadingFolders, setLoadingFolders] = useState(false)
+  const pagePadding = usePagePadding()
 
   useEffect(() => {
     const saved = localStorage.getItem('study_favorites')
@@ -144,7 +146,7 @@ export default function StudyPage() {
       paddingBottom: '100px',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
-      <div style={{ maxWidth: '480px', margin: '0 auto', padding: '52px 20px 0' }}>
+      <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding: pagePadding }}>
 
         {/* 헤더 */}
         <div style={{ marginBottom: '20px' }}>
@@ -185,7 +187,7 @@ export default function StudyPage() {
         </div>
 
         {/* 모드 리스트 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '8px' }}>
           {modes.map(mode => (
             <div
               key={mode.id}

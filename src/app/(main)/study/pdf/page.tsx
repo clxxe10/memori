@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, ChevronRight, Check, Download, Share2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 
 type Folder = {
   id: string
@@ -24,6 +25,7 @@ type ExamType = 'word-to-meaning' | 'meaning-to-word' | 'mixed'
 
 export default function PDFPage() {
   const router = useRouter()
+  const padding = usePagePadding()
   const [step, setStep] = useState<Step>('folder')
   const [folders, setFolders] = useState<Folder[]>([])
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null)
@@ -192,7 +194,7 @@ export default function PDFPage() {
       paddingBottom: '40px',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
-      <div style={{ maxWidth: '480px', margin: '0 auto', padding: '52px 20px 0' }}>
+      <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding }}>
 
         {/* 헤더 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
@@ -330,7 +332,7 @@ export default function PDFPage() {
             <div style={{
               position: 'fixed', bottom: '90px', left: 0, right: 0,
               padding: '0 20px', zIndex: 40,
-              maxWidth: '480px', margin: '0 auto',
+              maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto',
             }}>
               <button
                 onClick={() => setStep('preview')}

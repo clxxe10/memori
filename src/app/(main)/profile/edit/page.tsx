@@ -2,6 +2,14 @@
 // 버킷 이름: avatars
 // Public bucket: true
 // 설정 후 아바타 업로드 가능
+//
+// Supabase SQL Editor에서 실행:
+// create policy "아바타 업로드" on storage.objects
+//   for insert with check (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]);
+// create policy "아바타 수정" on storage.objects
+//   for update with check (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]);
+// create policy "아바타 조회" on storage.objects
+//   for select using (bucket_id = 'avatars');
 
 'use client'
 
@@ -9,9 +17,11 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Camera, User } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 
 export default function ProfileEditPage() {
   const router = useRouter()
+  const padding = usePagePadding()
   const fileRef = useRef<HTMLInputElement>(null)
   const [nickname, setNickname] = useState('')
   const [email, setEmail] = useState('')
@@ -39,18 +49,46 @@ export default function ProfileEditPage() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const ext = file.name.split('.').pop()
-      const path = `avatars/${user.id}.${ext}`
-      const { error } = await supabase.storage
+
+      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+      const path = `${user.id}/avatar.${ext}`
+
+      const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(path, file, { upsert: true })
-      if (!error) {
-        const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path)
-        await supabase.auth.updateUser({ data: { avatar_url: urlData.publicUrl } })
-        setAvatarUrl(urlData.publicUrl)
+        .upload(path, file, {
+          upsert: true,
+          contentType: file.type,
+        })
+
+      if (uploadError) {
+        console.error('업로드 오류:', uploadError)
+        alert('사진 업로드에 실패했어요: ' + uploadError.message)
+        setUploading(false)
+        return
       }
-    } catch (err) {
-      console.error(err)
+
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(path)
+
+      const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { avatar_url: publicUrl }
+      })
+
+      if (updateError) {
+        console.error('메타데이터 업데이트 오류:', updateError)
+        alert('프로필 업데이트에 실패했어요')
+        setUploading(false)
+        return
+      }
+
+      setAvatarUrl(publicUrl)
+      console.log('프로필 사진 업로드 완료:', publicUrl)
+    } catch (e) {
+      console.error('프로필 사진 오류:', e)
+      alert('오류가 발생했어요')
     } finally {
       setUploading(false)
     }
@@ -89,7 +127,7 @@ export default function ProfileEditPage() {
       paddingBottom: '40px',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
-      <div style={{ maxWidth: '480px', margin: '0 auto', padding: '52px 20px 0' }}>
+      <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px' }}>
           <button onClick={() => router.back()}

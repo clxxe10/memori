@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Sparkles } from 'lucide-react'
 
 import { createClient } from '@/lib/supabase/client'
+import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 
 export default function AddWordPage() {
   const router = useRouter()
@@ -20,6 +21,7 @@ export default function AddWordPage() {
     example: string
   } | null>(null)
   const [error, setError] = useState('')
+  const padding = usePagePadding('40px')
 
   const handleGenerate = async () => {
     if (!word.trim()) return
@@ -86,10 +88,10 @@ export default function AddWordPage() {
         minHeight: '100vh',
         backgroundColor: 'var(--color-bg)',
         fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
-        padding: '52px 20px 40px',
+        padding,
       }}
     >
-      <div style={{ maxWidth: '480px', margin: '0 auto' }}>
+      <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '28px' }}>
           <button
             onClick={() => router.back()}

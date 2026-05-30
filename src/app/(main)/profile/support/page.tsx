@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Send } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 
 const FAQ_LIST = [
   { q: '단어를 어떻게 추가하나요?', a: '단어장 내부에서 + 버튼을 눌러 사진으로 추가하거나 직접 입력할 수 있어요.' },
@@ -34,6 +35,7 @@ export default function SupportPage() {
   const [content, setContent] = useState('')
   const [contactEmail, setContactEmail] = useState('')
   const [sent, setSent] = useState(false)
+  const padding = usePagePadding()
 
   const CATEGORIES = ['버그 신고', '기능 제안', '계정 문의', '기타']
 
@@ -79,7 +81,7 @@ export default function SupportPage() {
 
   return (
     <main style={{ minHeight: '100vh', backgroundColor: 'var(--color-bg)', paddingBottom: '100px', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
-      <div style={{ maxWidth: '480px', margin: '0 auto', padding: '52px 20px 0' }}>
+      <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
           <button onClick={() => router.back()} style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer' }}>

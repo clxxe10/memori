@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -10,6 +10,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [isDesktop, setIsDesktop] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsDesktop(window.innerWidth >= 1024)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   const handleLogin = async () => {
     if (!email || !password) { setError('이메일과 비밀번호를 입력해주세요'); return }
@@ -46,7 +54,16 @@ export default function LoginPage() {
       padding: '0 24px',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
-      <div style={{ width: '100%', maxWidth: '380px' }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '420px',
+        ...(isDesktop ? {
+          background: 'var(--color-surface)',
+          borderRadius: '24px',
+          padding: '48px 40px',
+          boxShadow: '0 8px 40px rgba(0,0,0,0.08)',
+        } : {}),
+      }}>
 
         {/* 로고 */}
         <div style={{ marginBottom: '36px' }}>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -12,6 +12,21 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsDesktop(window.innerWidth >= 1024)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
+  const cardStyle = isDesktop ? {
+    background: 'var(--color-surface)',
+    borderRadius: '24px',
+    padding: '48px 40px',
+    boxShadow: '0 8px 40px rgba(0,0,0,0.08)',
+  } : {}
 
   const handleSignup = async () => {
     if (!nickname || !email || !password) { setError('모든 항목을 입력해주세요'); return }
@@ -62,7 +77,7 @@ export default function SignupPage() {
       padding: '0 24px',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
-      <div style={{ width: '100%', maxWidth: '380px', textAlign: 'center' }}>
+      <div style={{ width: '100%', maxWidth: '420px', textAlign: 'center', ...cardStyle }}>
         <div style={{ fontSize: '56px', marginBottom: '16px' }}>✉️</div>
         <h2 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '10px' }}>
           이메일을 확인해주세요
@@ -90,7 +105,7 @@ export default function SignupPage() {
       padding: '0 24px',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
-      <div style={{ width: '100%', maxWidth: '380px' }}>
+      <div style={{ width: '100%', maxWidth: '420px', ...cardStyle }}>
 
         {/* 로고 */}
         <div style={{ marginBottom: '32px' }}>

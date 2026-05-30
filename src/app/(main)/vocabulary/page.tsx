@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation'
 import { ChevronRight, Plus, Search, X } from 'lucide-react'
 
 import { createClient } from '@/lib/supabase/client'
+import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 
 type Folder = {
   id: string
@@ -40,6 +41,7 @@ export default function VocabularyPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
+  const pagePadding = usePagePadding()
   const [customIcon, setCustomIcon] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('토익')
   const [customCategory, setCustomCategory] = useState('')
@@ -172,7 +174,7 @@ export default function VocabularyPage() {
         fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
       }}
     >
-      <div style={{ maxWidth: '480px', margin: '0 auto', padding: '52px 20px 0' }}>
+      <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding: pagePadding }}>
         <div style={{ marginBottom: '20px' }}>
           <h1
             style={{
@@ -227,7 +229,7 @@ export default function VocabularyPage() {
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>아래 + 버튼으로 첫 단어장을 만들어보세요</p>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '10px' }}>
             {filtered.map((folder) => {
               const total = folder.word_count || 0
               const mastered = folder.mastered_count || 0

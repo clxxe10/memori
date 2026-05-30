@@ -1,16 +1,28 @@
-import type { ReactNode } from 'react'
+'use client'
 
 import TabBar from '@/components/layout/TabBar'
+import { useEffect, useState } from 'react'
 
-type MainLayoutProps = {
-  children: ReactNode
-}
+export default function MainLayout({ children }: { children: React.ReactNode }) {
+  const [isDesktop, setIsDesktop] = useState(false)
 
-export default function MainLayout({ children }: MainLayoutProps) {
+  useEffect(() => {
+    const check = () => setIsDesktop(window.innerWidth >= 1024)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
   return (
-    <div className="min-h-screen bg-bg pb-24">
-      <main className="mx-auto w-full max-w-md px-5 py-6">{children}</main>
+    <div style={{ display: 'flex', minHeight: '100vh' }}>
       <TabBar />
+      <main style={{
+        flex: 1,
+        marginLeft: isDesktop ? '240px' : '0',
+        transition: 'margin-left 0.2s',
+      }}>
+        {children}
+      </main>
     </div>
   )
 }
