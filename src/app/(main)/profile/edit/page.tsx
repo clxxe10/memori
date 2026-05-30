@@ -1,0 +1,186 @@
+// Supabase 대시보드 → Storage → New bucket
+// 버킷 이름: avatars
+// Public bucket: true
+// 설정 후 아바타 업로드 가능
+
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { ArrowLeft, Camera, User } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+
+export default function ProfileEditPage() {
+  const router = useRouter()
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [nickname, setNickname] = useState('')
+  const [email, setEmail] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [avatarUrl, setAvatarUrl] = useState('')
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      setNickname(user.user_metadata?.nickname || user.user_metadata?.full_name || '')
+      setEmail(user.email || '')
+      setAvatarUrl(user.user_metadata?.avatar_url || '')
+    }
+    fetchUser()
+  }, [])
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const ext = file.name.split('.').pop()
+      const path = `avatars/${user.id}.${ext}`
+      const { error } = await supabase.storage
+        .from('avatars')
+        .upload(path, file, { upsert: true })
+      if (!error) {
+        const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path)
+        await supabase.auth.updateUser({ data: { avatar_url: urlData.publicUrl } })
+        setAvatarUrl(urlData.publicUrl)
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const handleSave = async () => {
+    if (!nickname.trim()) return
+    setSaving(true)
+    const supabase = createClient()
+    await supabase.auth.updateUser({
+      data: { nickname: nickname.trim() }
+    })
+    setSaving(false)
+    router.back()
+  }
+
+  const inputStyle = {
+    width: '100%', height: '52px',
+    background: 'var(--color-surface-2)',
+    border: '1px solid var(--color-border)',
+    borderRadius: '14px', padding: '0 16px',
+    fontSize: '15px', color: 'var(--color-text-primary)',
+    outline: 'none', boxSizing: 'border-box' as const,
+  }
+
+  const labelStyle = {
+    fontSize: '13px', fontWeight: 700,
+    color: 'var(--color-text-secondary)',
+    marginBottom: '8px', display: 'block',
+  }
+
+  return (
+    <main style={{
+      minHeight: '100vh',
+      backgroundColor: 'var(--color-bg)',
+      paddingBottom: '40px',
+      fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+    }}>
+      <div style={{ maxWidth: '480px', margin: '0 auto', padding: '52px 20px 0' }}>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px' }}>
+          <button onClick={() => router.back()}
+            style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer' }}>
+            <ArrowLeft size={22} color="var(--color-text-primary)" />
+          </button>
+          <h1 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
+            프로필 편집
+          </h1>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '32px' }}>
+          <div style={{ position: 'relative' }}>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleAvatarChange}
+            />
+            <div style={{
+              width: '88px', height: '88px', borderRadius: '50%',
+              background: 'var(--color-surface-2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              overflow: 'hidden',
+            }}>
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="avatar"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <User size={40} color="var(--color-text-secondary)" />
+              )}
+            </div>
+            <div
+              onClick={() => fileRef.current?.click()}
+              style={{
+                position: 'absolute', bottom: 0, right: 0,
+                width: '28px', height: '28px', borderRadius: '50%',
+                background: 'var(--color-my)', border: '2px solid var(--color-bg)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: uploading ? 'wait' : 'pointer',
+                fontSize: '11px', fontWeight: 700, color: 'var(--color-my-contrast)',
+              }}
+            >
+              {uploading ? '...' : <Camera size={13} color="var(--color-my-contrast)" />}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+          <div>
+            <label style={labelStyle}>닉네임</label>
+            <input
+              value={nickname}
+              onChange={e => setNickname(e.target.value)}
+              placeholder="닉네임 입력..."
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>이메일</label>
+            <input
+              value={email}
+              disabled
+              style={{ ...inputStyle, opacity: 0.5, cursor: 'not-allowed' }}
+            />
+            <p style={{ fontSize: '12px', color: 'var(--color-text-tertiary)', marginTop: '6px' }}>
+              이메일은 변경할 수 없어요
+            </p>
+          </div>
+
+          <button
+            onClick={handleSave}
+            disabled={saving || !nickname.trim()}
+            style={{
+              width: '100%', height: '52px', marginTop: '8px',
+              background: nickname.trim() ? 'var(--color-my)' : 'var(--color-surface-2)',
+              color: nickname.trim() ? 'var(--color-my-contrast)' : 'var(--color-text-tertiary)',
+              border: 'none', borderRadius: '14px',
+              fontSize: '15px', fontWeight: 700,
+              cursor: nickname.trim() ? 'pointer' : 'not-allowed',
+              opacity: saving ? 0.6 : 1,
+            }}
+          >
+            {saving ? '저장 중...' : '저장하기'}
+          </button>
+
+        </div>
+      </div>
+    </main>
+  )
+}
