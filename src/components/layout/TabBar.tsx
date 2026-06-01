@@ -18,7 +18,7 @@ export default function TabBar() {
   const [isDesktop, setIsDesktop] = useState(false)
 
   useEffect(() => {
-    const check = () => setIsDesktop(window.innerWidth >= 1024)
+    const check = () => setIsDesktop(window.innerWidth >= 1280)
     check()
     window.addEventListener('resize', check)
     return () => window.removeEventListener('resize', check)
@@ -75,7 +75,7 @@ export default function TabBar() {
       alignItems: 'center', gap: '4px',
       boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
       zIndex: 100,
-      width: 'min(calc(100% - 32px), 400px)',
+      width: 'min(calc(100% - 48px), 500px)',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
       {TABS.map(tab => {

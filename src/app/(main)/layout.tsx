@@ -7,7 +7,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const [isDesktop, setIsDesktop] = useState(false)
 
   useEffect(() => {
-    const check = () => setIsDesktop(window.innerWidth >= 1024)
+    const check = () => setIsDesktop(window.innerWidth >= 1280)
     check()
     window.addEventListener('resize', check)
     return () => window.removeEventListener('resize', check)

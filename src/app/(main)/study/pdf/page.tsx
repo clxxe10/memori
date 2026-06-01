@@ -17,6 +17,7 @@ type Word = {
   id: string
   word: string
   meaning: string
+  pronunciation?: string | null
   selected: boolean
 }
 
@@ -54,7 +55,7 @@ export default function PDFPage() {
     setLoading(true)
     const supabase = createClient()
     const { data } = await supabase
-      .from('words').select('id, word, meaning')
+      .from('words').select('id, word, meaning, pronunciation')
       .eq('folder_id', folder.id)
     setWords((data || []).map(w => ({ ...w, selected: true })))
     setLoading(false)
@@ -88,7 +89,6 @@ export default function PDFPage() {
       const { default: autoTable } = await import('jspdf-autotable')
 
       const selectedWords = words.filter(w => w.selected)
-      const folderName = selectedFolder?.name || '단어장'
       const half = Math.ceil(selectedWords.length / 2)
       const leftWords = selectedWords.slice(0, half)
       const rightWords = selectedWords.slice(half)
@@ -97,46 +97,41 @@ export default function PDFPage() {
 
       doc.setFontSize(14)
       doc.setFont('helvetica', 'bold')
-      doc.text(folderName, 105, 16, { align: 'center' })
+      doc.text('Vocabulary Test', 105, 16, { align: 'center' })
 
-      let leftHeader: string[]
-      let rightHeader: string[]
-      let getLeftData: (w: Word, i: number) => string[]
-      let getRightData: (w: Word, i: number) => string[]
-
-      if (examType === 'word-to-meaning') {
-        leftHeader = ['#', '단어', '뜻']
-        rightHeader = ['#', '단어', '뜻']
-        getLeftData = (w) => [w.word, '']
-        getRightData = (w) => [w.word, '']
-      } else if (examType === 'meaning-to-word') {
-        leftHeader = ['#', '뜻', '단어']
-        rightHeader = ['#', '뜻', '단어']
-        getLeftData = (w) => [w.meaning, '']
-        getRightData = (w) => [w.meaning, '']
-      } else {
-        leftHeader = ['#', '문제', '답']
-        rightHeader = ['#', '문제', '답']
-        getLeftData = (w, i) => [i % 2 === 0 ? w.word : w.meaning, '']
-        getRightData = (w, i) => [i % 2 === 0 ? w.word : w.meaning, '']
+      const buildRow = (word: Word, num: number) => {
+        if (examType === 'word-to-meaning') {
+          return [num, word.word, '']
+        } else if (examType === 'meaning-to-word') {
+          const hint = word.pronunciation || '( ? )'
+          return [num, hint, '']
+        } else {
+          return num % 2 === 1
+            ? [num, word.word, '']
+            : [num, '___________', word.word]
+        }
       }
+
+      const tableBody = leftWords.map((w, i) => {
+        const leftRow = buildRow(w, i + 1)
+        const rightWord = rightWords[i]
+        const rightRow = rightWord
+          ? buildRow(rightWord, i + half + 1)
+          : ['', '', '']
+        return [...leftRow, ...rightRow]
+      })
 
       autoTable(doc, {
         startY: 24,
         head: [[
-          { content: '', styles: { cellWidth: 8, halign: 'center' } },
-          { content: leftHeader[1], styles: { cellWidth: 47 } },
-          { content: leftHeader[2], styles: { cellWidth: 47 } },
-          { content: '', styles: { cellWidth: 8, halign: 'center' } },
-          { content: rightHeader[1], styles: { cellWidth: 47 } },
-          { content: rightHeader[2], styles: { cellWidth: 47 } },
+          { content: 'No.', styles: { halign: 'center', cellWidth: 8 } },
+          { content: examType === 'meaning-to-word' ? 'Hint' : 'Word', styles: { cellWidth: 47 } },
+          { content: examType === 'word-to-meaning' ? 'Meaning' : 'Answer', styles: { cellWidth: 47 } },
+          { content: 'No.', styles: { halign: 'center', cellWidth: 8 } },
+          { content: examType === 'meaning-to-word' ? 'Hint' : 'Word', styles: { cellWidth: 47 } },
+          { content: examType === 'word-to-meaning' ? 'Meaning' : 'Answer', styles: { cellWidth: 47 } },
         ]],
-        body: leftWords.map((w, i) => [
-          i + 1,
-          ...getLeftData(w, i),
-          rightWords[i] ? i + half + 1 : '',
-          ...(rightWords[i] ? getRightData(rightWords[i], i + half) : ['', '']),
-        ]),
+        body: tableBody,
         styles: {
           fontSize: 9,
           cellPadding: 3,
@@ -144,6 +139,7 @@ export default function PDFPage() {
           lineWidth: 0.3,
           textColor: [28, 28, 30],
           font: 'helvetica',
+          overflow: 'linebreak',
         },
         headStyles: {
           fillColor: [255, 255, 255],
