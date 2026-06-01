@@ -18,6 +18,16 @@ const ALL_MODES = [
     badgeBg: 'rgba(28,28,30,0.08)',
   },
   {
+    id: 'speed',
+    name: '스피드 모드',
+    desc: '단어가 내려오기 전에 뜻을 입력해요',
+    emoji: '🚀',
+    color: 'rgba(251,191,36,0.10)',
+    badge: 'NEW',
+    badgeColor: '#B45309',
+    badgeBg: 'rgba(251,191,36,0.12)',
+  },
+  {
     id: 'blink',
     name: '깜빡이',
     desc: '단어를 빠르게 반복 노출해요',

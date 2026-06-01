@@ -58,6 +58,7 @@ type PublicFolder = {
   category?: string
   user_id: string
   word_count?: number
+  like_count?: number
   author_nickname?: string
 }
 
@@ -82,34 +83,43 @@ function SearchPageContent() {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) setMyUserId(user.id)
 
-      // is_public이 true인 모든 단어장 가져오기
-      const { data: folderData, error } = await supabase
+      const { data: folderData } = await supabase
         .from('folders')
         .select('*')
         .eq('is_public', true)
 
-      console.log('공개 단어장:', folderData, '에러:', error)
-
-      if (!folderData || folderData.length === 0) {
+      if (!folderData) {
         setLoading(false)
         return
       }
 
       const foldersWithCount = await Promise.all(
         folderData.map(async (folder) => {
-          const { count } = await supabase
+          const { count: wordCount } = await supabase
             .from('words')
+            .select('*', { count: 'exact', head: true })
+            .eq('folder_id', folder.id)
+
+          const { count: likeCount } = await supabase
+            .from('folder_likes')
             .select('*', { count: 'exact', head: true })
             .eq('folder_id', folder.id)
 
           return {
             ...folder,
-            word_count: count || 0,
+            word_count: wordCount || 0,
+            like_count: likeCount || 0,
           }
         })
       )
 
-      setFolders(foldersWithCount)
+      const sorted = foldersWithCount.sort((a, b) => {
+        const scoreA = (a.like_count * 2) + (a.word_count * 0.1)
+        const scoreB = (b.like_count * 2) + (b.word_count * 0.1)
+        return scoreB - scoreA
+      })
+
+      setFolders(sorted)
       setLoading(false)
     }
     fetchPublicFolders()
@@ -305,9 +315,12 @@ function SearchPageContent() {
                             </span>
                           )}
                         </div>
-                        <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>
-                          @{folder.author_nickname || '익명'} · {folder.word_count}개 단어
+                        <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: '0 0 2px' }}>
+                          @{folder.author_nickname || '익명'}
                         </p>
+                        <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
+                          ❤️ {folder.like_count || 0} · {folder.word_count}개
+                        </span>
                       </div>
                       {isMyFolder(folder) ? (
                         <span style={{

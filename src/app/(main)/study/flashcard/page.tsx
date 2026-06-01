@@ -38,27 +38,49 @@ function FlashcardContent() {
   useEffect(() => {
     const style = document.createElement('style')
     style.textContent = `
-    @keyframes slideInRight {
-      from { transform: translateX(60px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes slideInLeft {
-      from { transform: translateX(-60px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes flipOut {
-      0% { transform: rotateY(0deg); opacity: 1; }
-      100% { transform: rotateY(90deg); opacity: 0; }
-    }
-    @keyframes flipIn {
-      0% { transform: rotateY(-90deg); opacity: 0; }
-      100% { transform: rotateY(0deg); opacity: 1; }
-    }
-    .card-slide-right { animation: slideInRight 0.25s ease; }
-    .card-slide-left { animation: slideInLeft 0.25s ease; }
-    .card-flip-out { animation: flipOut 0.15s ease forwards; }
-    .card-flip-in { animation: flipIn 0.15s ease forwards; }
-  `
+      @keyframes slideInFromRight {
+        from { transform: translateX(60px) scale(0.95); opacity: 0; }
+        to { transform: translateX(0) scale(1); opacity: 1; }
+      }
+      @keyframes slideInFromLeft {
+        from { transform: translateX(-60px) scale(0.95); opacity: 0; }
+        to { transform: translateX(0) scale(1); opacity: 1; }
+      }
+      @keyframes slideOutToLeft {
+        from { transform: translateX(0) scale(1); opacity: 1; }
+        to { transform: translateX(-60px) scale(0.95); opacity: 0; }
+      }
+      @keyframes slideOutToRight {
+        from { transform: translateX(0) scale(1); opacity: 1; }
+        to { transform: translateX(60px) scale(0.95); opacity: 0; }
+      }
+      @keyframes flipOut {
+        from { transform: perspective(600px) rotateY(0deg); opacity: 1; }
+        to { transform: perspective(600px) rotateY(90deg); opacity: 0; }
+      }
+      @keyframes flipIn {
+        from { transform: perspective(600px) rotateY(-90deg); opacity: 0; }
+        to { transform: perspective(600px) rotateY(0deg); opacity: 1; }
+      }
+      .card-slide-out-left {
+        animation: slideOutToLeft 0.18s ease-in forwards;
+      }
+      .card-slide-out-right {
+        animation: slideOutToRight 0.18s ease-in forwards;
+      }
+      .card-slide-in-right {
+        animation: slideInFromRight 0.22s ease-out forwards;
+      }
+      .card-slide-in-left {
+        animation: slideInFromLeft 0.22s ease-out forwards;
+      }
+      .card-flip-out {
+        animation: flipOut 0.15s ease-in forwards;
+      }
+      .card-flip-in {
+        animation: flipIn 0.15s ease-out forwards;
+      }
+    `
     document.head.appendChild(style)
     return () => { document.head.removeChild(style) }
   }, [])
@@ -106,6 +128,8 @@ function FlashcardContent() {
     const word = words[current]
     const supabase = createClient()
 
+    setCardAnim(know ? 'card-slide-out-left' : 'card-slide-out-right')
+
     const { nextInterval, nextEaseFactor, nextReviewDate } = calculateNextReview(
       word.correct_count || 0,
       word.review_interval || 0,
@@ -113,7 +137,7 @@ function FlashcardContent() {
       know
     )
 
-    await supabase.from('words').update({
+    supabase.from('words').update({
       correct_count: know
         ? (word.correct_count || 0) + 1
         : Math.max(0, (word.correct_count || 0) - 1),
@@ -129,17 +153,17 @@ function FlashcardContent() {
       dontKnow: !know ? prev.dontKnow + 1 : prev.dontKnow,
     }))
 
-    setCardAnim(know ? 'card-slide-left' : 'card-slide-right')
-    setTimeout(async () => {
+    setTimeout(() => {
       if (current + 1 >= words.length) {
-        await recordStudyProgress(words.length)
+        recordStudyProgress(words.length)
         setFinished(true)
       } else {
         setCurrent(prev => prev + 1)
         setFlipped(false)
-        setCardAnim(know ? 'card-slide-right' : 'card-slide-left')
+        setCardAnim(know ? 'card-slide-in-right' : 'card-slide-in-left')
+        setTimeout(() => setCardAnim(''), 220)
       }
-    }, 200)
+    }, 180)
   }
 
   const handleRestart = () => {
@@ -257,8 +281,13 @@ function FlashcardContent() {
           <button
             onClick={() => {
               if (current > 0) {
-                setCardAnim('card-slide-left')
-                setTimeout(() => { setCurrent(p => p - 1); setFlipped(false); setCardAnim('card-slide-right') }, 50)
+                setCardAnim('card-slide-out-right')
+                setTimeout(() => {
+                  setCurrent(p => p - 1)
+                  setFlipped(false)
+                  setCardAnim('card-slide-in-left')
+                  setTimeout(() => setCardAnim(''), 220)
+                }, 180)
               }
             }}
             disabled={current === 0}
@@ -284,6 +313,7 @@ function FlashcardContent() {
               setTimeout(() => {
                 setFlipped(f => !f)
                 setCardAnim('card-flip-in')
+                setTimeout(() => setCardAnim(''), 150)
               }, 150)
             }}
             style={{
@@ -351,8 +381,13 @@ function FlashcardContent() {
           <button
             onClick={() => {
               if (current < words.length - 1) {
-                setCardAnim('card-slide-right')
-                setTimeout(() => { setCurrent(p => p + 1); setFlipped(false); setCardAnim('card-slide-left') }, 50)
+                setCardAnim('card-slide-out-left')
+                setTimeout(() => {
+                  setCurrent(p => p + 1)
+                  setFlipped(false)
+                  setCardAnim('card-slide-in-right')
+                  setTimeout(() => setCardAnim(''), 220)
+                }, 180)
               }
             }}
             disabled={current === words.length - 1}
