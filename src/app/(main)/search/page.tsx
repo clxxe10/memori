@@ -1,6 +1,46 @@
 // Supabase SQL Editor에서 아래 실행 필요 (공개 단어장 RLS):
 // create policy "공개 단어장 전체 조회" on folders
 //   for select using (is_public = true);
+//
+// create policy "공개 단어장 단어 조회" on words
+//   for select using (
+//     EXISTS (
+//       SELECT 1 FROM folders
+//       WHERE folders.id = words.folder_id
+//       AND folders.is_public = true
+//     )
+//     OR auth.uid() = user_id
+//   );
+//
+// alter table folders add column if not exists author_nickname text;
+//
+// create or replace function set_author_nickname()
+// returns trigger as $$
+// begin
+//   NEW.author_nickname := (
+//     SELECT raw_user_meta_data->>'nickname'
+//     FROM auth.users
+//     WHERE id = NEW.user_id
+//   );
+//   if NEW.author_nickname is null then
+//     NEW.author_nickname := 'user_' || left(NEW.user_id::text, 6);
+//   end if;
+//   return NEW;
+// end;
+// $$ language plpgsql security definer;
+//
+// create trigger folder_author_nickname
+//   before insert on folders
+//   for each row execute function set_author_nickname();
+//
+// UPDATE folders f
+// SET author_nickname = (
+//   SELECT raw_user_meta_data->>'nickname'
+//   FROM auth.users
+//   WHERE id = f.user_id
+// )
+// WHERE author_nickname IS NULL
+//   OR author_nickname LIKE 'user_%';
 
 'use client'
 
@@ -18,6 +58,7 @@ type PublicFolder = {
   category?: string
   user_id: string
   word_count?: number
+  author_nickname?: string
 }
 
 const CATEGORIES = ['전체', '토익', '일상', '여행', '비즈니스', '기타']
@@ -56,12 +97,16 @@ function SearchPageContent() {
 
       const foldersWithCount = await Promise.all(
         folderData.map(async (folder) => {
-            const { count } = await supabase
-              .from('words')
-              .select('*', { count: 'exact', head: true })
-              .eq('folder_id', folder.id)
-            return { ...folder, word_count: count || 0 }
-          })
+          const { count } = await supabase
+            .from('words')
+            .select('*', { count: 'exact', head: true })
+            .eq('folder_id', folder.id)
+
+          return {
+            ...folder,
+            word_count: count || 0,
+          }
+        })
       )
 
       setFolders(foldersWithCount)
@@ -261,27 +306,38 @@ function SearchPageContent() {
                           )}
                         </div>
                         <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>
-                          {folder.word_count}개 단어
+                          @{folder.author_nickname || '익명'} · {folder.word_count}개 단어
                         </p>
                       </div>
-                      <button
-                        onClick={e => {
-                          e.stopPropagation()
-                          if (!isImported && !isMyFolder(folder)) handleImport(folder)
-                        }}
-                        disabled={isImported || importing === folder.id || isMyFolder(folder)}
-                        style={{
+                      {isMyFolder(folder) ? (
+                        <span style={{
                           padding: '7px 14px', borderRadius: '20px', flexShrink: 0,
-                          background: isMyFolder(folder) ? 'var(--color-surface-2)' : isImported ? 'var(--color-surface-2)' : 'var(--color-my)',
-                          color: isMyFolder(folder) ? 'var(--color-text-secondary)' : isImported ? 'var(--color-text-secondary)' : 'var(--color-my-contrast)',
-                          border: 'none',
-                          cursor: isMyFolder(folder) || isImported ? 'default' : 'pointer',
-                          fontSize: '12px', fontWeight: 600,
-                          opacity: importing === folder.id ? 0.6 : 1,
-                        }}
-                      >
-                        {importing === folder.id ? '...' : isMyFolder(folder) ? '내 단어장' : isImported ? '완료 ✓' : '가져오기'}
-                      </button>
+                          background: 'var(--color-my-light)',
+                          color: 'var(--color-my)',
+                          fontSize: '12px', fontWeight: 700,
+                        }}>
+                          내 단어장
+                        </span>
+                      ) : (
+                        <button
+                          onClick={e => {
+                            e.stopPropagation()
+                            if (!isImported) handleImport(folder)
+                          }}
+                          disabled={isImported || importing === folder.id}
+                          style={{
+                            padding: '7px 14px', borderRadius: '20px', flexShrink: 0,
+                            background: isImported ? 'var(--color-surface-2)' : 'var(--color-my)',
+                            color: isImported ? 'var(--color-text-secondary)' : 'var(--color-my-contrast)',
+                            border: 'none',
+                            cursor: isImported ? 'default' : 'pointer',
+                            fontSize: '12px', fontWeight: 600,
+                            opacity: importing === folder.id ? 0.6 : 1,
+                          }}
+                        >
+                          {importing === folder.id ? '...' : isImported ? '완료 ✓' : '가져오기'}
+                        </button>
+                      )}
                     </div>
                   </div>
                 )

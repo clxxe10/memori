@@ -1,22 +1,21 @@
-console.log('ANTHROPIC_API_KEY:', process.env.ANTHROPIC_API_KEY ? '있음' : '없음')
+export const maxDuration = 30
 
-import { NextRequest, NextResponse } from 'next/server'
-
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const { word, meaning } = await req.json()
-    if (!word) return NextResponse.json({ error: 'word required' }, { status: 400 })
+    const { word, meaning } = await request.json()
+    if (!word) {
+      return Response.json({ error: '단어가 없어요' }, { status: 400 })
+    }
 
-    const apiKey = process.env.ANTHROPIC_API_KEY
-    if (!apiKey) {
-      return NextResponse.json({ error: 'API key not configured' }, { status: 500 })
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return Response.json({ error: 'API 키가 설정되지 않았어요' }, { status: 500 })
     }
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey,
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
@@ -30,24 +29,28 @@ export async function POST(req: NextRequest) {
   "pronunciation": "IPA 발음기호 (예: /æmˈbɪɡjuəs/)",
   "example": "짧고 자연스러운 영어 예문"
 }`,
-        }]
-      })
+        }],
+      }),
     })
 
     if (!response.ok) {
-      const errText = await response.text()
-      console.error('Anthropic API error:', errText)
-      return NextResponse.json({ error: 'API call failed' }, { status: 500 })
+      const errorData = await response.text()
+      console.error('Anthropic API 오류:', response.status, errorData)
+      return Response.json({ error: 'AI API 오류: ' + response.status }, { status: 500 })
     }
 
     const data = await response.json()
     const text = data.content?.[0]?.text || ''
-    const jsonMatch = text.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) throw new Error('JSON 파싱 실패')
+    const clean = text.replace(/```json|```/g, '').trim()
+    const jsonMatch = clean.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) {
+      return Response.json({ error: 'JSON 파싱 실패' }, { status: 500 })
+    }
     const result = JSON.parse(jsonMatch[0])
-    return NextResponse.json(result)
-  } catch (e) {
-    console.error('generate-word-info error:', e)
-    return NextResponse.json({ error: 'generation failed' }, { status: 500 })
+    return Response.json(result)
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : '알 수 없는 오류'
+    console.error('generate-word-info 오류:', e)
+    return Response.json({ error: message }, { status: 500 })
   }
 }

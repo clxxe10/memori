@@ -73,13 +73,9 @@ export default function VocabularyDetailPage() {
 
   useEffect(() => {
     fetchWords()
-
-    const onFocus = () => {
-      fetchWords()
-    }
-
-    window.addEventListener('focus', onFocus)
-    return () => window.removeEventListener('focus', onFocus)
+    const handleFocus = () => fetchWords()
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
   }, [folderId])
 
   const filtered = words.filter(w => {

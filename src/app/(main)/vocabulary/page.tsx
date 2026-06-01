@@ -3,6 +3,16 @@
 // alter table folders add column if not exists category text;
 // alter table folders add column if not exists is_public boolean default false;
 // alter table folders add column if not exists cover_url text;
+// alter table folders add column if not exists author_nickname text;
+//
+// UPDATE folders f
+// SET author_nickname = (
+//   SELECT raw_user_meta_data->>'nickname'
+//   FROM auth.users
+//   WHERE id = f.user_id
+// )
+// WHERE author_nickname IS NULL
+//   OR author_nickname LIKE 'user_%';
 
 'use client'
 
@@ -99,6 +109,10 @@ export default function VocabularyPage() {
       } = await supabase.auth.getUser()
       if (!user) return
 
+      const authorNickname = user.user_metadata?.nickname ||
+        user.user_metadata?.full_name ||
+        `user_${user.id?.slice(0, 6)}`
+
       const finalCategory = selectedCategory === '기타' ? customCategory.trim() : selectedCategory
       const finalIcon = customIcon.trim() || '📚'
 
@@ -111,6 +125,7 @@ export default function VocabularyPage() {
           color: form.color,
           category: finalCategory || null,
           is_public: form.is_public,
+          author_nickname: authorNickname,
         })
         .select()
         .single()
@@ -122,6 +137,7 @@ export default function VocabularyPage() {
             user_id: user.id,
             name: form.name.trim(),
             icon: finalIcon,
+            author_nickname: authorNickname,
           })
           .select()
           .single()
@@ -319,31 +335,31 @@ export default function VocabularyPage() {
       </button>
 
       {showModal && (
-        <div
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setShowModal(false)
-          }}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.4)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '24px',
-            zIndex: 50,
-          }}
-        >
+        <>
+          <div
+            onClick={() => setShowModal(false)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.4)',
+              zIndex: 200,
+            }}
+          />
           <div
             style={{
-              width: '100%',
-              maxWidth: '360px',
+              position: 'fixed',
+              bottom: 0,
+              left: 0,
+              right: 0,
               background: 'var(--color-surface)',
-              borderRadius: '24px',
-              padding: '28px 24px',
-              boxShadow: '0 8px 40px rgba(0,0,0,0.15)',
+              borderRadius: '24px 24px 0 0',
+              padding: '12px 20px 100px',
+              zIndex: 201,
+              maxHeight: '90vh',
+              overflowY: 'auto',
             }}
           >
+            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 16px' }} />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <span style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)' }}>새 단어장</span>
               <button
@@ -525,7 +541,7 @@ export default function VocabularyPage() {
               {creating ? '만드는 중...' : '만들기'}
             </button>
           </div>
-        </div>
+        </>
       )}
     </main>
   )

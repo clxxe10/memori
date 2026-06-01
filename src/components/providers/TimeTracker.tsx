@@ -26,6 +26,7 @@ export default function TimeTracker() {
   const isVisibleRef = useRef<boolean>(true)
 
   const saveTime = async (seconds: number) => {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return
     if (seconds < 5) return
     try {
       const supabase = createClient()
@@ -102,9 +103,12 @@ export default function TimeTracker() {
             total_words: 0,
           })
       }
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : String(e)
-      if (message.includes('fetch')) return
+    } catch (e: any) {
+      if (
+        e?.message?.includes('fetch') ||
+        e?.message?.includes('network') ||
+        e?.message?.includes('Failed')
+      ) return
       console.error('TimeTracker 오류:', e)
     }
   }

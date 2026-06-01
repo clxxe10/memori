@@ -132,11 +132,29 @@ export default function StudyPage() {
     setShowFolderSheet(true)
   }
 
-  const handleStart = (folderId?: string) => {
+  const handleStart = async (folderId?: string) => {
     if (!selectedMode) return
+
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    let query = supabase
+      .from('words')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+    if (folderId) query = query.eq('folder_id', folderId)
+
+    const { count } = await query
+
+    if (!count || count === 0) {
+      alert('단어장에 단어가 없어요! 단어를 먼저 추가해주세요.')
+      return
+    }
+
     setShowFolderSheet(false)
-    const query = folderId ? `?folderId=${folderId}` : ''
-    router.push(`/study/${selectedMode}${query}`)
+    const queryStr = folderId ? `?folderId=${folderId}` : ''
+    router.push(`/study/${selectedMode}${queryStr}`)
   }
 
   return (
@@ -328,13 +346,15 @@ export default function StudyPage() {
                     folders.map(folder => (
                       <button
                         key={folder.id}
-                        onClick={() => handleStart(folder.id)}
+                        onClick={() => (folder.word_count || 0) > 0 ? handleStart(folder.id) : undefined}
                         style={{
                           width: '100%', background: 'var(--color-surface)',
                           borderRadius: '16px', padding: '14px 16px',
                           border: '1px solid var(--color-border)',
                           display: 'flex', alignItems: 'center', gap: '12px',
-                          cursor: 'pointer', textAlign: 'left',
+                          cursor: (folder.word_count || 0) === 0 ? 'not-allowed' : 'pointer',
+                          textAlign: 'left',
+                          opacity: (folder.word_count || 0) === 0 ? 0.4 : 1,
                         }}
                       >
                         <div style={{ width: '42px', height: '42px', borderRadius: '13px', background: folder.color ? `${folder.color}60` : 'rgba(28,28,30,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>
@@ -342,7 +362,9 @@ export default function StudyPage() {
                         </div>
                         <div>
                           <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{folder.name}</div>
-                          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>{folder.word_count || 0}개 단어</div>
+                          <div style={{ fontSize: '12px', color: (folder.word_count || 0) === 0 ? '#E24B4A' : 'var(--color-text-secondary)', marginTop: '2px' }}>
+                            {(folder.word_count || 0) === 0 ? '단어 없음' : `${folder.word_count}개 단어`}
+                          </div>
                         </div>
                       </button>
                     ))
@@ -383,18 +405,39 @@ export default function StudyPage() {
                   {loadingFolders ? (
                     <div style={{ textAlign: 'center', padding: '20px', color: 'var(--color-text-secondary)', fontSize: '14px' }}>불러오는 중...</div>
                   ) : folders.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '20px', color: 'var(--color-text-secondary)', fontSize: '14px' }}>단어장이 없어요</div>
+                    <div style={{ textAlign: 'center', padding: '32px 0' }}>
+                      <div style={{ fontSize: '36px', marginBottom: '12px' }}>📚</div>
+                      <p style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>
+                        단어장이 없어요
+                      </p>
+                      <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>
+                        단어장을 먼저 만들어주세요
+                      </p>
+                      <button
+                        onClick={() => { setShowFolderSheet(false); router.push('/vocabulary') }}
+                        style={{
+                          padding: '10px 24px', background: 'var(--color-my)',
+                          color: 'var(--color-my-contrast)', border: 'none',
+                          borderRadius: '20px', fontSize: '14px',
+                          fontWeight: 600, cursor: 'pointer',
+                        }}
+                      >
+                        단어장 만들러 가기
+                      </button>
+                    </div>
                   ) : (
                     folders.map(folder => (
                       <button
                         key={folder.id}
-                        onClick={() => handleStart(folder.id)}
+                        onClick={() => (folder.word_count || 0) > 0 ? handleStart(folder.id) : undefined}
                         style={{
                           width: '100%', background: 'var(--color-surface)',
                           borderRadius: '16px', padding: '14px 16px',
                           border: '1px solid var(--color-border)',
                           display: 'flex', alignItems: 'center', gap: '12px',
-                          cursor: 'pointer', textAlign: 'left',
+                          cursor: (folder.word_count || 0) === 0 ? 'not-allowed' : 'pointer',
+                          textAlign: 'left',
+                          opacity: (folder.word_count || 0) === 0 ? 0.4 : 1,
                         }}
                       >
                         <div style={{ width: '42px', height: '42px', borderRadius: '13px', background: folder.color ? `${folder.color}60` : 'rgba(28,28,30,0.09)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>
@@ -402,7 +445,9 @@ export default function StudyPage() {
                         </div>
                         <div style={{ flex: 1 }}>
                           <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{folder.name}</div>
-                          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>{folder.word_count || 0}개 단어</div>
+                          <div style={{ fontSize: '12px', color: (folder.word_count || 0) === 0 ? '#E24B4A' : 'var(--color-text-secondary)', marginTop: '2px' }}>
+                            {(folder.word_count || 0) === 0 ? '단어 없음' : `${folder.word_count}개 단어`}
+                          </div>
                         </div>
                       </button>
                     ))

@@ -11,7 +11,7 @@ export default function CameraPage() {
   const router = useRouter()
   const params = useParams()
   const folderId = params.id as string
-  const padding = usePagePadding('40px')
+  const padding = usePagePadding('100px')
   const fileRef = useRef<HTMLInputElement>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [imageFile, setImageFile] = useState<File | null>(null)
@@ -29,6 +29,27 @@ export default function CameraPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
 
+  const compressImage = (file: File, maxWidth = 1024): Promise<string> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')!
+      const img = document.createElement('img')
+      img.onload = () => {
+        let { width, height } = img
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width
+          width = maxWidth
+        }
+        canvas.width = width
+        canvas.height = height
+        ctx.drawImage(img, 0, 0, width, height)
+        const compressed = canvas.toDataURL('image/jpeg', 0.8)
+        resolve(compressed.split(',')[1])
+      }
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -43,28 +64,23 @@ export default function CameraPage() {
     setIsAnalyzing(true)
     setError('')
     try {
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = () => {
-          const result = reader.result as string
-          resolve(result.split(',')[1])
-        }
-        reader.onerror = reject
-        reader.readAsDataURL(imageFile)
-      })
+      const base64 = await compressImage(imageFile)
 
-      const res = await fetch('/api/extract-words', {
+      const response = await fetch('/api/extract-words', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          image: base64,
-          mediaType: imageFile.type,
-        }),
+        body: JSON.stringify({ image: base64 }),
       })
 
-      if (!res.ok) throw new Error('분석 실패')
-      const data = await res.json()
-      setWords(data.words.map((w: any) => ({ ...w, selected: true })))
+      const data = await response.json()
+
+      if (!response.ok || data.error) {
+        alert('단어 추출에 실패했어요: ' + (data.error || '다시 시도해주세요'))
+        setIsAnalyzing(false)
+        return
+      }
+
+      setWords(data.words.map((w: { word: string; meaning: string; part_of_speech?: string; pronunciation?: string; example?: string }) => ({ ...w, selected: true })))
     } catch {
       setError('단어 추출에 실패했어요. 다시 시도해주세요.')
     } finally {
@@ -107,6 +123,7 @@ export default function CameraPage() {
         backgroundColor: 'var(--color-bg)',
         fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
         padding,
+        paddingBottom: '100px',
       }}
     >
       <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto' }}>

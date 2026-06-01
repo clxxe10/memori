@@ -25,6 +25,16 @@
 // create policy "댓글 조회" on folder_comments for select using (true);
 // create policy "댓글 작성" on folder_comments for insert with check (auth.uid() = user_id);
 // create policy "댓글 삭제" on folder_comments for delete using (auth.uid() = user_id);
+//
+// create policy "공개 단어장 단어 조회" on words
+//   for select using (
+//     EXISTS (
+//       SELECT 1 FROM folders
+//       WHERE folders.id = words.folder_id
+//       AND folders.is_public = true
+//     )
+//     OR auth.uid() = user_id
+//   );
 
 'use client'
 
@@ -41,6 +51,7 @@ type Folder = {
   color?: string
   category?: string
   user_id: string
+  author_nickname?: string
 }
 
 type Word = {
@@ -87,13 +98,18 @@ export default function PublicFolderPage() {
       }
 
       const { data: folderData } = await supabase
-        .from('folders').select('*').eq('id', folderId).single()
+        .from('folders')
+        .select('*')
+        .eq('id', folderId)
+        .eq('is_public', true)
+        .single()
       setFolder(folderData)
 
       const { data: wordData } = await supabase
-        .from('words').select('id, word, meaning, part_of_speech')
+        .from('words')
+        .select('id, word, meaning, part_of_speech')
         .eq('folder_id', folderId)
-        .limit(20)
+        .order('created_at', { ascending: true })
       setWords(wordData || [])
 
       const { count: likeCountData } = await supabase
@@ -232,6 +248,9 @@ export default function PublicFolderPage() {
               {folder?.icon || '📚'}
             </div>
             <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '3px' }}>
+                by @{folder?.author_nickname || '익명'}
+              </div>
               <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '3px' }}>{folder?.name}</div>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                 {folder?.category && (

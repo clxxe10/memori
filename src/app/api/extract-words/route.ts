@@ -1,25 +1,22 @@
-console.log('ANTHROPIC_API_KEY:', process.env.ANTHROPIC_API_KEY ? '있음' : '없음')
+export const maxDuration = 60
 
-import { NextRequest, NextResponse } from 'next/server'
-
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const { image, mediaType } = await req.json()
-    if (!image) return NextResponse.json({ error: 'image required' }, { status: 400 })
-
-    const apiKey = process.env.ANTHROPIC_API_KEY
-    if (!apiKey) return NextResponse.json({ error: 'API key not configured' }, { status: 500 })
+    const { image } = await request.json()
+    if (!image) {
+      return Response.json({ error: '이미지가 없어요' }, { status: 400 })
+    }
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey,
+        'x-api-key': process.env.ANTHROPIC_API_KEY!,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
         model: 'claude-opus-4-5',
-        max_tokens: 2000,
+        max_tokens: 2048,
         messages: [{
           role: 'user',
           content: [
@@ -27,45 +24,36 @@ export async function POST(req: NextRequest) {
               type: 'image',
               source: {
                 type: 'base64',
-                media_type: mediaType || 'image/jpeg',
+                media_type: 'image/jpeg',
                 data: image,
-              }
+              },
             },
             {
               type: 'text',
-              text: `이 이미지에서 외국어 단어들을 추출해줘.
-각 단어에 대해 아래 JSON 배열 형식으로만 응답해줘. 마크다운 없이 순수 JSON만.
-[
-  {
-    "word": "원문 단어",
-    "meaning": "한국어 뜻",
-    "part_of_speech": "품사 한국어로 (예: 명사, 동사, 형용사, 부사)",
-    "pronunciation": "IPA 발음기호 (예: /ˈdʒenərəl/)",
-    "example": "짧고 자연스러운 영어 예문 (10단어 이내)"
-  }
-]
-단어가 없으면 빈 배열 [] 반환.
-반드시 모든 필드를 채워줘. example과 part_of_speech는 절대 빈칸으로 두지 말 것.`
-            }
-          ]
-        }]
-      })
+              text: `이 이미지에서 영어 단어들을 추출해줘. 
+              각 단어에 대해 JSON 배열로 반환해줘.
+              형식: [{"word": "단어", "meaning": "한국어뜻", "part_of_speech": "품사", "pronunciation": "발음기호", "example": "예문"}]
+              JSON만 반환하고 다른 텍스트는 포함하지 마.`,
+            },
+          ],
+        }],
+      }),
     })
 
     if (!response.ok) {
-      const errText = await response.text()
-      console.error('Anthropic API error:', errText)
-      return NextResponse.json({ error: 'API call failed' }, { status: 500 })
+      const errorData = await response.text()
+      console.error('Anthropic API 오류:', response.status, errorData)
+      return Response.json({ error: 'AI API 오류: ' + response.status }, { status: 500 })
     }
 
     const data = await response.json()
-    const text = data.content?.[0]?.text || ''
-    const jsonMatch = text.match(/\[[\s\S]*\]/)
-    if (!jsonMatch) return NextResponse.json({ words: [] })
-    const words = JSON.parse(jsonMatch[0])
-    return NextResponse.json({ words })
-  } catch (e) {
-    console.error('extract-words error:', e)
-    return NextResponse.json({ error: 'extraction failed' }, { status: 500 })
+    const text = data.content[0].text
+    const clean = text.replace(/```json|```/g, '').trim()
+    const words = JSON.parse(clean)
+    return Response.json({ words })
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : '알 수 없는 오류'
+    console.error('extract-words 오류:', e)
+    return Response.json({ error: message }, { status: 500 })
   }
 }

@@ -98,9 +98,19 @@ export default function ProfileEditPage() {
     if (!nickname.trim()) return
     setSaving(true)
     const supabase = createClient()
+
     await supabase.auth.updateUser({
       data: { nickname: nickname.trim() }
     })
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      await supabase
+        .from('folders')
+        .update({ author_nickname: nickname.trim() })
+        .eq('user_id', user.id)
+    }
+
     setSaving(false)
     router.back()
   }
@@ -124,7 +134,7 @@ export default function ProfileEditPage() {
     <main style={{
       minHeight: '100vh',
       backgroundColor: 'var(--color-bg)',
-      paddingBottom: '40px',
+      paddingBottom: '100px',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
       <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding }}>
@@ -187,6 +197,13 @@ export default function ProfileEditPage() {
               placeholder="닉네임 입력..."
               style={inputStyle}
             />
+            <p style={{
+              fontSize: '12px',
+              color: 'var(--color-text-tertiary)',
+              marginTop: '6px',
+            }}>
+              닉네임은 공개 단어장에 표시돼요
+            </p>
           </div>
 
           <div>

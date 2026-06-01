@@ -87,37 +87,55 @@ export default function PDFPage() {
       const { default: jsPDF } = await import('jspdf')
       const { default: autoTable } = await import('jspdf-autotable')
 
-      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-
       const selectedWords = words.filter(w => w.selected)
       const folderName = selectedFolder?.name || '단어장'
-
-      doc.setFontSize(16)
-      doc.setFont('helvetica', 'bold')
-      doc.text(folderName, 105, 20, { align: 'center' })
-
       const half = Math.ceil(selectedWords.length / 2)
       const leftWords = selectedWords.slice(0, half)
       const rightWords = selectedWords.slice(half)
-      const labels = getColLabels()
+
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+
+      doc.setFontSize(14)
+      doc.setFont('helvetica', 'bold')
+      doc.text(folderName, 105, 16, { align: 'center' })
+
+      let leftHeader: string[]
+      let rightHeader: string[]
+      let getLeftData: (w: Word, i: number) => string[]
+      let getRightData: (w: Word, i: number) => string[]
+
+      if (examType === 'word-to-meaning') {
+        leftHeader = ['#', '단어', '뜻']
+        rightHeader = ['#', '단어', '뜻']
+        getLeftData = (w) => [w.word, '']
+        getRightData = (w) => [w.word, '']
+      } else if (examType === 'meaning-to-word') {
+        leftHeader = ['#', '뜻', '단어']
+        rightHeader = ['#', '뜻', '단어']
+        getLeftData = (w) => [w.meaning, '']
+        getRightData = (w) => [w.meaning, '']
+      } else {
+        leftHeader = ['#', '문제', '답']
+        rightHeader = ['#', '문제', '답']
+        getLeftData = (w, i) => [i % 2 === 0 ? w.word : w.meaning, '']
+        getRightData = (w, i) => [i % 2 === 0 ? w.word : w.meaning, '']
+      }
 
       autoTable(doc, {
-        startY: 28,
+        startY: 24,
         head: [[
-          { content: '', styles: { halign: 'center', cellWidth: 8 } },
-          { content: labels.left, styles: { halign: 'center', cellWidth: 45 } },
-          { content: labels.right, styles: { halign: 'center', cellWidth: 45 } },
-          { content: '', styles: { halign: 'center', cellWidth: 8 } },
-          { content: labels.left, styles: { halign: 'center', cellWidth: 45 } },
-          { content: labels.right, styles: { halign: 'center', cellWidth: 45 } },
+          { content: '', styles: { cellWidth: 8, halign: 'center' } },
+          { content: leftHeader[1], styles: { cellWidth: 47 } },
+          { content: leftHeader[2], styles: { cellWidth: 47 } },
+          { content: '', styles: { cellWidth: 8, halign: 'center' } },
+          { content: rightHeader[1], styles: { cellWidth: 47 } },
+          { content: rightHeader[2], styles: { cellWidth: 47 } },
         ]],
         body: leftWords.map((w, i) => [
           i + 1,
-          getPrompt(w, i),
-          '',
+          ...getLeftData(w, i),
           rightWords[i] ? i + half + 1 : '',
-          rightWords[i] ? getPrompt(rightWords[i], i + half) : '',
-          '',
+          ...(rightWords[i] ? getRightData(rightWords[i], i + half) : ['', '']),
         ]),
         styles: {
           fontSize: 9,
@@ -125,6 +143,7 @@ export default function PDFPage() {
           lineColor: [0, 0, 0],
           lineWidth: 0.3,
           textColor: [28, 28, 30],
+          font: 'helvetica',
         },
         headStyles: {
           fillColor: [255, 255, 255],
@@ -135,22 +154,22 @@ export default function PDFPage() {
         },
         columnStyles: {
           0: { cellWidth: 8, halign: 'center' },
-          1: { cellWidth: 45 },
-          2: { cellWidth: 45 },
+          1: { cellWidth: 47 },
+          2: { cellWidth: 47 },
           3: { cellWidth: 8, halign: 'center' },
-          4: { cellWidth: 45 },
-          5: { cellWidth: 45 },
+          4: { cellWidth: 47 },
+          5: { cellWidth: 47 },
         },
+        tableWidth: 204,
+        margin: { left: 4, right: 4 },
         alternateRowStyles: { fillColor: [255, 255, 255] },
-        tableWidth: 196,
-        margin: { left: 7, right: 7 },
       })
 
       const url = doc.output('bloburl') as unknown as string
       setPdfUrl(url)
       setStep('done')
     } catch (e) {
-      console.error(e)
+      console.error('PDF 생성 오류:', e)
       alert('PDF 생성에 실패했어요.')
     } finally {
       setGenerating(false)

@@ -21,7 +21,7 @@ export default function AddWordPage() {
     example: string
   } | null>(null)
   const [error, setError] = useState('')
-  const padding = usePagePadding('40px')
+  const padding = usePagePadding('100px')
 
   const handleGenerate = async () => {
     if (!word.trim()) return
@@ -51,7 +51,25 @@ export default function AddWordPage() {
       const {
         data: { user },
       } = await supabase.auth.getUser()
-      if (!user) return
+      if (!user) {
+        setIsSaving(false)
+        return
+      }
+
+      const { data: existing } = await supabase
+        .from('words')
+        .select('id')
+        .eq('folder_id', folderId)
+        .ilike('word', word.trim())
+        .maybeSingle()
+
+      if (existing) {
+        if (!confirm(`"${word.trim()}"이 이미 있어요. 그래도 추가할까요?`)) {
+          setIsSaving(false)
+          return
+        }
+      }
+
       const { error } = await supabase.from('words').insert({
         user_id: user.id,
         folder_id: folderId,
@@ -89,6 +107,7 @@ export default function AddWordPage() {
         backgroundColor: 'var(--color-bg)',
         fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
         padding,
+        paddingBottom: '100px',
       }}
     >
       <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto' }}>

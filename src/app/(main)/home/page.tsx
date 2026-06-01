@@ -187,6 +187,35 @@ export default function HomePage() {
           </p>
         </div>
 
+        {totalWords === 0 && (
+          <div
+            onClick={() => router.push('/vocabulary')}
+            style={{
+              background: 'var(--color-surface)',
+              borderRadius: '20px', padding: '20px',
+              border: '1.5px dashed var(--color-border)',
+              textAlign: 'center', cursor: 'pointer',
+              marginBottom: '12px',
+            }}
+          >
+            <div style={{ fontSize: '36px', marginBottom: '10px' }}>📚</div>
+            <p style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>
+              첫 단어장을 만들어볼까요?
+            </p>
+            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '14px', whiteSpace: 'pre-line' }}>
+              사진 한 장으로 단어를 추출하거나{'\n'}직접 입력해서 시작해보세요
+            </p>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              background: 'var(--color-my)', color: 'var(--color-my-contrast)',
+              padding: '10px 20px', borderRadius: '20px',
+              fontSize: '14px', fontWeight: 600,
+            }}>
+              단어장 만들기 →
+            </div>
+          </div>
+        )}
+
         {/* 통계 카드 2개 */}
         <div style={{ display: 'grid', gridTemplateColumns: isDesktop ? '1fr 1fr 1fr 1fr' : '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
           {[
