@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, ChevronRight, Check } from 'lucide-react'
+import { ArrowLeft, ChevronRight, Check, Download, Share2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 
@@ -33,6 +33,7 @@ export default function PDFPage() {
   const [words, setWords] = useState<Word[]>([])
   const [loading, setLoading] = useState(false)
   const [generating, setGenerating] = useState(false)
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const [examType, setExamType] = useState<ExamType>('word-to-meaning')
 
   useEffect(() => {
@@ -81,21 +82,33 @@ export default function PDFPage() {
     return { left: '단어', right: '뜻' }
   }
 
-  const escapeHtml = (text: string) =>
-    text
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-
   const generatePDF = async () => {
     setGenerating(true)
     try {
+      const { default: jsPDF } = await import('jspdf')
+      const { default: autoTable } = await import('jspdf-autotable')
+
       const selectedWords = words.filter(w => w.selected)
       const folderName = selectedFolder?.name || '단어장'
       const half = Math.ceil(selectedWords.length / 2)
       const leftWords = selectedWords.slice(0, half)
       const rightWords = selectedWords.slice(half)
+
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+
+      const fontUrl = 'https://fonts.gstatic.com/s/nanumgothic/v21/PN_3Rfy57FB_HLkEo-0V2x8.woff2'
+      const fontRes = await fetch(fontUrl)
+      const fontBuffer = await fontRes.arrayBuffer()
+      const fontBase64 = btoa(
+        new Uint8Array(fontBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
+      )
+      doc.addFileToVFS('NanumGothic.ttf', fontBase64)
+      doc.addFont('NanumGothic.ttf', 'NanumGothic', 'normal')
+      doc.setFont('NanumGothic')
+
+      doc.setFontSize(16)
+      doc.setFont('NanumGothic', 'normal')
+      doc.text(folderName, 105, 16, { align: 'center' })
 
       const getHeader = () => {
         if (examType === 'word-to-meaning') return ['단어', '뜻']
@@ -103,87 +116,70 @@ export default function PDFPage() {
         return ['문제', '답']
       }
 
-      const getCell = (word: Word, idx: number) => {
+      const getCells = (word: Word, idx: number): [string, string] => {
         if (examType === 'word-to-meaning') return [word.word, '']
         if (examType === 'meaning-to-word') return [word.meaning, '']
         return idx % 2 === 0 ? [word.word, ''] : [word.meaning, '']
       }
 
       const headers = getHeader()
-      const rows = leftWords.map((w, i) => {
-        const left = getCell(w, i)
-        const right = rightWords[i] ? getCell(rightWords[i], i + half) : ['', '']
-        return { num1: i + 1, left, num2: rightWords[i] ? i + half + 1 : '', right }
+      const tableBody = leftWords.map((w, i) => {
+        const [lc1, lc2] = getCells(w, i)
+        const rw = rightWords[i]
+        const [rc1, rc2] = rw ? getCells(rw, i + half) : ['', '']
+        return [
+          i + 1, lc1, lc2,
+          rw ? i + half + 1 : '', rc1, rc2,
+        ]
       })
 
-      const printWindow = window.open('', '_blank')
-      if (!printWindow) {
-        alert('팝업이 차단됐어요. 브라우저에서 팝업을 허용해주세요.')
-        return
-      }
+      autoTable(doc, {
+        startY: 24,
+        head: [[
+          { content: 'No.', styles: { halign: 'center', cellWidth: 8 } },
+          { content: headers[0], styles: { cellWidth: 47 } },
+          { content: headers[1], styles: { cellWidth: 47 } },
+          { content: 'No.', styles: { halign: 'center', cellWidth: 8 } },
+          { content: headers[0], styles: { cellWidth: 47 } },
+          { content: headers[1], styles: { cellWidth: 47 } },
+        ]],
+        body: tableBody,
+        styles: {
+          font: 'NanumGothic',
+          fontSize: 9,
+          cellPadding: 3,
+          lineColor: [0, 0, 0],
+          lineWidth: 0.3,
+          textColor: [28, 28, 30],
+          overflow: 'linebreak',
+        },
+        headStyles: {
+          font: 'NanumGothic',
+          fillColor: [255, 255, 255],
+          textColor: [28, 28, 30],
+          fontStyle: 'normal',
+          fontSize: 9,
+          lineWidth: 0.3,
+        },
+        columnStyles: {
+          0: { cellWidth: 8, halign: 'center' },
+          1: { cellWidth: 47 },
+          2: { cellWidth: 47 },
+          3: { cellWidth: 8, halign: 'center' },
+          4: { cellWidth: 47 },
+          5: { cellWidth: 47 },
+        },
+        tableWidth: 204,
+        margin: { left: 4, right: 4 },
+        alternateRowStyles: { fillColor: [255, 255, 255] },
+      })
 
-      printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>${escapeHtml(folderName)} 시험지</title>
-        <style>
-          * { box-sizing: border-box; margin: 0; padding: 0; }
-          body { font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; padding: 20px; }
-          h2 { text-align: center; font-size: 18px; margin-bottom: 20px; font-weight: 700; }
-          table { width: 100%; border-collapse: collapse; font-size: 11px; }
-          th, td { border: 1px solid #333; padding: 5px 8px; }
-          th { background: #f5f5f5; font-weight: 700; text-align: center; }
-          td:first-child, td:nth-child(4) { text-align: center; width: 24px; color: #666; }
-          td:nth-child(3), td:nth-child(6) { min-height: 24px; }
-          .left-section { width: 50%; }
-          @media print {
-            body { padding: 10px; }
-            @page { margin: 10mm; }
-          }
-        </style>
-      </head>
-      <body>
-        <h2>${escapeHtml(folderName)}</h2>
-        <table>
-          <thead>
-            <tr>
-              <th style="width:24px">No.</th>
-              <th>${escapeHtml(headers[0])}</th>
-              <th>${escapeHtml(headers[1])}</th>
-              <th style="width:24px">No.</th>
-              <th>${escapeHtml(headers[0])}</th>
-              <th>${escapeHtml(headers[1])}</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows.map(row => `
-              <tr>
-                <td>${row.num1}</td>
-                <td>${escapeHtml(row.left[0])}</td>
-                <td>${escapeHtml(row.left[1])}</td>
-                <td>${row.num2}</td>
-                <td>${escapeHtml(row.right[0])}</td>
-                <td>${escapeHtml(row.right[1])}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-        <script>
-          window.onload = function() {
-            window.print()
-          }
-        </script>
-      </body>
-      </html>
-    `)
-      printWindow.document.close()
-
+      const url = doc.output('bloburl') as unknown as string
+      setPdfUrl(url)
       setStep('done')
     } catch (e) {
-      console.error('프린트 오류:', e)
-      alert('시험지 생성에 실패했어요.')
+      console.error('PDF 생성 오류:', e)
+      alert('PDF 생성에 실패했어요. 다시 시도해주세요.')
     } finally {
       setGenerating(false)
     }
@@ -410,8 +406,18 @@ export default function PDFPage() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
               }}
             >
-              {generating ? '생성 중...' : '🖨️ 시험지 출력하기'}
+              {generating ? '생성 중...' : '📥 PDF 추출하기'}
             </button>
+            {generating && (
+              <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
+                  한글 폰트를 불러오는 중이에요...
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>
+                  잠시만 기다려주세요 (5~10초)
+                </div>
+              </div>
+            )}
           </>
         )}
 
@@ -425,10 +431,37 @@ export default function PDFPage() {
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
               <button
-                onClick={() => generatePDF()}
-                style={{ width: '100%', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}
+                onClick={() => {
+                  const a = document.createElement('a')
+                  a.href = pdfUrl!
+                  a.download = `${selectedFolder?.name || '단어장'}_시험지.pdf`
+                  a.click()
+                }}
+                style={{ width: '100%', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
               >
-                다시 인쇄하기
+                <Download size={18} /> 저장하기
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    const res = await fetch(pdfUrl!)
+                    const blob = await res.blob()
+                    const file = new File([blob], `${selectedFolder?.name || '단어장'}_시험지.pdf`, { type: 'application/pdf' })
+                    if (navigator.share && navigator.canShare({ files: [file] })) {
+                      await navigator.share({ files: [file], title: '단어 시험지' })
+                    } else {
+                      const a = document.createElement('a')
+                      a.href = pdfUrl!
+                      a.download = `${selectedFolder?.name || '단어장'}_시험지.pdf`
+                      a.click()
+                    }
+                  } catch (e) {
+                    console.error(e)
+                  }
+                }}
+                style={{ width: '100%', height: '52px', background: 'var(--color-surface)', color: 'var(--color-text-primary)', border: '1.5px solid var(--color-border)', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              >
+                <Share2 size={18} /> 공유하기
               </button>
               <button
                 onClick={() => router.back()}

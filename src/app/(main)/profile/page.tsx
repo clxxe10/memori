@@ -107,10 +107,11 @@ export default function ProfilePage() {
     cursor: 'pointer',
   }
 
-  const menuIconStyle = (bg: string) => ({
-    width: '32px', height: '32px', borderRadius: '9px',
-    background: bg, display: 'flex', alignItems: 'center',
-    justifyContent: 'center', flexShrink: 0, fontSize: '16px',
+  const menuIconStyle = () => ({
+    width: '32px', height: '32px',
+    display: 'flex', alignItems: 'center',
+    justifyContent: 'center', flexShrink: 0,
+    fontSize: '20px',
   })
 
   return (
@@ -182,14 +183,14 @@ export default function ProfilePage() {
         <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', letterSpacing: '0.3px' }}>계정 설정</p>
         <div style={menuSectionStyle}>
           <div style={{ ...menuItemStyle }} onClick={() => setShowPasswordSheet(true)}>
-            <div style={menuIconStyle('rgba(28,28,30,0.07)')}>🔒</div>
+            <div style={menuIconStyle()}>🔒</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>비밀번호 변경</div>
             </div>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
           <div style={{ ...menuItemStyle, borderBottom: 'none', cursor: 'default' }}>
-            <div style={menuIconStyle('rgba(28,28,30,0.07)')}>📧</div>
+            <div style={menuIconStyle()}>📧</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>이메일</div>
               <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
@@ -203,7 +204,7 @@ export default function ProfilePage() {
         <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', letterSpacing: '0.3px' }}>설정</p>
         <div style={menuSectionStyle}>
           <div style={{ ...menuItemStyle, borderBottom: 'none' }} onClick={() => setShowThemeSheet(true)}>
-            <div style={menuIconStyle('var(--color-surface-2)')}>🎨</div>
+            <div style={menuIconStyle()}>🎨</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>테마 및 색상</div>
               <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>{theme} · 마이컬러</div>
@@ -216,7 +217,7 @@ export default function ProfilePage() {
         <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', letterSpacing: '0.3px' }}>학습 설정</p>
         <div style={menuSectionStyle}>
           <div style={{ ...menuItemStyle }} onClick={() => setShowGoalSheet(true)}>
-            <div style={menuIconStyle('rgba(52,199,89,0.12)')}>🎯</div>
+            <div style={menuIconStyle()}>🎯</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>하루 학습 목표</div>
             </div>
@@ -224,7 +225,7 @@ export default function ProfilePage() {
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
           <div style={{ ...menuItemStyle }} onClick={() => setShowNotificationSheet(true)}>
-            <div style={menuIconStyle('rgba(255,149,0,0.12)')}>🔔</div>
+            <div style={menuIconStyle()}>🔔</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>학습 알림</div>
               <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
@@ -234,7 +235,7 @@ export default function ProfilePage() {
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
           <div style={{ ...menuItemStyle, borderBottom: 'none' }}>
-            <div style={menuIconStyle('rgba(0,199,190,0.12)')}>🔊</div>
+            <div style={menuIconStyle()}>🔊</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>발음 소리</div>
               <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>단어 학습 시 TTS 재생</div>
@@ -267,7 +268,7 @@ export default function ProfilePage() {
         <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', letterSpacing: '0.3px' }}>내 공개 단어장</p>
         <div style={menuSectionStyle}>
           <div style={{ ...menuItemStyle, borderBottom: 'none' }} onClick={() => router.push('/search?my=true')}>
-            <div style={menuIconStyle('rgba(37,99,235,0.12)')}>📚</div>
+            <div style={menuIconStyle()}>📚</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>공개한 단어장</div>
               <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>다른 사용자와 공유 중인 단어장</div>
@@ -280,21 +281,21 @@ export default function ProfilePage() {
         <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', letterSpacing: '0.3px' }}>지원</p>
         <div style={menuSectionStyle}>
           <div style={{ ...menuItemStyle }} onClick={() => router.push('/profile/support')}>
-            <div style={menuIconStyle('rgba(175,82,222,0.12)')}>💬</div>
+            <div style={menuIconStyle()}>💬</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>문의하기</div>
             </div>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
           <div style={{ ...menuItemStyle }} onClick={() => window.open('https://apps.apple.com', '_blank')}>
-            <div style={menuIconStyle('rgba(255,149,0,0.12)')}>⭐</div>
+            <div style={menuIconStyle()}>⭐</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>앱 평가하기</div>
             </div>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
           <div style={{ ...menuItemStyle, borderBottom: 'none' }} onClick={() => router.push('/profile/notices')}>
-            <div style={menuIconStyle('rgba(28,28,30,0.07)')}>📢</div>
+            <div style={menuIconStyle()}>📢</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>공지사항</div>
             </div>
@@ -306,7 +307,7 @@ export default function ProfilePage() {
         <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', letterSpacing: '0.3px' }}>계정</p>
         <div style={menuSectionStyle}>
           <div style={{ ...menuItemStyle, borderBottom: 'none' }} onClick={() => setShowDeleteSheet(true)}>
-            <div style={menuIconStyle('rgba(226,75,74,0.10)')}>🗑️</div>
+            <div style={menuIconStyle()}>🗑️</div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '15px', fontWeight: 500, color: '#E24B4A' }}>계정 탈퇴</div>
             </div>

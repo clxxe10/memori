@@ -241,7 +241,6 @@ export default function StudyPage() {
                 height: '46px',
                 minWidth: '46px',
                 borderRadius: '14px',
-                background: mode.color,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

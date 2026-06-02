@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Camera, Image, Loader2 } from 'lucide-react'
 
@@ -28,6 +28,54 @@ export default function CameraPage() {
   >([])
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
+  const [elapsed, setElapsed] = useState(0)
+  const [loadingMsg, setLoadingMsg] = useState('')
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+
+  const LOADING_MESSAGES = [
+    '사진을 분석하고 있어요...',
+    '단어를 찾고 있어요...',
+    '뜻을 정리하고 있어요...',
+    '발음기호를 확인하고 있어요...',
+    '예문을 만들고 있어요...',
+    '거의 다 됐어요!',
+  ]
+
+  useEffect(() => {
+    const style = document.createElement('style')
+    style.textContent = `
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+    `
+    document.head.appendChild(style)
+    return () => document.head.removeChild(style)
+  }, [])
+
+  const stopTimer = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current)
+      timerRef.current = null
+    }
+  }
+
+  const startTimer = () => {
+    stopTimer()
+    setElapsed(0)
+    setLoadingMsg(LOADING_MESSAGES[0])
+    let count = 0
+    timerRef.current = setInterval(() => {
+      count++
+      setElapsed(count)
+      const msgIdx = Math.min(Math.floor(count / 3), LOADING_MESSAGES.length - 1)
+      setLoadingMsg(LOADING_MESSAGES[msgIdx])
+    }, 1000)
+  }
+
+  useEffect(() => {
+    return () => stopTimer()
+  }, [])
 
   const compressImage = (file: File, maxWidth = 1024): Promise<string> => {
     return new Promise((resolve) => {
@@ -62,6 +110,7 @@ export default function CameraPage() {
   const handleAnalyze = async () => {
     if (!imageFile) return
     setIsAnalyzing(true)
+    startTimer()
     setError('')
     try {
       const base64 = await compressImage(imageFile)
@@ -76,7 +125,6 @@ export default function CameraPage() {
 
       if (!response.ok || data.error) {
         alert('단어 추출에 실패했어요: ' + (data.error || '다시 시도해주세요'))
-        setIsAnalyzing(false)
         return
       }
 
@@ -84,6 +132,7 @@ export default function CameraPage() {
     } catch {
       setError('단어 추출에 실패했어요. 다시 시도해주세요.')
     } finally {
+      stopTimer()
       setIsAnalyzing(false)
     }
   }
@@ -358,6 +407,64 @@ export default function CameraPage() {
           </div>
         )}
       </div>
+      {isAnalyzing && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.85)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 100,
+            gap: '20px',
+            fontFamily: '-apple-system, sans-serif',
+          }}
+        >
+          <div
+            style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              border: '3px solid rgba(255,255,255,0.1)',
+              borderTop: '3px solid #FFFFFF',
+              animation: 'spin 1s linear infinite',
+            }}
+          />
+
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: '16px', fontWeight: 700, color: '#FFFFFF', marginBottom: '8px' }}>
+              {loadingMsg}
+            </p>
+            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>{elapsed}초 경과</p>
+          </div>
+
+          <div
+            style={{
+              width: '200px',
+              height: '4px',
+              background: 'rgba(255,255,255,0.1)',
+              borderRadius: '4px',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                height: '100%',
+                borderRadius: '4px',
+                background: 'var(--color-my)',
+                width: `${Math.min((elapsed / 20) * 100, 95)}%`,
+                transition: 'width 1s ease',
+              }}
+            />
+          </div>
+
+          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', textAlign: 'center', maxWidth: '240px' }}>
+            AI가 사진에서 단어를 추출하고 있어요
+          </p>
+        </div>
+      )}
     </main>
   )
 }

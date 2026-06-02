@@ -15,6 +15,8 @@ export default function HomePage() {
   const [studyTimeToday, setStudyTimeToday] = useState(0)
   const [streakDays, setStreakDays] = useState(0)
   const [folders, setFolders] = useState<Array<{ id: string; name: string; icon: string; color?: string; word_count: number }>>([])
+  const [showSpeedSheet, setShowSpeedSheet] = useState(false)
+  const [speedFolders, setSpeedFolders] = useState<Array<{ id: string; name: string; icon: string; color?: string; word_count: number }>>([])
   const [calendarMonth, setCalendarMonth] = useState(new Date())
   const [monthlyData, setMonthlyData] = useState<Record<string, number>>({})
   const [todayWord, setTodayWord] = useState<any>(null)
@@ -425,7 +427,23 @@ export default function HomePage() {
         })()}
 
         <div
-          onClick={() => router.push('/study/speed')}
+          onClick={async () => {
+            const supabase = createClient()
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) return
+            const { data } = await supabase
+              .from('folders').select('*').eq('user_id', user.id)
+              .order('created_at', { ascending: false })
+            if (data) {
+              const withCount = await Promise.all(data.map(async f => {
+                const { count } = await supabase.from('words')
+                  .select('*', { count: 'exact', head: true }).eq('folder_id', f.id)
+                return { ...f, word_count: count || 0 }
+              }))
+              setSpeedFolders(withCount)
+            }
+            setShowSpeedSheet(true)
+          }}
           style={{
             background: 'var(--color-surface)',
             borderRadius: '16px', padding: '14px 16px',
@@ -444,6 +462,28 @@ export default function HomePage() {
               <span style={{ fontSize: '10px', fontWeight: 600, color: '#B45309', background: 'rgba(251,191,36,0.12)', borderRadius: '6px', padding: '1px 6px' }}>NEW</span>
             </div>
             <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>단어가 내려오기 전에 맞혀보세요!</p>
+          </div>
+          <ChevronRight size={16} color="var(--color-text-tertiary)" />
+        </div>
+        <div
+          onClick={() => router.push('/study/pdf')}
+          style={{
+            background: 'var(--color-surface)',
+            borderRadius: '16px', padding: '14px 16px',
+            border: '1px solid var(--color-border)',
+            display: 'flex', alignItems: 'center', gap: '14px',
+            cursor: 'pointer', marginBottom: '12px',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+          }}
+        >
+          <div style={{ width: '46px', height: '46px', borderRadius: '14px', background: 'rgba(28,28,30,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', flexShrink: 0 }}>
+            📄
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
+              <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>PDF 시험지</span>
+            </div>
+            <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>단어장을 PDF로 만들어 굿노트에서 공부해요</p>
           </div>
           <ChevronRight size={16} color="var(--color-text-tertiary)" />
         </div>
@@ -466,6 +506,48 @@ export default function HomePage() {
         )}
 
       </div>
+      {showSpeedSheet && (
+        <>
+          <div onClick={() => setShowSpeedSheet(false)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 200 }} />
+          <div style={{
+            position: 'fixed', bottom: 0, left: 0, right: 0,
+            background: 'var(--color-surface)', borderRadius: '24px 24px 0 0',
+            padding: '12px 20px 100px', zIndex: 201, maxHeight: '75vh',
+            display: 'flex', flexDirection: 'column',
+          }}>
+            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 16px' }} />
+            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '6px' }}>단어장 선택</h3>
+            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>스피드 모드로 학습할 단어장을 선택하세요</p>
+            <div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <button onClick={() => { setShowSpeedSheet(false); router.push('/study/speed') }}
+                style={{ width: '100%', background: 'rgba(28,28,30,0.06)', borderRadius: '16px', padding: '14px 16px', border: '1.5px solid rgba(28,28,30,0.12)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textAlign: 'left' as const }}>
+                <div style={{ width: '42px', height: '42px', borderRadius: '13px', background: 'rgba(28,28,30,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>📚</div>
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>전체 단어장</div>
+                  <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>모든 단어로 플레이</div>
+                </div>
+              </button>
+              {speedFolders.map(f => (
+                <button key={f.id}
+                  onClick={() => { setShowSpeedSheet(false); router.push(`/study/speed?folderId=${f.id}`) }}
+                  disabled={f.word_count === 0}
+                  style={{ width: '100%', background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '12px', cursor: f.word_count === 0 ? 'not-allowed' : 'pointer', textAlign: 'left' as const, opacity: f.word_count === 0 ? 0.4 : 1 }}>
+                  <div style={{ width: '42px', height: '42px', borderRadius: '13px', background: f.color ? `${f.color}60` : 'rgba(28,28,30,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>
+                    {f.icon || '📚'}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{f.name}</div>
+                    <div style={{ fontSize: '12px', color: f.word_count === 0 ? '#E24B4A' : 'var(--color-text-secondary)' }}>
+                      {f.word_count === 0 ? '단어 없음' : `${f.word_count}개 단어`}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </main>
   )
 }

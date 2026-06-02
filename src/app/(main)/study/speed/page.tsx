@@ -48,6 +48,8 @@ function SpeedContent() {
   const [flashWord, setFlashWord] = useState<string | null>(null)
   const [countdown, setCountdown] = useState<number | null>(null)
   const [particles, setParticles] = useState<Array<{ id: string; x: number; y: number; color: string; dx: string; dy: string }>>([])
+  const [missedWords, setMissedWords] = useState<Array<{ word: string; meaning: string }>>([])
+  const [bestScore, setBestScore] = useState<number>(0)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const countdownTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -63,6 +65,8 @@ function SpeedContent() {
   const stageRef = useRef(1)
   const correctRef = useRef(0)
   const missedRef = useRef(0)
+  const missedWordsRef = useRef<Array<{ word: string; meaning: string }>>([])
+  const bestScoreRef = useRef(0)
 
   useEffect(() => {
     const fetchWords = async () => {
@@ -81,6 +85,15 @@ function SpeedContent() {
     }
     fetchWords()
   }, [folderId])
+
+  useEffect(() => {
+    const saved = localStorage.getItem('speed_best_score')
+    if (saved) {
+      const parsed = Number(saved)
+      setBestScore(parsed)
+      bestScoreRef.current = parsed
+    }
+  }, [])
 
   useEffect(() => {
     const style = document.createElement('style')
@@ -138,12 +151,21 @@ function SpeedContent() {
     }
   }
 
+  const handleGameOver = () => {
+    if (scoreRef.current > bestScoreRef.current) {
+      setBestScore(scoreRef.current)
+      bestScoreRef.current = scoreRef.current
+      localStorage.setItem('speed_best_score', String(scoreRef.current))
+    }
+    setGameOver(true)
+  }
+
   const spawnWord = () => {
     if (wordQueueRef.current.length === 0) return
     const word = wordQueueRef.current[0]
     wordQueueRef.current = wordQueueRef.current.slice(1)
 
-    const x = 10 + Math.random() * 60
+    const x = 15 + Math.random() * 60
     const baseSpeed = 9 + (stageRef.current - 1) * 3
     const comboBonus = Math.floor(comboRef.current / 3) * 0.8
     const speed = baseSpeed + comboBonus + Math.random() * 2
@@ -191,7 +213,12 @@ function SpeedContent() {
     })
 
     if (livesLost > 0) {
-      vibrate([100, 50, 100])
+      vibrate([80, 30, 80])
+      const missedList = fallingWordsRef.current.filter(fw => fw.y > 95 && fw.status === 'falling')
+      missedList.forEach(fw => {
+        missedWordsRef.current = [...missedWordsRef.current, { word: fw.word, meaning: fw.meaning }]
+      })
+      setMissedWords([...missedWordsRef.current])
       const newLives = Math.max(0, livesRef.current - livesLost)
       livesRef.current = newLives
       setLives(newLives)
@@ -200,7 +227,7 @@ function SpeedContent() {
       missedRef.current += livesLost
       setMissed(missedRef.current)
       if (newLives <= 0) {
-        setGameOver(true)
+        handleGameOver()
         fallingWordsRef.current = []
         setFallingWords([])
         return
@@ -225,11 +252,11 @@ function SpeedContent() {
     if (newStage !== stageRef.current) {
       stageRef.current = newStage
       setStage(newStage)
-      vibrate(200)
+      vibrate([50, 30, 50, 30, 100])
     }
 
     if (wordQueueRef.current.length === 0 && fallingWordsRef.current.length === 0) {
-      setGameOver(true)
+      handleGameOver()
       return
     }
 
@@ -277,27 +304,31 @@ function SpeedContent() {
     const trimmed = val.trim().toLowerCase()
     if (!trimmed) return
 
+    const normalize = (str: string) =>
+      str.toLowerCase()
+        .replace(/[~\-·]/g, '')
+        .replace(/\s+/g, '')
+        .trim()
+
+    const normalizedInput = normalize(trimmed)
+
     const matched = fallingWordsRef.current.find(fw => {
       if (fw.status !== 'falling') return false
 
       if (mode === 'word-to-meaning') {
         const meanings = fw.meaning
-          .toLowerCase()
           .split(/[,，、\/]/)
-          .map(m => m.trim())
+          .map(m => normalize(m))
           .filter(m => m.length > 0)
 
-        return meanings.some(m =>
-          m === trimmed ||
-          m.replace(/\s/g, '') === trimmed.replace(/\s/g, '')
-        )
+        return meanings.some(m => m === normalizedInput)
+      } else {
+        return normalize(fw.word) === normalizedInput
       }
-
-      return fw.word.toLowerCase().trim() === trimmed
     })
 
     if (matched) {
-      vibrate(50)
+      vibrate(30)
       setFlashWord(matched.id)
       setTimeout(() => setFlashWord(null), 400)
 
@@ -360,6 +391,8 @@ function SpeedContent() {
     setFallingWords([])
     setInput('')
     setGameOver(false)
+    missedWordsRef.current = []
+    setMissedWords([])
     setTimeout(() => {
       spawnWord()
       animFrameRef.current = requestAnimationFrame(gameLoop)
@@ -464,6 +497,17 @@ function SpeedContent() {
           <div style={{ fontSize: '42px', fontWeight: 900, color: 'var(--color-my)', letterSpacing: '-1px', marginBottom: '4px' }}>{score.toLocaleString()}</div>
           <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600, letterSpacing: '1px' }}>TOTAL SCORE</div>
         </div>
+        {score >= bestScore && score > 0 && (
+          <div style={{ background: 'rgba(255,184,0,0.10)', border: '1px solid rgba(255,184,0,0.25)', borderRadius: '12px', padding: '8px 16px', marginBottom: '12px', textAlign: 'center' }}>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: '#FFB800' }}>🏆 새로운 최고기록!</span>
+          </div>
+        )}
+
+        {score < bestScore && (
+          <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '12px', textAlign: 'center' }}>
+            최고기록: {bestScore.toLocaleString()}점
+          </div>
+        )}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '20px' }}>
           {[
             { val: correct, lbl: '맞힘', color: '#34C759' },
@@ -476,6 +520,21 @@ function SpeedContent() {
             </div>
           ))}
         </div>
+        {missedWords.length > 0 && (
+          <div style={{ width: '100%', marginBottom: '16px' }}>
+            <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px', textAlign: 'left' }}>
+              놓친 단어 ({missedWords.length}개)
+            </p>
+            <div style={{ maxHeight: '160px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              {missedWords.map((w, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--color-surface)', borderRadius: '10px', padding: '8px 12px', border: '1px solid var(--color-border)' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{w.word}</span>
+                  <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>{w.meaning}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <button onClick={handleRestart}
             style={{ width: '100%', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 800, cursor: 'pointer' }}>
@@ -569,7 +628,9 @@ function SpeedContent() {
               position: 'absolute',
               left: `${fw.x}%`,
               top: `${fw.y}%`,
-              ...(fw.status === 'falling' && fw.id !== flashWord ? { transform: 'translateX(-50%)' } : {}),
+              transform: 'translateX(-50%)',
+              maxWidth: '120px',
+              minWidth: '80px',
               background: fw.status === 'correct'
                 ? 'rgba(52,199,89,0.12)'
                 : fw.status === 'missed'
