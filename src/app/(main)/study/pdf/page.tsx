@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, ChevronRight, Check, Download, Share2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { canUsePdfExtract, incrementPdfCount } from '@/lib/premium'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 
 type Folder = {
@@ -35,6 +36,7 @@ export default function PDFPage() {
   const [generating, setGenerating] = useState(false)
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const [examType, setExamType] = useState<ExamType>('word-to-meaning')
+  const [showPdfGate, setShowPdfGate] = useState(false)
 
   useEffect(() => {
     const fetchFolders = async () => {
@@ -80,6 +82,16 @@ export default function PDFPage() {
   const getColLabels = () => {
     if (examType === 'meaning-to-word') return { left: '뜻', right: '단어' }
     return { left: '단어', right: '뜻' }
+  }
+
+  const handleGenerateClick = async () => {
+    const { canUse, needAd } = await canUsePdfExtract()
+    if (canUse) {
+      incrementPdfCount()
+      generatePDF()
+    } else if (needAd) {
+      setShowPdfGate(true)
+    }
   }
 
   const generatePDF = async () => {
@@ -400,7 +412,7 @@ export default function PDFPage() {
               </p>
             </div>
             <button
-              onClick={generatePDF}
+              onClick={handleGenerateClick}
               disabled={generating}
               style={{
                 width: '100%', height: '52px',
@@ -479,6 +491,89 @@ export default function PDFPage() {
         )}
 
       </div>
+
+      {showPdfGate && (
+        <>
+          <div
+            onClick={() => setShowPdfGate(false)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200 }}
+          />
+          <div
+            style={{
+              position: 'fixed',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              background: 'var(--color-surface)',
+              borderRadius: '24px 24px 0 0',
+              padding: '24px 20px 80px',
+              zIndex: 201,
+              textAlign: 'center',
+            }}
+          >
+            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 20px' }} />
+            <div style={{ fontSize: '44px', marginBottom: '12px' }}>📄</div>
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>
+              PDF 추출은 첫 1회 무료예요
+            </h3>
+            <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px', lineHeight: 1.6 }}>
+              광고를 시청하거나 프리미엄으로<br />무제한 사용해보세요
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <button
+                onClick={() => {
+                  alert('광고 시청 완료! (AdMob 연동 후 실제 광고 표시)')
+                  incrementPdfCount()
+                  setShowPdfGate(false)
+                  generatePDF()
+                }}
+                style={{
+                  width: '100%',
+                  height: '52px',
+                  background: 'var(--color-my)',
+                  color: 'var(--color-my-contrast)',
+                  border: 'none',
+                  borderRadius: '14px',
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                }}
+              >
+                📺 광고 보고 사용하기
+              </button>
+              <button
+                onClick={() => {
+                  setShowPdfGate(false)
+                  alert('프리미엄 구독 (RevenueCat 연동 후 구현)')
+                }}
+                style={{
+                  width: '100%',
+                  height: '52px',
+                  background: 'var(--color-surface-2)',
+                  color: 'var(--color-text-primary)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: '14px',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                👑 프리미엄 구독하기 (월 4,900원)
+              </button>
+              <button
+                onClick={() => setShowPdfGate(false)}
+                style={{ background: 'none', border: 'none', fontSize: '14px', color: 'var(--color-text-secondary)', cursor: 'pointer', padding: '8px' }}
+              >
+                취소
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </main>
   )
 }

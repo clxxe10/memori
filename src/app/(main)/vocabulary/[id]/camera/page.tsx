@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Camera, Image, Loader2 } from 'lucide-react'
 
 import { createClient } from '@/lib/supabase/client'
+import { canUsePhotoExtract, incrementExtractCount } from '@/lib/premium'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 
 export default function CameraPage() {
@@ -30,6 +31,7 @@ export default function CameraPage() {
   const [error, setError] = useState('')
   const [elapsed, setElapsed] = useState(0)
   const [loadingMsg, setLoadingMsg] = useState('')
+  const [showPhotoGate, setShowPhotoGate] = useState(false)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   const LOADING_MESSAGES = [
@@ -105,6 +107,16 @@ export default function CameraPage() {
     setPreview(URL.createObjectURL(file))
     setWords([])
     setError('')
+  }
+
+  const handleAnalyzeClick = async () => {
+    const { canUse, needAd } = await canUsePhotoExtract()
+    if (canUse) {
+      incrementExtractCount()
+      handleAnalyze()
+    } else if (needAd) {
+      setShowPhotoGate(true)
+    }
   }
 
   const handleAnalyze = async () => {
@@ -307,7 +319,7 @@ export default function CameraPage() {
 
             {words.length === 0 && (
               <button
-                onClick={handleAnalyze}
+                onClick={handleAnalyzeClick}
                 disabled={isAnalyzing}
                 style={{
                   width: '100%',
@@ -407,6 +419,88 @@ export default function CameraPage() {
           </div>
         )}
       </div>
+      {showPhotoGate && (
+        <>
+          <div
+            onClick={() => setShowPhotoGate(false)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200 }}
+          />
+          <div
+            style={{
+              position: 'fixed',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              background: 'var(--color-surface)',
+              borderRadius: '24px 24px 0 0',
+              padding: '24px 20px 80px',
+              zIndex: 201,
+              textAlign: 'center',
+            }}
+          >
+            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 20px' }} />
+            <div style={{ fontSize: '44px', marginBottom: '12px' }}>📸</div>
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>
+              오늘 무료 사용을 다 썼어요
+            </h3>
+            <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px', lineHeight: 1.6 }}>
+              광고를 시청하거나 프리미엄으로<br />무제한 사용해보세요
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <button
+                onClick={() => {
+                  alert('광고 시청 완료! (AdMob 연동 후 실제 광고 표시)')
+                  incrementExtractCount()
+                  setShowPhotoGate(false)
+                  handleAnalyze()
+                }}
+                style={{
+                  width: '100%',
+                  height: '52px',
+                  background: 'var(--color-my)',
+                  color: 'var(--color-my-contrast)',
+                  border: 'none',
+                  borderRadius: '14px',
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                }}
+              >
+                📺 광고 보고 사용하기
+              </button>
+              <button
+                onClick={() => {
+                  setShowPhotoGate(false)
+                  alert('프리미엄 구독 (RevenueCat 연동 후 구현)')
+                }}
+                style={{
+                  width: '100%',
+                  height: '52px',
+                  background: 'var(--color-surface-2)',
+                  color: 'var(--color-text-primary)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: '14px',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                👑 프리미엄 구독하기 (월 4,900원)
+              </button>
+              <button
+                onClick={() => setShowPhotoGate(false)}
+                style={{ background: 'none', border: 'none', fontSize: '14px', color: 'var(--color-text-secondary)', cursor: 'pointer', padding: '8px' }}
+              >
+                취소
+              </button>
+            </div>
+          </div>
+        </>
+      )}
       {isAnalyzing && (
         <div
           style={{
