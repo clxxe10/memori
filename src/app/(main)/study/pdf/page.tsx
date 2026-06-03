@@ -85,101 +85,106 @@ export default function PDFPage() {
   const generatePDF = async () => {
     setGenerating(true)
     try {
-      const { default: jsPDF } = await import('jspdf')
-      const { default: autoTable } = await import('jspdf-autotable')
-
       const selectedWords = words.filter(w => w.selected)
       const folderName = selectedFolder?.name || '단어장'
       const half = Math.ceil(selectedWords.length / 2)
       const leftWords = selectedWords.slice(0, half)
       const rightWords = selectedWords.slice(half)
 
-      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-
-      const fontUrl = 'https://fonts.gstatic.com/s/nanumgothic/v21/PN_3Rfy57FB_HLkEo-0V2x8.woff2'
-      const fontRes = await fetch(fontUrl)
-      const fontBuffer = await fontRes.arrayBuffer()
-      const fontBase64 = btoa(
-        new Uint8Array(fontBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
-      )
-      doc.addFileToVFS('NanumGothic.ttf', fontBase64)
-      doc.addFont('NanumGothic.ttf', 'NanumGothic', 'normal')
-      doc.setFont('NanumGothic')
-
-      doc.setFontSize(16)
-      doc.setFont('NanumGothic', 'normal')
-      doc.text(folderName, 105, 16, { align: 'center' })
-
       const getHeader = () => {
         if (examType === 'word-to-meaning') return ['단어', '뜻']
         if (examType === 'meaning-to-word') return ['뜻', '단어']
         return ['문제', '답']
       }
-
       const getCells = (word: Word, idx: number): [string, string] => {
         if (examType === 'word-to-meaning') return [word.word, '']
         if (examType === 'meaning-to-word') return [word.meaning, '']
         return idx % 2 === 0 ? [word.word, ''] : [word.meaning, '']
       }
-
       const headers = getHeader()
-      const tableBody = leftWords.map((w, i) => {
-        const [lc1, lc2] = getCells(w, i)
-        const rw = rightWords[i]
-        const [rc1, rc2] = rw ? getCells(rw, i + half) : ['', '']
-        return [
-          i + 1, lc1, lc2,
-          rw ? i + half + 1 : '', rc1, rc2,
-        ]
+
+      const canvas = document.createElement('canvas')
+      const scale = 2
+      const logicalWidth = 794
+      const logicalHeight = Math.max(1123, 40 + 30 + leftWords.length * 26 + 100)
+      canvas.width = logicalWidth * scale
+      canvas.height = logicalHeight * scale
+      const ctx = canvas.getContext('2d')!
+      ctx.scale(scale, scale)
+
+      ctx.fillStyle = '#FFFFFF'
+      ctx.fillRect(0, 0, logicalWidth, logicalHeight)
+
+      ctx.fillStyle = '#1C1C1E'
+      ctx.font = 'bold 18px Apple SD Gothic Neo, Noto Sans KR, sans-serif'
+      ctx.textAlign = 'center'
+      ctx.fillText(folderName, 397, 32)
+
+      const tableX = 20
+      const tableY = 50
+      const colWidths = [24, 160, 160, 24, 160, 160]
+      const rowHeight = 26
+      const totalWidth = colWidths.reduce((a, b) => a + b, 0)
+
+      ctx.fillStyle = '#F5F5F7'
+      ctx.fillRect(tableX, tableY, totalWidth, rowHeight)
+
+      ctx.strokeStyle = '#333333'
+      ctx.lineWidth = 0.5
+
+      ctx.font = 'bold 11px Apple SD Gothic Neo, Noto Sans KR, sans-serif'
+      ctx.fillStyle = '#1C1C1E'
+      ctx.textAlign = 'left'
+
+      let xPos = tableX
+      const headerLabels = ['No.', headers[0], headers[1], 'No.', headers[0], headers[1]]
+      headerLabels.forEach((label, i) => {
+        ctx.strokeRect(xPos, tableY, colWidths[i], rowHeight)
+        ctx.fillText(label, xPos + 4, tableY + 17)
+        xPos += colWidths[i]
       })
 
-      autoTable(doc, {
-        startY: 24,
-        head: [[
-          { content: 'No.', styles: { halign: 'center', cellWidth: 8 } },
-          { content: headers[0], styles: { cellWidth: 47 } },
-          { content: headers[1], styles: { cellWidth: 47 } },
-          { content: 'No.', styles: { halign: 'center', cellWidth: 8 } },
-          { content: headers[0], styles: { cellWidth: 47 } },
-          { content: headers[1], styles: { cellWidth: 47 } },
-        ]],
-        body: tableBody,
-        styles: {
-          font: 'NanumGothic',
-          fontSize: 9,
-          cellPadding: 3,
-          lineColor: [0, 0, 0],
-          lineWidth: 0.3,
-          textColor: [28, 28, 30],
-          overflow: 'linebreak',
-        },
-        headStyles: {
-          font: 'NanumGothic',
-          fillColor: [255, 255, 255],
-          textColor: [28, 28, 30],
-          fontStyle: 'normal',
-          fontSize: 9,
-          lineWidth: 0.3,
-        },
-        columnStyles: {
-          0: { cellWidth: 8, halign: 'center' },
-          1: { cellWidth: 47 },
-          2: { cellWidth: 47 },
-          3: { cellWidth: 8, halign: 'center' },
-          4: { cellWidth: 47 },
-          5: { cellWidth: 47 },
-        },
-        tableWidth: 204,
-        margin: { left: 4, right: 4 },
-        alternateRowStyles: { fillColor: [255, 255, 255] },
+      ctx.font = '10px Apple SD Gothic Neo, Noto Sans KR, sans-serif'
+      leftWords.forEach((w, i) => {
+        const y = tableY + (i + 1) * rowHeight
+        const [lc1] = getCells(w, i)
+        const rw = rightWords[i]
+        const [rc1] = rw ? getCells(rw, i + half) : ['', '']
+
+        const rowData = [
+          String(i + 1), lc1, '',
+          rw ? String(i + half + 1) : '', rc1, '',
+        ]
+
+        xPos = tableX
+        rowData.forEach((cell, j) => {
+          ctx.strokeStyle = '#CCCCCC'
+          ctx.strokeRect(xPos, y, colWidths[j], rowHeight)
+          ctx.fillStyle = '#1C1C1E'
+          const maxWidth = colWidths[j] - 8
+          let text = cell
+          while (ctx.measureText(text).width > maxWidth && text.length > 0) {
+            text = text.slice(0, -1)
+          }
+          if (text !== cell) text += '…'
+          ctx.fillText(text, xPos + 4, y + 17)
+          xPos += colWidths[j]
+        })
       })
+
+      const { default: jsPDF } = await import('jspdf')
+      const imgData = canvas.toDataURL('image/png')
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+      const pageWidth = 210
+      const pageHeight = logicalHeight * (210 / logicalWidth)
+      doc.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight)
 
       const url = doc.output('bloburl') as unknown as string
       setPdfUrl(url)
       setStep('done')
     } catch (e) {
       console.error('PDF 생성 오류:', e)
-      alert('PDF 생성에 실패했어요. 다시 시도해주세요.')
+      alert('PDF 생성에 실패했어요.')
     } finally {
       setGenerating(false)
     }
@@ -411,10 +416,10 @@ export default function PDFPage() {
             {generating && (
               <div style={{ textAlign: 'center', padding: '20px 0' }}>
                 <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
-                  한글 폰트를 불러오는 중이에요...
+                  시험지를 만들고 있어요...
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>
-                  잠시만 기다려주세요 (5~10초)
+                  잠시만 기다려주세요
                 </div>
               </div>
             )}
