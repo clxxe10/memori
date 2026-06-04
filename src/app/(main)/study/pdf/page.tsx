@@ -546,10 +546,7 @@ export default function PDFPage() {
                 📺 광고 보고 사용하기
               </button>
               <button
-                onClick={() => {
-                  setShowPdfGate(false)
-                  alert('프리미엄 구독 (RevenueCat 연동 후 구현)')
-                }}
+                onClick={() => { setShowPdfGate(false); router.push('/profile/premium') }}
                 style={{
                   width: '100%',
                   height: '52px',

@@ -49,6 +49,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Search, Star } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import SelectDropdown from '@/components/ui/SelectDropdown'
 
 type PublicFolder = {
   id: string
@@ -56,13 +57,12 @@ type PublicFolder = {
   icon: string
   color?: string
   category?: string
+  language?: string
   user_id: string
   word_count?: number
   like_count?: number
   author_nickname?: string
 }
-
-const CATEGORIES = ['전체', '토익', '일상', '여행', '비즈니스', '기타']
 
 function SearchPageContent() {
   const router = useRouter()
@@ -70,6 +70,7 @@ function SearchPageContent() {
   const myOnly = searchParams.get('my') === 'true'
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('전체')
+  const [languageFilter, setLanguageFilter] = useState('전체')
   const [folders, setFolders] = useState<PublicFolder[]>([])
   const [loading, setLoading] = useState(true)
   const [importing, setImporting] = useState<string | null>(null)
@@ -131,7 +132,8 @@ function SearchPageContent() {
       f.name.toLowerCase().includes(query.toLowerCase())
     const matchCategory = category === '전체' ||
       f.category === category
-    return matchQuery && matchCategory
+    const matchLanguage = languageFilter === '전체' || f.language === languageFilter
+    return matchQuery && matchCategory && matchLanguage
   })
 
   const isMyFolder = (folder: PublicFolder) => folder.user_id === myUserId
@@ -152,6 +154,7 @@ function SearchPageContent() {
           icon: folder.icon,
           color: folder.color,
           category: folder.category,
+          language: folder.language,
           is_public: false,
         })
         .select()
@@ -233,24 +236,36 @@ function SearchPageContent() {
           )}
         </div>
 
-        {/* 카테고리 칩 */}
-        <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', overflowX: 'auto', paddingBottom: '2px' }}>
-          {CATEGORIES.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setCategory(cat)}
-              style={{
-                padding: '6px 14px', borderRadius: '20px', whiteSpace: 'nowrap',
-                border: category === cat ? 'none' : '1px solid var(--color-border)',
-                background: category === cat ? 'var(--color-my)' : 'var(--color-surface)',
-                color: category === cat ? 'var(--color-my-contrast)' : 'var(--color-text-secondary)',
-                fontSize: '13px', fontWeight: category === cat ? 600 : 400,
-                cursor: 'pointer', transition: 'all 0.2s',
-              }}
-            >
-              {cat}
-            </button>
-          ))}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', alignItems: 'center' }}>
+          <SelectDropdown
+            value={category}
+            onChange={setCategory}
+            options={[
+              { value: '전체', label: '전체 카테고리' },
+              { value: '수능', label: '수능' },
+              { value: '토익', label: '토익' },
+              { value: '일상', label: '일상' },
+              { value: '비즈니스', label: '비즈니스' },
+              { value: '기타', label: '기타' },
+            ]}
+            placeholder="카테고리"
+          />
+          <SelectDropdown
+            value={languageFilter}
+            onChange={setLanguageFilter}
+            options={[
+              { value: '전체', label: '전체 언어' },
+              { value: '영어', label: '영어', flag: '🇺🇸' },
+              { value: '한국어', label: '한국어', flag: '🇰🇷' },
+              { value: '일본어', label: '일본어', flag: '🇯🇵' },
+              { value: '중국어', label: '중국어', flag: '🇨🇳' },
+              { value: '프랑스어', label: '프랑스어', flag: '🇫🇷' },
+              { value: '스페인어', label: '스페인어', flag: '🇪🇸' },
+              { value: '독일어', label: '독일어', flag: '🇩🇪' },
+              { value: '기타', label: '기타', flag: '🌐' },
+            ]}
+            placeholder="언어"
+          />
         </div>
 
         {/* 결과 */}
@@ -312,6 +327,18 @@ function SearchPageContent() {
                               background: 'rgba(28,28,30,0.07)', borderRadius: '6px', padding: '1px 6px',
                             }}>
                               {folder.category}
+                            </span>
+                          )}
+                          {folder.language && (
+                            <span style={{
+                              fontSize: '10px', fontWeight: 600,
+                              color: 'var(--color-text-secondary)',
+                              background: 'var(--color-surface-2)',
+                              borderRadius: '6px', padding: '1px 6px',
+                              border: '1px solid var(--color-border)',
+                              flexShrink: 0,
+                            }}>
+                              {folder.language}
                             </span>
                           )}
                         </div>

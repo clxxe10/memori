@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, Suspense, type CSSProperties } from 'react
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { recordStudyProgress } from '@/lib/studyTracker'
 
 type Word = {
   id: string
@@ -146,17 +147,24 @@ function SpeedContent() {
   }, [])
 
   const vibrate = (pattern: number | number[]) => {
-    if (typeof navigator !== 'undefined' && navigator.vibrate) {
-      navigator.vibrate(pattern)
+    try {
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate(pattern)
+      }
+    } catch (e) {
+      // 진동 미지원 기기 무시
     }
   }
 
-  const handleGameOver = () => {
+  const handleGameOver = async () => {
+    await recordStudyProgress(correctRef.current)
+
     if (scoreRef.current > bestScoreRef.current) {
       setBestScore(scoreRef.current)
       bestScoreRef.current = scoreRef.current
       localStorage.setItem('speed_best_score', String(scoreRef.current))
     }
+
     setGameOver(true)
   }
 
@@ -213,7 +221,7 @@ function SpeedContent() {
     })
 
     if (livesLost > 0) {
-      vibrate([80, 30, 80])
+      vibrate([100, 50, 100])
       const missedList = fallingWordsRef.current.filter(fw => fw.y > 95 && fw.status === 'falling')
       missedList.forEach(fw => {
         missedWordsRef.current = [...missedWordsRef.current, { word: fw.word, meaning: fw.meaning }]
@@ -252,7 +260,7 @@ function SpeedContent() {
     if (newStage !== stageRef.current) {
       stageRef.current = newStage
       setStage(newStage)
-      vibrate([50, 30, 50, 30, 100])
+      vibrate([50, 30, 50, 30, 50, 30, 200])
     }
 
     if (wordQueueRef.current.length === 0 && fallingWordsRef.current.length === 0) {
@@ -328,7 +336,6 @@ function SpeedContent() {
     })
 
     if (matched) {
-      vibrate(30)
       setFlashWord(matched.id)
       setTimeout(() => setFlashWord(null), 400)
 
@@ -350,6 +357,12 @@ function SpeedContent() {
       comboRef.current = newCombo
       setCombo(newCombo)
       if (newCombo > maxCombo) setMaxCombo(newCombo)
+
+      if (newCombo % 5 === 0) {
+        vibrate([50, 30, 50, 30, 100])
+      } else {
+        vibrate([30, 20, 30])
+      }
 
       const points = 100 + (newCombo > 1 ? (newCombo - 1) * 20 : 0)
       scoreRef.current += points
@@ -520,31 +533,68 @@ function SpeedContent() {
             </div>
           ))}
         </div>
-        {missedWords.length > 0 && (
-          <div style={{ width: '100%', marginBottom: '16px' }}>
-            <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px', textAlign: 'left' }}>
-              놓친 단어 ({missedWords.length}개)
-            </p>
-            <div style={{ maxHeight: '160px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              {missedWords.map((w, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--color-surface)', borderRadius: '10px', padding: '8px 12px', border: '1px solid var(--color-border)' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{w.word}</span>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>{w.meaning}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <button onClick={handleRestart}
             style={{ width: '100%', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 800, cursor: 'pointer' }}>
             🔄 다시 하기
           </button>
-          <button onClick={() => router.back()}
+          <button onClick={() => router.push('/home')}
             style={{ width: '100%', height: '44px', background: 'var(--color-surface-2)', color: 'var(--color-text-secondary)', border: 'none', borderRadius: '14px', fontSize: '14px', cursor: 'pointer' }}>
             돌아가기
           </button>
         </div>
+        {missedWords.length > 0 && (
+          <div style={{
+            width: '100%', marginTop: '20px',
+            borderTop: '1px solid var(--color-border)',
+            paddingTop: '20px',
+          }}>
+            <p style={{
+              fontSize: '14px', fontWeight: 700,
+              color: 'var(--color-text-primary)',
+              marginBottom: '10px', textAlign: 'left',
+            }}>
+              놓친 단어 {missedWords.length}개
+            </p>
+            <div style={{
+              display: 'flex', flexDirection: 'column', gap: '6px',
+              maxHeight: '240px', overflowY: 'auto',
+            }}>
+              {missedWords.map((w, i) => (
+                <div key={i} style={{
+                  display: 'flex', alignItems: 'center',
+                  justifyContent: 'space-between',
+                  background: 'var(--color-surface)',
+                  borderRadius: '12px', padding: '10px 14px',
+                  border: '1px solid var(--color-border)',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{
+                      width: '20px', height: '20px',
+                      borderRadius: '50%',
+                      background: 'rgba(226,75,74,0.1)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '10px', color: '#E24B4A',
+                      fontWeight: 700, flexShrink: 0,
+                    }}>✗</span>
+                    <span style={{
+                      fontSize: '14px', fontWeight: 700,
+                      color: 'var(--color-text-primary)',
+                    }}>{w.word}</span>
+                  </div>
+                  <span style={{
+                    fontSize: '12px',
+                    color: 'var(--color-text-secondary)',
+                    maxWidth: '120px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}>{w.meaning}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </main>
   )

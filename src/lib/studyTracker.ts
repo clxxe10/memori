@@ -1,5 +1,8 @@
 // Supabase SQL Editor에서 실행:
 // alter table user_daily_study add column if not exists study_time int default 0;
+// alter table user_learning_stats add column if not exists daily_goal int default 10;
+// alter table user_learning_stats add column if not exists notification_enabled boolean default true;
+// alter table user_learning_stats add column if not exists notification_time text default '오전 8:00';
 // alter table user_learning_stats add column if not exists total_study_time int default 0;
 // alter table user_learning_stats add column if not exists total_words int default 0;
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Play, BookOpen, Clock, ChevronRight } from 'lucide-react'
@@ -24,92 +24,117 @@ export default function HomePage() {
   const pagePadding = usePagePadding()
   const isDesktop = useIsDesktop()
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
-        setUser(user)
+  const fetchData = useCallback(async () => {
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      setUser(user)
 
-        const now = new Date()
-        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+      const now = new Date()
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
 
-        // 전체 단어 통계
-        const { data: words } = await supabase
-          .from('words')
-          .select('correct_count, next_review_date, difficulty, created_at, word, meaning, part_of_speech, pronunciation')
-          .eq('user_id', user.id)
+      // 전체 단어 통계
+      const { data: words } = await supabase
+        .from('words')
+        .select('correct_count, next_review_date, difficulty, created_at, word, meaning, part_of_speech, pronunciation')
+        .eq('user_id', user.id)
 
-        if (words) {
-          setTotalWords(words.length)
-          setMasteredWords(words.filter(w => (w.correct_count || 0) >= 1).length)
+      if (words) {
+        setTotalWords(words.length)
+        setMasteredWords(words.filter(w => (w.correct_count || 0) >= 1).length)
 
-          const reviewWords = words.filter(w => {
-            if (w.difficulty === 'hard') return true
-            if (!w.next_review_date) return false
-            return w.next_review_date <= today
-          })
-          setReviewCount(reviewWords.length)
+        const reviewWords = words.filter(w => {
+          if (w.difficulty === 'hard') return true
+          if (!w.next_review_date) return false
+          return w.next_review_date <= today
+        })
+        setReviewCount(reviewWords.length)
 
-          const latestWord = words.sort((a, b) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-          )[0]
-          if (latestWord) setTodayWord(latestWord)
-        }
-
-        const { data: todayStudy } = await supabase
-          .from('user_daily_study')
-          .select('study_time')
-          .eq('user_id', user.id)
-          .eq('study_date', today)
-          .maybeSingle()
-
-        setStudyTimeToday(todayStudy?.study_time || 0)
-
-        const { data: folderData } = await supabase
-          .from('folders')
-          .select('id, name, icon, color')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(3)
-
-        if (folderData) {
-          const foldersWithCount = await Promise.all(
-            folderData.map(async (f) => {
-              const { count } = await supabase
-                .from('words')
-                .select('*', { count: 'exact', head: true })
-                .eq('folder_id', f.id)
-              return { ...f, word_count: count || 0 }
-            })
-          )
-          setFolders(foldersWithCount)
-        }
-
-        // 학습 통계
-        const { data: stats } = await supabase
-          .from('user_learning_stats')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle()
-
-        if (stats) {
-          setStreakDays(stats.streak_days || 0)
-        } else {
-          setStreakDays(0)
-        }
-      } catch (e) {
-        console.error('홈 데이터 로딩 오류:', e)
-      } finally {
-        setLoading(false)
+        const latestWord = words.sort((a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        )[0]
+        if (latestWord) setTodayWord(latestWord)
       }
+
+      const { data: todayStudy } = await supabase
+        .from('user_daily_study')
+        .select('study_time')
+        .eq('user_id', user.id)
+        .eq('study_date', today)
+        .maybeSingle()
+
+      setStudyTimeToday(todayStudy?.study_time || 0)
+
+      const { data: folderData } = await supabase
+        .from('folders')
+        .select('id, name, icon, color')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(3)
+
+      if (folderData) {
+        const foldersWithCount = await Promise.all(
+          folderData.map(async (f) => {
+            const { count } = await supabase
+              .from('words')
+              .select('*', { count: 'exact', head: true })
+              .eq('folder_id', f.id)
+            return { ...f, word_count: count || 0 }
+          })
+        )
+        setFolders(foldersWithCount)
+      }
+
+      // 학습 통계
+      const { data: stats } = await supabase
+        .from('user_learning_stats')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (stats) {
+        setStreakDays(stats.streak_days || 0)
+      } else {
+        setStreakDays(0)
+      }
+
+      // 이달 학습 데이터
+      const year = now.getFullYear()
+      const month = now.getMonth()
+      const firstDay = new Date(year, month, 1).toISOString().split('T')[0]
+      const lastDay = new Date(year, month + 1, 0).toISOString().split('T')[0]
+
+      const { data: monthData } = await supabase
+        .from('user_daily_study')
+        .select('study_date, words_studied')
+        .eq('user_id', user.id)
+        .gte('study_date', firstDay)
+        .lte('study_date', lastDay)
+
+      if (monthData) {
+        const dataMap: Record<string, number> = {}
+        monthData.forEach(d => {
+          dataMap[d.study_date] = d.words_studied || 0
+        })
+        setMonthlyData(dataMap)
+      }
+    } catch (e) {
+      console.error('홈 데이터 로딩 오류:', e)
+    } finally {
+      setLoading(false)
     }
+  }, [calendarMonth])
+
+  useEffect(() => {
     fetchData()
+  }, [])
+
+  useEffect(() => {
     const handleFocus = () => fetchData()
     window.addEventListener('focus', handleFocus)
     return () => window.removeEventListener('focus', handleFocus)
-  }, [])
+  }, [fetchData])
 
   useEffect(() => {
     const fetchMonthData = async () => {
@@ -340,12 +365,18 @@ export default function HomePage() {
 
           const levelColors = [
             'var(--color-surface-2)',
-            'rgba(28,28,30,0.15)',
-            'rgba(28,28,30,0.35)',
-            'rgba(28,28,30,0.60)',
-            'rgba(28,28,30,0.85)',
+            'rgba(128,128,128,0.25)',
+            'rgba(128,128,128,0.50)',
+            'rgba(128,128,128,0.75)',
+            'var(--color-text-primary)',
           ]
-          const levelTextColors = ['var(--color-text-tertiary)', 'var(--color-text-primary)', '#fff', '#fff', '#fff']
+          const levelTextColors = [
+            'var(--color-text-tertiary)',
+            'var(--color-text-primary)',
+            'var(--color-text-primary)',
+            'var(--color-my-contrast)',
+            'var(--color-my-contrast)',
+          ]
 
           return (
             <div style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px', border: '1px solid var(--color-border)', marginBottom: '12px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
@@ -405,7 +436,7 @@ export default function HomePage() {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', marginBottom: '10px' }}>
                 <span style={{ fontSize: '9px', color: 'var(--color-text-tertiary)' }}>적음</span>
                 {levelColors.map((c, i) => (
-                  <div key={i} style={{ width: '12px', height: '12px', borderRadius: '3px', background: c, border: i === 0 ? '1px solid var(--color-border)' : 'none' }} />
+                  <div key={i} style={{ width: '12px', height: '12px', borderRadius: '3px', background: c, border: '1px solid var(--color-border)' }} />
                 ))}
                 <span style={{ fontSize: '9px', color: 'var(--color-text-tertiary)' }}>많음</span>
               </div>

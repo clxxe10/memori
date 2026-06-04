@@ -219,7 +219,7 @@ function FlashcardContent() {
         <button onClick={handleRestart} style={{ width: '100%', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
           <RotateCcw size={18} /> 다시 학습하기
         </button>
-        <button onClick={() => router.back()} style={{ width: '100%', height: '52px', background: 'var(--color-bg)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
+        <button onClick={() => router.push('/home')} style={{ width: '100%', height: '52px', background: 'var(--color-bg)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
       </div>
     </main>
   )

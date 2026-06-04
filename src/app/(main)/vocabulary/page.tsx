@@ -2,7 +2,7 @@
 // alter table folders add column if not exists color text default '#B8D4FF';
 // alter table folders add column if not exists category text;
 // alter table folders add column if not exists is_public boolean default false;
-// alter table folders add column if not exists cover_url text;
+// alter table folders add column if not exists language text default '영어';
 // alter table folders add column if not exists author_nickname text;
 //
 // UPDATE folders f
@@ -22,6 +22,7 @@ import { ChevronRight, Plus, Search, X } from 'lucide-react'
 
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import SelectDropdown from '@/components/ui/SelectDropdown'
 
 type Folder = {
   id: string
@@ -34,17 +35,6 @@ type Folder = {
   mastered_count?: number
 }
 
-const COLORS = [
-  '#B8D4FF',
-  '#B5EAD7',
-  '#FFDAC1',
-  '#FFB7C5',
-  '#E2C9FF',
-  '#FFFACD',
-  '#C9F0FF',
-  '#D4EDDA',
-]
-
 export default function VocabularyPage() {
   const router = useRouter()
   const [folders, setFolders] = useState<Folder[]>([])
@@ -52,14 +42,13 @@ export default function VocabularyPage() {
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const pagePadding = usePagePadding()
-  const [customIcon, setCustomIcon] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('토익')
-  const [customCategory, setCustomCategory] = useState('')
   const [creating, setCreating] = useState(false)
-  const [coverPreview] = useState<string | null>(null)
-  const [form, setForm] = useState({
+  const [newFolder, setNewFolder] = useState({
     name: '',
+    icon: '📚',
     color: '#B8D4FF',
+    category: '',
+    language: '영어',
     is_public: false,
   })
 
@@ -99,7 +88,7 @@ export default function VocabularyPage() {
   }, [])
 
   const handleCreate = async () => {
-    if (!form.name.trim()) return
+    if (!newFolder.name.trim()) return
     setCreating(true)
 
     try {
@@ -113,18 +102,19 @@ export default function VocabularyPage() {
         user.user_metadata?.full_name ||
         `user_${user.id?.slice(0, 6)}`
 
-      const finalCategory = selectedCategory === '기타' ? customCategory.trim() : selectedCategory
-      const finalIcon = customIcon.trim() || '📚'
+      const finalCategory = newFolder.category
+      const finalIcon = newFolder.icon.trim() || '📚'
 
       const { data, error } = await supabase
         .from('folders')
         .insert({
           user_id: user.id,
-          name: form.name.trim(),
+          name: newFolder.name.trim(),
           icon: finalIcon,
-          color: form.color,
+          color: newFolder.color,
           category: finalCategory || null,
-          is_public: form.is_public,
+          language: newFolder.language,
+          is_public: newFolder.is_public,
           author_nickname: authorNickname,
         })
         .select()
@@ -135,7 +125,7 @@ export default function VocabularyPage() {
           .from('folders')
           .insert({
             user_id: user.id,
-            name: form.name.trim(),
+            name: newFolder.name.trim(),
             icon: finalIcon,
             author_nickname: authorNickname,
           })
@@ -152,10 +142,14 @@ export default function VocabularyPage() {
         setFolders((prev) => [data, ...prev])
       }
 
-      setForm({ name: '', color: '#B8D4FF', is_public: false })
-      setCustomIcon('')
-      setSelectedCategory('토익')
-      setCustomCategory('')
+      setNewFolder({
+        name: '',
+        icon: '📚',
+        color: '#B8D4FF',
+        category: '',
+        language: '영어',
+        is_public: false,
+      })
       setShowModal(false)
     } catch (e) {
       console.error(e)
@@ -166,20 +160,6 @@ export default function VocabularyPage() {
   }
 
   const filtered = folders.filter((f) => f.name.toLowerCase().includes(search.toLowerCase()))
-
-  const inputStyle = (mb = '0px') => ({
-    width: '100%',
-    height: '46px',
-    background: 'var(--color-bg)',
-    border: '1px solid var(--color-border)',
-    borderRadius: '12px',
-    padding: '0 12px',
-    fontSize: '14px',
-    color: 'var(--color-text-primary)',
-    outline: 'none',
-    boxSizing: 'border-box' as const,
-    marginBottom: mb,
-  })
 
   return (
     <main
@@ -380,106 +360,118 @@ export default function VocabularyPage() {
               </button>
             </div>
 
-            <div
-              style={{
-                width: '100%',
-                height: '80px',
-                borderRadius: '16px',
-                background: form.color,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '12px',
-                marginBottom: '16px',
-                overflow: 'hidden',
-              }}
-            >
-              {coverPreview ? (
-                <img src={coverPreview} alt="cover-preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              ) : (
-                <>
-                  <span style={{ fontSize: '32px' }}>{customIcon || '📚'}</span>
-                  <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{form.name || '새 단어장'}</span>
-                </>
-              )}
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'stretch', marginBottom: '16px' }}>
+              <div style={{
+                width: '80px', height: '80px', borderRadius: '18px',
+                background: newFolder.color + '80',
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                gap: '4px', flexShrink: 0,
+                border: '1px solid var(--color-border)',
+              }}>
+                <span style={{ fontSize: '26px' }}>{newFolder.icon || '📚'}</span>
+                <span style={{
+                  fontSize: '8px', fontWeight: 700,
+                  color: 'var(--color-text-primary)',
+                  maxWidth: '70px', overflow: 'hidden',
+                  textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  textAlign: 'center',
+                }}>
+                  {newFolder.name || '단어장'}
+                </span>
+              </div>
+
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div>
+                  <p style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '4px' }}>단어장 이름</p>
+                  <input
+                    value={newFolder.name}
+                    onChange={e => setNewFolder(f => ({ ...f, name: e.target.value }))}
+                    placeholder="이름 입력..."
+                    style={{
+                      width: '100%', height: '34px',
+                      background: 'var(--color-surface-2)',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: '10px', padding: '0 12px',
+                      fontSize: '14px', color: 'var(--color-text-primary)',
+                      outline: 'none', boxSizing: 'border-box' as const,
+                    }}
+                  />
+                </div>
+                <div>
+                  <p style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '4px' }}>아이콘</p>
+                  <input
+                    value={newFolder.icon}
+                    onChange={e => setNewFolder(f => ({ ...f, icon: e.target.value.slice(0, 4) }))}
+                    placeholder="이모지 입력..."
+                    style={{
+                      width: '100%', height: '34px',
+                      background: 'var(--color-surface-2)',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: '10px', padding: '0 12px',
+                      fontSize: '18px', color: 'var(--color-text-primary)',
+                      outline: 'none', boxSizing: 'border-box' as const,
+                    }}
+                  />
+                </div>
+              </div>
             </div>
 
-            <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>단어장 이름</p>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              placeholder="단어장 이름 입력"
-              style={inputStyle('16px')}
-            />
-
-            <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>아이콘 (이모지 또는 텍스트)</p>
-            <input
-              type="text"
-              value={customIcon}
-              maxLength={4}
-              onChange={(e) => setCustomIcon(e.target.value.slice(0, 4))}
-              placeholder="📚 또는 EN"
-              style={inputStyle('16px')}
-            />
-
-            <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>배경 컬러</p>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px', alignItems: 'center' }}>
-              {COLORS.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setForm((f) => ({ ...f, color: c }))}
-                  style={{
-                    width: '28px',
-                    height: '28px',
-                    borderRadius: '50%',
-                    background: c,
-                    border: 'none',
-                    cursor: 'pointer',
-                    boxShadow: form.color === c ? '0 0 0 2px #fff, 0 0 0 3.5px #1C1C1E' : '0 0 0 1px rgba(0,0,0,0.09)',
-                  }}
-                />
-              ))}
-              <input
-                type="color"
-                value={form.color}
-                onChange={(e) => setForm((f) => ({ ...f, color: e.target.value }))}
-                style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid var(--color-border)', padding: 0, background: 'none' }}
-              />
+            <div style={{ marginBottom: '16px' }}>
+              <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>배경 컬러</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="color"
+                    value={newFolder.color}
+                    onChange={e => setNewFolder(f => ({ ...f, color: e.target.value }))}
+                    style={{ width: '44px', height: '44px', borderRadius: '50%', border: 'none', cursor: 'pointer', padding: 0, opacity: 0, position: 'absolute', inset: 0, zIndex: 1 }}
+                  />
+                  <div style={{
+                    width: '44px', height: '44px', borderRadius: '50%',
+                    background: 'conic-gradient(#ffb3c6,#ffd6a5,#fdffb6,#caffbf,#a0c4ff,#bdb2ff,#ffb3c6)',
+                    border: '2px solid var(--color-border)', cursor: 'pointer',
+                  }} />
+                </div>
+                <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: newFolder.color + '80', border: '1px solid var(--color-border)' }} />
+                <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>{newFolder.color}</span>
+              </div>
             </div>
 
             <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>카테고리</p>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
-              {['토익', '일상', '여행', '비즈니스', '기타'].map((category) => (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() => setSelectedCategory(category)}
-                  style={{
-                    borderRadius: '999px',
-                    padding: '7px 14px',
-                    border: selectedCategory === category ? '1px solid var(--color-my)' : '1px solid var(--color-border)',
-                    background: selectedCategory === category ? 'var(--color-my)' : 'var(--color-bg)',
-                    color: selectedCategory === category ? 'var(--color-my-contrast)' : 'var(--color-text-secondary)',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-            {selectedCategory === '기타' && (
-              <input
-                type="text"
-                value={customCategory}
-                onChange={(e) => setCustomCategory(e.target.value)}
-                placeholder="카테고리 입력"
-                style={inputStyle('16px')}
+            <div style={{ marginBottom: '16px' }}>
+              <SelectDropdown
+                value={newFolder.category}
+                onChange={val => setNewFolder(f => ({ ...f, category: val }))}
+                options={[
+                  { value: '수능', label: '수능' },
+                  { value: '토익', label: '토익' },
+                  { value: '일상', label: '일상' },
+                  { value: '비즈니스', label: '비즈니스' },
+                  { value: '기타', label: '기타' },
+                ]}
+                placeholder="카테고리 선택"
               />
-            )}
+            </div>
+
+            <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>학습 언어</p>
+            <div style={{ marginBottom: '16px' }}>
+              <SelectDropdown
+                value={newFolder.language}
+                onChange={val => setNewFolder(f => ({ ...f, language: val }))}
+                options={[
+                  { value: '영어', label: '영어', flag: '🇺🇸' },
+                  { value: '한국어', label: '한국어', flag: '🇰🇷' },
+                  { value: '일본어', label: '일본어', flag: '🇯🇵' },
+                  { value: '중국어', label: '중국어', flag: '🇨🇳' },
+                  { value: '프랑스어', label: '프랑스어', flag: '🇫🇷' },
+                  { value: '스페인어', label: '스페인어', flag: '🇪🇸' },
+                  { value: '독일어', label: '독일어', flag: '🇩🇪' },
+                  { value: '기타', label: '기타', flag: '🌐' },
+                ]}
+                placeholder="학습 언어 선택"
+              />
+            </div>
 
             <div
               style={{
@@ -497,12 +489,12 @@ export default function VocabularyPage() {
                 <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-text-secondary)' }}>다른 사용자에게 공개</p>
               </div>
               <div
-                onClick={() => setForm((f) => ({ ...f, is_public: !f.is_public }))}
+                onClick={() => setNewFolder((f) => ({ ...f, is_public: !f.is_public }))}
                 style={{
                   width: '44px',
                   height: '26px',
                   borderRadius: '20px',
-                  background: form.is_public ? 'var(--color-my)' : 'var(--color-track)',
+                  background: newFolder.is_public ? 'var(--color-my)' : 'var(--color-track)',
                   position: 'relative',
                   cursor: 'pointer',
                 }}
@@ -515,7 +507,7 @@ export default function VocabularyPage() {
                     background: '#fff',
                     position: 'absolute',
                     top: '3px',
-                    left: form.is_public ? '21px' : '3px',
+                    left: newFolder.is_public ? '21px' : '3px',
                     transition: 'left 0.2s',
                   }}
                 />
@@ -524,7 +516,7 @@ export default function VocabularyPage() {
 
             <button
               onClick={handleCreate}
-              disabled={creating || !form.name.trim()}
+              disabled={creating || !newFolder.name.trim()}
               style={{
                 width: '100%',
                 height: '50px',
@@ -534,8 +526,8 @@ export default function VocabularyPage() {
                 borderRadius: '14px',
                 fontSize: '15px',
                 fontWeight: 700,
-                opacity: creating || !form.name.trim() ? 0.6 : 1,
-                cursor: form.name.trim() ? 'pointer' : 'not-allowed',
+                opacity: creating || !newFolder.name.trim() ? 0.6 : 1,
+                cursor: newFolder.name.trim() ? 'pointer' : 'not-allowed',
               }}
             >
               {creating ? '만드는 중...' : '만들기'}

@@ -200,6 +200,29 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        <div
+          onClick={() => router.push('/profile/premium')}
+          style={{
+            background: 'linear-gradient(135deg, var(--color-text-primary) 0%, rgba(60,60,62,1) 100%)',
+            borderRadius: '18px', padding: '16px 18px',
+            display: 'flex', alignItems: 'center', gap: '12px',
+            cursor: 'pointer', marginBottom: '20px',
+          }}
+        >
+          <span style={{ fontSize: '28px' }}>👑</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '15px', fontWeight: 800, color: '#FFFFFF', marginBottom: '3px' }}>
+              Memori Premium
+            </div>
+            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>
+              무제한 사용 · 광고 제거 · 위젯
+            </div>
+          </div>
+          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>
+            시작하기 →
+          </div>
+        </div>
+
         {/* 설정 섹션 */}
         <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', letterSpacing: '0.3px' }}>설정</p>
         <div style={menuSectionStyle}>

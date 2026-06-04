@@ -177,6 +177,22 @@ export default function CameraPage() {
     }
   }
 
+  const getPosStyle = (pos: string | null) => {
+    if (!pos) return { bg: 'rgba(142,142,147,0.12)', color: '#636366' }
+    if (pos.includes('동사')) return { bg: 'rgba(52,199,89,0.12)', color: '#1A7F3C' }
+    if (pos.includes('명사')) return { bg: 'rgba(0,122,255,0.12)', color: '#0055B3' }
+    if (pos.includes('형용사')) return { bg: 'rgba(255,149,0,0.12)', color: '#B86800' }
+    if (pos.includes('부사')) return { bg: 'rgba(175,82,222,0.12)', color: '#7B2FBE' }
+    if (pos.includes('접속사')) return { bg: 'rgba(255,59,48,0.12)', color: '#C0392B' }
+    if (pos.includes('전치사')) return { bg: 'rgba(0,199,190,0.12)', color: '#007A76' }
+    if (pos.includes('감탄사')) return { bg: 'rgba(255,204,0,0.12)', color: '#8B6800' }
+    if (pos.toLowerCase().includes('verb')) return { bg: 'rgba(52,199,89,0.12)', color: '#1A7F3C' }
+    if (pos.toLowerCase().includes('noun')) return { bg: 'rgba(0,122,255,0.12)', color: '#0055B3' }
+    if (pos.toLowerCase().includes('adj')) return { bg: 'rgba(255,149,0,0.12)', color: '#B86800' }
+    if (pos.toLowerCase().includes('adv')) return { bg: 'rgba(175,82,222,0.12)', color: '#7B2FBE' }
+    return { bg: 'rgba(142,142,147,0.12)', color: '#636366' }
+  }
+
   return (
     <main
       style={{
@@ -357,7 +373,9 @@ export default function CameraPage() {
                   추출된 단어 {words.length}개 — 저장할 단어를 선택하세요
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
-                  {words.map((w, i) => (
+                  {words.map((w, i) => {
+                    const posStyle = getPosStyle(w.part_of_speech || null)
+                    return (
                     <div
                       key={i}
                       onClick={() =>
@@ -375,7 +393,24 @@ export default function CameraPage() {
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '3px' }}>
-                        <span style={{ fontSize: '15px', fontWeight: 800, color: 'var(--color-text-primary)' }}>{w.word}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1, minWidth: 0 }}>
+                          <span style={{ fontSize: '15px', fontWeight: 800, color: 'var(--color-text-primary)' }}>{w.word}</span>
+                          {w.part_of_speech && (
+                            <span
+                              style={{
+                                background: posStyle.bg,
+                                color: posStyle.color,
+                                borderRadius: '6px',
+                                padding: '2px 7px',
+                                fontSize: '10px',
+                                fontWeight: 600,
+                                flexShrink: 0,
+                              }}
+                            >
+                              {w.part_of_speech}
+                            </span>
+                          )}
+                        </div>
                         <div
                           style={{
                             width: '20px',
@@ -394,7 +429,8 @@ export default function CameraPage() {
                       <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: 0 }}>{w.meaning}</p>
                       {w.pronunciation && <p style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', margin: '2px 0 0' }}>{w.pronunciation}</p>}
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
                 <button
                   onClick={handleSave}
@@ -473,10 +509,7 @@ export default function CameraPage() {
                 📺 광고 보고 사용하기
               </button>
               <button
-                onClick={() => {
-                  setShowPhotoGate(false)
-                  alert('프리미엄 구독 (RevenueCat 연동 후 구현)')
-                }}
+                onClick={() => { setShowPhotoGate(false); router.push('/profile/premium') }}
                 style={{
                   width: '100%',
                   height: '52px',

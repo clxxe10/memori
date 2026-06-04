@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Bookmark, Camera, Pencil, Plus, Volume2, Settings } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import SelectDropdown from '@/components/ui/SelectDropdown'
 
 type Word = {
   id: string
@@ -25,6 +26,7 @@ type Folder = {
   color?: string
   category?: string
   is_public?: boolean
+  language?: string
 }
 
 const FILTERS = ['전체', '북마크', '어려워요', '미학습']
@@ -47,6 +49,7 @@ export default function VocabularyDetailPage() {
     color: '',
     category: '',
     is_public: false,
+    language: '영어',
   })
 
   const fetchWords = async () => {
@@ -60,6 +63,7 @@ export default function VocabularyDetailPage() {
         color: folderData.color || '#B8D4FF',
         category: folderData.category || '',
         is_public: folderData.is_public || false,
+        language: folderData.language || '영어',
       })
     }
     const { data: wordData } = await supabase
@@ -93,6 +97,7 @@ export default function VocabularyDetailPage() {
       color: editForm.color,
       category: editForm.category,
       is_public: editForm.is_public,
+      language: editForm.language,
     }).eq('id', folderId)
     setFolder(prev => prev ? { ...prev, ...editForm } : prev)
     setShowEditSheet(false)
@@ -386,14 +391,37 @@ export default function VocabularyDetailPage() {
 
               <div>
                 <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>카테고리</p>
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                  {['토익', '일상', '여행', '비즈니스', '기타'].map(cat => (
-                    <button key={cat} onClick={() => setEditForm(f => ({ ...f, category: cat }))}
-                      style={{ padding: '6px 14px', borderRadius: '20px', border: editForm.category === cat ? 'none' : '1px solid var(--color-border)', background: editForm.category === cat ? 'var(--color-my)' : 'var(--color-surface)', color: editForm.category === cat ? 'var(--color-my-contrast)' : 'var(--color-text-secondary)', fontSize: '13px', fontWeight: editForm.category === cat ? 600 : 400, cursor: 'pointer' }}>
-                      {cat}
-                    </button>
-                  ))}
-                </div>
+                <SelectDropdown
+                  value={editForm.category}
+                  onChange={val => setEditForm(f => ({ ...f, category: val }))}
+                  options={[
+                    { value: '수능', label: '수능' },
+                    { value: '토익', label: '토익' },
+                    { value: '일상', label: '일상' },
+                    { value: '비즈니스', label: '비즈니스' },
+                    { value: '기타', label: '기타' },
+                  ]}
+                  placeholder="카테고리 선택"
+                />
+              </div>
+
+              <div>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>학습 언어</p>
+                <SelectDropdown
+                  value={editForm.language}
+                  onChange={val => setEditForm(f => ({ ...f, language: val }))}
+                  options={[
+                    { value: '영어', label: '영어', flag: '🇺🇸' },
+                    { value: '한국어', label: '한국어', flag: '🇰🇷' },
+                    { value: '일본어', label: '일본어', flag: '🇯🇵' },
+                    { value: '중국어', label: '중국어', flag: '🇨🇳' },
+                    { value: '프랑스어', label: '프랑스어', flag: '🇫🇷' },
+                    { value: '스페인어', label: '스페인어', flag: '🇪🇸' },
+                    { value: '독일어', label: '독일어', flag: '🇩🇪' },
+                    { value: '기타', label: '기타', flag: '🌐' },
+                  ]}
+                  placeholder="학습 언어 선택"
+                />
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', background: 'var(--color-surface-2)', borderRadius: '12px' }}>
