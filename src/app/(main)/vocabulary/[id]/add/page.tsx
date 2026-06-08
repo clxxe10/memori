@@ -5,7 +5,9 @@ import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Sparkles } from 'lucide-react'
 
 import { createClient } from '@/lib/supabase/client'
+import { showToast } from '@/components/ui/Toast'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import { useKeyboard } from '@/hooks/useKeyboard'
 
 export default function AddWordPage() {
   const router = useRouter()
@@ -22,6 +24,7 @@ export default function AddWordPage() {
   } | null>(null)
   const [error, setError] = useState('')
   const padding = usePagePadding('100px')
+  const { keyboardHeight, isKeyboardOpen } = useKeyboard()
 
   const handleGenerate = async () => {
     if (!word.trim()) return
@@ -64,10 +67,9 @@ export default function AddWordPage() {
         .maybeSingle()
 
       if (existing) {
-        if (!confirm(`"${word.trim()}"이 이미 있어요. 그래도 추가할까요?`)) {
-          setIsSaving(false)
-          return
-        }
+        showToast('이미 있는 단어예요', 'error')
+        setIsSaving(false)
+        return
       }
 
       const { error } = await supabase.from('words').insert({
@@ -80,6 +82,7 @@ export default function AddWordPage() {
         example: generated?.example || null,
       })
       if (error) throw error
+      showToast('단어가 추가됐어요!')
       router.back()
     } catch {
       setError('저장에 실패했어요.')
@@ -203,14 +206,27 @@ export default function AddWordPage() {
           )}
 
           {error && <p style={{ fontSize: '13px', color: '#E24B4A', margin: 0 }}>{error}</p>}
+        </div>
+      </div>
 
+      <div style={{
+        position: 'fixed',
+        left: 0,
+        right: 0,
+        bottom: isKeyboardOpen ? keyboardHeight + 8 : 80,
+        padding: '12px 24px',
+        background: 'var(--color-bg)',
+        borderTop: '1px solid var(--color-border)',
+        zIndex: 10,
+        transition: 'bottom 0.2s',
+      }}>
+        <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto' }}>
           <button
             onClick={handleSave}
             disabled={!word.trim() || !meaning.trim() || isSaving}
             style={{
               width: '100%',
               height: '52px',
-              marginTop: '8px',
               background: word.trim() && meaning.trim() ? 'var(--color-my)' : 'var(--color-surface-2)',
               color: word.trim() && meaning.trim() ? 'var(--color-my-contrast)' : 'var(--color-text-tertiary)',
               border: 'none',

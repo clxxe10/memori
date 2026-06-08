@@ -7,6 +7,8 @@ import { createClient } from '@/lib/supabase/client'
 import { calculateNextReview } from '@/lib/srs'
 import { recordStudyProgress } from '@/lib/studyTracker'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import { useSwipe } from '@/hooks/useSwipe'
+import { haptics } from '@/lib/haptics'
 
 type Word = {
   id: string
@@ -125,6 +127,9 @@ function FlashcardContent() {
   }
 
   const handleAnswer = async (know: boolean) => {
+    if (know) haptics.success()
+    else haptics.medium()
+
     const word = words[current]
     const supabase = createClient()
 
@@ -172,6 +177,20 @@ function FlashcardContent() {
     setStats({ know: 0, dontKnow: 0 })
     setCardAnim('')
   }
+
+  const swipeHandlers = useSwipe({
+    onSwipeLeft: () => {
+      if (!flipped) { setFlipped(true); return }
+      haptics.medium()
+      handleAnswer(false)
+    },
+    onSwipeRight: () => {
+      if (!flipped) { setFlipped(true); return }
+      haptics.success()
+      handleAnswer(true)
+    },
+    threshold: 60,
+  })
 
   const getPosStyle = (pos: string | null) => {
     if (!pos) return { bg: 'rgba(142,142,147,0.12)', color: '#636366' }
@@ -307,6 +326,7 @@ function FlashcardContent() {
 
           {/* 카드 */}
           <div
+            {...swipeHandlers}
             className={cardAnim}
             onClick={() => {
               setCardAnim('card-flip-out')
@@ -404,6 +424,14 @@ function FlashcardContent() {
           >
             <ChevronRight size={15} color={current === words.length - 1 ? 'var(--color-text-tertiary)' : 'var(--color-text-primary)'} />
           </button>
+        </div>
+
+        <div style={{
+          display: 'flex', justifyContent: 'space-between',
+          padding: '0 24px', marginTop: '8px',
+        }}>
+          <span style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>← 몰라요</span>
+          <span style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>알아요 →</span>
         </div>
 
         {/* 알아요/몰라요 버튼 */}

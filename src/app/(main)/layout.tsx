@@ -1,9 +1,12 @@
 'use client'
 
 import TabBar from '@/components/layout/TabBar'
+import ToastContainer from '@/components/ui/Toast'
+import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
   const [isDesktop, setIsDesktop] = useState(false)
 
   useEffect(() => {
@@ -21,7 +24,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         marginLeft: isDesktop ? '240px' : '0',
         transition: 'margin-left 0.2s',
       }}>
-        {children}
+        <div key={pathname} className="page-enter">
+          {children}
+        </div>
+        <ToastContainer />
       </main>
     </div>
   )

@@ -6,6 +6,8 @@ import { ArrowLeft, Bookmark, Camera, Pencil, Plus, Volume2, Settings } from 'lu
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import SelectDropdown from '@/components/ui/SelectDropdown'
+import EmptyState from '@/components/ui/EmptyState'
+import { WordSkeleton } from '@/components/ui/Skeleton'
 
 type Word = {
   id: string
@@ -230,12 +232,17 @@ export default function VocabularyDetailPage() {
 
         {/* 단어 카드 리스트 */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--color-text-secondary)' }}>불러오는 중...</div>
-        ) : filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 0' }}>
-            <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '6px' }}>단어가 없어요</p>
-            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>카메라로 사진을 찍어 단어를 추가해보세요</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '8px' }}>
+            {[1, 2, 3, 4, 5, 6].map(i => <WordSkeleton key={i} />)}
           </div>
+        ) : filtered.length === 0 ? (
+          <EmptyState
+            icon="✏️"
+            title="아직 단어가 없어요"
+            desc="직접 입력하거나 사진으로 단어를 추가해봐요"
+            actionLabel="단어 추가하기"
+            onAction={() => router.push(`/vocabulary/${folderId}/add`)}
+          />
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '8px' }}>
             {filtered.map(word => {

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Play, BookOpen, Clock, ChevronRight } from 'lucide-react'
 import { CONTENT_MAX_WIDTH, useIsDesktop, usePagePadding } from '@/lib/responsive'
+import PullToRefresh from '@/components/ui/PullToRefresh'
 
 export default function HomePage() {
   const router = useRouter()
@@ -12,7 +13,7 @@ export default function HomePage() {
   const [reviewCount, setReviewCount] = useState(0)
   const [totalWords, setTotalWords] = useState(0)
   const [masteredWords, setMasteredWords] = useState(0)
-  const [studyTimeToday, setStudyTimeToday] = useState(0)
+  const [totalStudyTime, setTotalStudyTime] = useState(0)
   const [streakDays, setStreakDays] = useState(0)
   const [folders, setFolders] = useState<Array<{ id: string; name: string; icon: string; color?: string; word_count: number }>>([])
   const [showSpeedSheet, setShowSpeedSheet] = useState(false)
@@ -57,14 +58,16 @@ export default function HomePage() {
         if (latestWord) setTodayWord(latestWord)
       }
 
-      const { data: todayStudy } = await supabase
-        .from('user_daily_study')
-        .select('study_time')
-        .eq('user_id', user.id)
-        .eq('study_date', today)
-        .maybeSingle()
-
-      setStudyTimeToday(todayStudy?.study_time || 0)
+      {
+        const today = new Date().toLocaleDateString('en-CA')
+        const { data: todayStudy } = await supabase
+          .from('user_daily_study')
+          .select('study_time')
+          .eq('user_id', user.id)
+          .eq('study_date', today)
+          .maybeSingle()
+        setTotalStudyTime(todayStudy?.study_time || 0)
+      }
 
       const { data: folderData } = await supabase
         .from('folders')
@@ -168,9 +171,13 @@ export default function HomePage() {
 
   const progress = totalWords > 0 ? Math.round((masteredWords / totalWords) * 100) : 0
 
-  const hours = Math.floor(studyTimeToday / 3600)
-  const minutes = Math.floor((studyTimeToday % 3600) / 60)
-  const timeDisplay = studyTimeToday < 60 ? `${studyTimeToday}s` : hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`
+  const formatStudyTime = (seconds: number) => {
+    if (seconds < 60) return 'Just now'
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m`
+    const h = Math.floor(seconds / 3600)
+    const m = Math.floor((seconds % 3600) / 60)
+    return m > 0 ? `${h}h ${m}m` : `${h}h`
+  }
 
   return (
     <main style={{
@@ -179,6 +186,7 @@ export default function HomePage() {
       paddingBottom: '100px',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
+      <PullToRefresh onRefresh={async () => { await fetchData() }}>
       <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding: pagePadding }}>
 
         {/* 상단 인사말 */}
@@ -270,7 +278,7 @@ export default function HomePage() {
         <div style={{ display: 'grid', gridTemplateColumns: isDesktop ? '1fr 1fr 1fr 1fr' : '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
           {[
             { icon: BookOpen, label: '마스터 단어', value: masteredWords.toString() },
-            { icon: Clock, label: '총 학습시간', value: timeDisplay },
+            { icon: Clock, label: 'Today', value: formatStudyTime(totalStudyTime) },
           ].map((item) => (
             <div key={item.label} style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '14px', border: '1px solid var(--color-border)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
               <div style={{ width: '22px', height: '3px', background: 'var(--color-my)', borderRadius: '3px', marginBottom: '8px' }} />
@@ -357,9 +365,9 @@ export default function HomePage() {
           const getLevel = (dateStr: string) => {
             const w = monthlyData[dateStr] || 0
             if (w === 0) return 0
-            if (w < maxWords * 0.25) return 1
-            if (w < maxWords * 0.5) return 2
-            if (w < maxWords * 0.75) return 3
+            if (w < 10) return 1
+            if (w < 20) return 2
+            if (w < 30) return 3
             return 4
           }
 
@@ -537,6 +545,7 @@ export default function HomePage() {
         )}
 
       </div>
+      </PullToRefresh>
       {showSpeedSheet && (
         <>
           <div onClick={() => setShowSpeedSheet(false)}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useRef, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, Volume2, RotateCcw } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -44,6 +44,8 @@ function ReviewContent() {
   const [options, setOptions] = useState<string[]>([])
   const [stats, setStats] = useState({ know: 0, dontKnow: 0 })
   const [allWords, setAllWords] = useState<Word[]>([])
+  const [isAnswered, setIsAnswered] = useState(false)
+  const typingAdvanceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(() => {
     const fetchWords = async () => {
       const supabase = createClient()
@@ -82,6 +84,7 @@ function ReviewContent() {
     setFlipped(false)
     setInputValue('')
     setInputResult(null)
+    setIsAnswered(false)
     setSelectedOption(null)
     if (randomMode === 'quiz') generateOptions(words[current])
   }, [current, words])
@@ -142,6 +145,7 @@ function ReviewContent() {
     const word = words[current]
     const isCorrect = inputValue.trim().toLowerCase() === word.word.toLowerCase()
     setInputResult(isCorrect ? 'correct' : 'wrong')
+    setIsAnswered(true)
 
     const supabase = createClient()
 
@@ -168,7 +172,9 @@ function ReviewContent() {
       dontKnow: !isCorrect ? prev.dontKnow + 1 : prev.dontKnow,
     }))
 
-    setTimeout(async () => {
+    if (typingAdvanceRef.current) clearTimeout(typingAdvanceRef.current)
+    typingAdvanceRef.current = setTimeout(async () => {
+      typingAdvanceRef.current = null
       if (current + 1 >= words.length) {
         await recordStudyProgress(words.length)
         setFinished(true)
@@ -176,6 +182,7 @@ function ReviewContent() {
         setCurrent(prev => prev + 1)
         setInputValue('')
         setInputResult(null)
+        setIsAnswered(false)
       }
     }, 1200)
   }
@@ -371,6 +378,11 @@ function ReviewContent() {
             ) : (
               <button
                 onClick={async () => {
+                  if (!isAnswered) return
+                  if (typingAdvanceRef.current) {
+                    clearTimeout(typingAdvanceRef.current)
+                    typingAdvanceRef.current = null
+                  }
                   if (current + 1 >= words.length) {
                     await recordStudyProgress(words.length)
                     setFinished(true)
@@ -378,6 +390,7 @@ function ReviewContent() {
                     setCurrent(prev => prev + 1)
                     setInputValue('')
                     setInputResult(null)
+                    setIsAnswered(false)
                   }
                 }}
                 style={{
@@ -385,7 +398,9 @@ function ReviewContent() {
                   background: 'var(--color-my)', color: 'var(--color-my-contrast)',
                   border: 'none', borderRadius: '14px',
                   fontSize: '15px', fontWeight: 700,
-                  cursor: 'pointer', marginTop: '10px',
+                  opacity: isAnswered ? 1 : 0.4,
+                  cursor: isAnswered ? 'pointer' : 'default',
+                  marginTop: '10px',
                 }}
               >
                 다음 →

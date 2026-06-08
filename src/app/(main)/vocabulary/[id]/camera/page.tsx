@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Camera, Image, Loader2 } from 'lucide-react'
 
 import { createClient } from '@/lib/supabase/client'
+import { showToast } from '@/components/ui/Toast'
 import { canUsePhotoExtract, incrementExtractCount } from '@/lib/premium'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 
@@ -136,13 +137,14 @@ export default function CameraPage() {
       const data = await response.json()
 
       if (!response.ok || data.error) {
-        alert('단어 추출에 실패했어요: ' + (data.error || '다시 시도해주세요'))
+        showToast('단어를 찾지 못했어요', 'error')
         return
       }
 
       setWords(data.words.map((w: { word: string; meaning: string; part_of_speech?: string; pronunciation?: string; example?: string }) => ({ ...w, selected: true })))
+      showToast('단어를 찾았어요!')
     } catch {
-      setError('단어 추출에 실패했어요. 다시 시도해주세요.')
+      showToast('단어를 찾지 못했어요', 'error')
     } finally {
       stopTimer()
       setIsAnalyzing(false)
@@ -170,6 +172,7 @@ export default function CameraPage() {
           example: w.example || null,
         }))
       )
+      showToast('단어장에 추가됐어요!')
       router.back()
     } catch {
       setError('저장에 실패했어요.')

@@ -67,10 +67,12 @@ export default function TabBar() {
 
   return (
     <nav style={{
-      position: 'fixed', bottom: 16, left: '50%',
+      position: 'fixed', bottom: 20, left: '50%',
       transform: 'translateX(-50%)',
       background: 'var(--color-surface)',
-      borderRadius: '40px', padding: '7px 8px',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
+      borderRadius: '40px', padding: '10px 8px',
       display: 'flex', justifyContent: 'space-around',
       alignItems: 'center', gap: '4px',
       boxShadow: '0 4px 24px rgba(0,0,0,0.12)',

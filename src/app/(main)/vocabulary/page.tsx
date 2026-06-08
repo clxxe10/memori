@@ -23,6 +23,10 @@ import { ChevronRight, Plus, Search, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import SelectDropdown from '@/components/ui/SelectDropdown'
+import EmptyState from '@/components/ui/EmptyState'
+import { showToast } from '@/components/ui/Toast'
+import { FolderSkeleton } from '@/components/ui/Skeleton'
+import PullToRefresh from '@/components/ui/PullToRefresh'
 
 type Folder = {
   id: string
@@ -151,6 +155,7 @@ export default function VocabularyPage() {
         is_public: false,
       })
       setShowModal(false)
+      showToast('단어장이 만들어졌어요!')
     } catch (e) {
       console.error(e)
       alert('오류가 발생했습니다.')
@@ -170,6 +175,7 @@ export default function VocabularyPage() {
         fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
       }}
     >
+      <PullToRefresh onRefresh={async () => { await fetchFolders() }}>
       <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding: pagePadding }}>
         <div style={{ marginBottom: '20px' }}>
           <h1
@@ -217,13 +223,17 @@ export default function VocabularyPage() {
         </div>
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--color-text-secondary)' }}>불러오는 중...</div>
-        ) : filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 0' }}>
-            <div style={{ fontSize: '40px', marginBottom: '12px' }}>📚</div>
-            <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '6px' }}>단어장이 없어요</p>
-            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>아래 + 버튼으로 첫 단어장을 만들어보세요</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {[1, 2, 3, 4].map(i => <FolderSkeleton key={i} />)}
           </div>
+        ) : folders.length === 0 ? (
+          <EmptyState
+            icon="📚"
+            title="단어장이 없어요"
+            desc="첫 단어장을 만들고 단어를 추가해봐요"
+            actionLabel="단어장 만들기"
+            onAction={() => setShowModal(true)}
+          />
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '10px' }}>
             {filtered.map((folder) => {
@@ -291,6 +301,7 @@ export default function VocabularyPage() {
           </div>
         )}
       </div>
+      </PullToRefresh>
 
       <button
         onClick={() => setShowModal(true)}

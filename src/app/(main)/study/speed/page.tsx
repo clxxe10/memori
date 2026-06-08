@@ -724,7 +724,7 @@ function SpeedContent() {
         </div>
       </div>
 
-      <div style={{ padding: '0 16px 80px', flexShrink: 0, zIndex: 20, position: 'relative' }}>
+      <div style={{ padding: '0 16px', paddingBottom: 'env(safe-area-inset-bottom, 80px)', flexShrink: 0, zIndex: 20, position: 'relative' }}>
         <div style={{ height: '3px', background: 'var(--color-surface-2)', borderRadius: '3px', marginBottom: '8px', overflow: 'hidden' }}>
           <div style={{
             height: '100%', borderRadius: '3px',
@@ -745,6 +745,9 @@ function SpeedContent() {
           ref={inputRef}
           value={input}
           onChange={handleInput}
+          onFocus={() => {
+            window.scrollTo(0, 0)
+          }}
           placeholder={mode === 'word-to-meaning' ? '한국어 뜻 입력...' : '영어 단어 입력...'}
           autoComplete="off"
           autoCorrect="off"

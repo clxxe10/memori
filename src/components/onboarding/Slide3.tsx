@@ -13,6 +13,7 @@ export default function Slide3({ onNext, onSkip: _onSkip }: { onNext: () => void
   const [showGoalDrop, setShowGoalDrop] = useState(false)
   const [showTimeDrop, setShowTimeDrop] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [myColor, setMyColor] = useState('#1C1C1E')
 
   const handleNext = async () => {
     setSaving(true)
@@ -31,6 +32,8 @@ export default function Slide3({ onNext, onSkip: _onSkip }: { onNext: () => void
         localStorage.setItem('notification_enabled', String(notifOn))
         localStorage.setItem('notification_time', time)
       }
+      localStorage.setItem('my-color', myColor)
+      document.documentElement.style.setProperty('--color-my', myColor)
     } catch (e) {
       console.error(e)
     } finally {
@@ -165,6 +168,72 @@ export default function Slide3({ onNext, onSkip: _onSkip }: { onNext: () => void
             )}
           </div>
         )}
+      </div>
+
+      <div style={{
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-border)',
+        borderRadius: '14px', padding: '14px 16px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+        marginBottom: '12px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+          <div>
+            <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>마이컬러</p>
+            <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: 0 }}>앱 포인트 색상을 설정해요</p>
+          </div>
+          <div style={{ position: 'relative', width: '36px', height: '36px' }}>
+            <div style={{
+              width: '36px', height: '36px', borderRadius: '50%',
+              background: myColor,
+              border: '2px solid var(--color-border)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            }} />
+            <input
+              type="color"
+              value={myColor}
+              onChange={e => setMyColor(e.target.value)}
+              style={{
+                position: 'absolute', inset: 0,
+                opacity: 0, width: '100%', height: '100%',
+                cursor: 'pointer',
+              }}
+            />
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          {['#1C1C1E', '#007AFF', '#34C759', '#FF9500', '#FF3B30', '#AF52DE', '#FF2D55', '#5AC8FA'].map(color => (
+            <div
+              key={color}
+              onClick={() => setMyColor(color)}
+              style={{
+                width: '28px', height: '28px', borderRadius: '50%',
+                background: color, cursor: 'pointer',
+                border: myColor === color ? '2px solid var(--color-text-primary)' : '2px solid transparent',
+                boxShadow: myColor === color ? `0 0 0 2px var(--color-bg), 0 0 0 4px ${color}` : '0 1px 4px rgba(0,0,0,0.15)',
+                transition: 'all 0.15s',
+              }}
+            />
+          ))}
+          <div style={{ position: 'relative', width: '28px', height: '28px' }}>
+            <div style={{
+              width: '28px', height: '28px', borderRadius: '50%',
+              background: 'conic-gradient(#ffb3c6,#ffd6a5,#fdffb6,#caffbf,#a0c4ff,#bdb2ff,#ffb3c6)',
+              border: '2px solid var(--color-border)', cursor: 'pointer',
+            }} />
+            <input
+              type="color"
+              value={myColor}
+              onChange={e => setMyColor(e.target.value)}
+              style={{
+                position: 'absolute', inset: 0,
+                opacity: 0, width: '100%', height: '100%',
+                cursor: 'pointer',
+              }}
+            />
+          </div>
+        </div>
       </div>
 
       <p style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', textAlign: 'center', marginBottom: '20px' }}>

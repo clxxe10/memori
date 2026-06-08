@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronRight, Star } from 'lucide-react'
+import { ChevronRight, HelpCircle, Star } from 'lucide-react'
+import HelpSheet from '@/components/ui/HelpSheet'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 
@@ -16,16 +17,6 @@ const ALL_MODES = [
     badge: '추천',
     badgeColor: '#1C1C1E',
     badgeBg: 'rgba(28,28,30,0.08)',
-  },
-  {
-    id: 'speed',
-    name: '스피드 모드',
-    desc: '단어가 내려오기 전에 뜻을 입력해요',
-    emoji: '🚀',
-    color: 'rgba(251,191,36,0.10)',
-    badge: 'NEW',
-    badgeColor: '#B45309',
-    badgeBg: 'rgba(251,191,36,0.12)',
   },
   {
     id: 'blink',
@@ -54,6 +45,24 @@ const ALL_MODES = [
     badge: null,
   },
   {
+    id: 'speed',
+    name: '스피드 모드',
+    desc: '단어가 내려오기 전에 뜻을 입력해요',
+    emoji: '🚀',
+    color: 'rgba(251,191,36,0.10)',
+    badge: 'NEW',
+    badgeColor: '#B45309',
+    badgeBg: 'rgba(251,191,36,0.12)',
+  },
+  {
+    id: 'pdf',
+    name: 'PDF 시험지',
+    desc: '단어 시험지를 PDF로 만들어요',
+    emoji: '📄',
+    color: 'rgba(28,28,30,0.06)',
+    badge: null,
+  },
+  {
     id: 'review',
     name: '복습',
     desc: '틀린 단어만 모아서 다시 학습해요',
@@ -69,14 +78,6 @@ const ALL_MODES = [
     color: 'rgba(0,199,190,0.09)',
     badge: null,
   },
-  {
-    id: 'pdf',
-    name: 'PDF 시험지',
-    desc: '단어 시험지를 PDF로 만들어요',
-    emoji: '📄',
-    color: 'rgba(28,28,30,0.06)',
-    badge: null,
-  },
 ]
 
 export default function StudyPage() {
@@ -87,6 +88,7 @@ export default function StudyPage() {
   const [selectedMode, setSelectedMode] = useState<string | null>(null)
   const [folders, setFolders] = useState<Array<{ id: string; name: string; icon: string; word_count?: number; color?: string }>>([])
   const [loadingFolders, setLoadingFolders] = useState(false)
+  const [helpMode, setHelpMode] = useState<string | null>(null)
   const pagePadding = usePagePadding()
 
   useEffect(() => {
@@ -274,6 +276,19 @@ export default function StudyPage() {
                 </p>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setHelpMode(mode.id)
+                  }}
+                  style={{
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    padding: '4px', color: 'var(--color-text-tertiary)',
+                    flexShrink: 0,
+                  }}
+                >
+                  <HelpCircle size={16} />
+                </button>
                 <button
                   onClick={e => toggleFavorite(mode.id, e)}
                   style={{
@@ -466,6 +481,10 @@ export default function StudyPage() {
             )}
           </div>
         </>
+      )}
+
+      {helpMode && (
+        <HelpSheet mode={helpMode} onClose={() => setHelpMode(null)} />
       )}
     </main>
   )

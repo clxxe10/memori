@@ -43,6 +43,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Heart, Download, Send } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import { showToast } from '@/components/ui/Toast'
 
 type Folder = {
   id: string
@@ -191,6 +192,7 @@ export default function PublicFolderPage() {
     }
     setIsImported(true)
     setImporting(false)
+    if (newFolder) showToast('내 단어장에 추가됐어요!')
   }
 
   const handleComment = async () => {

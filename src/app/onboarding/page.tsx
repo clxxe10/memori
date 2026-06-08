@@ -6,6 +6,7 @@ import OnboardingSlide1 from '@/components/onboarding/Slide1'
 import OnboardingSlide2 from '@/components/onboarding/Slide2'
 import OnboardingSlide3 from '@/components/onboarding/Slide3'
 import OnboardingSlide4 from '@/components/onboarding/Slide4'
+import { useSwipe } from '@/hooks/useSwipe'
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -26,8 +27,16 @@ export default function OnboardingPage() {
     router.replace('/home')
   }
 
+  const swipeHandlers = useSwipe({
+    onSwipeLeft: () => { if (step < 4) setStep(s => s + 1) },
+    onSwipeRight: () => { if (step > 1) setStep(s => s - 1) },
+    threshold: 80,
+  })
+
   return (
-    <main style={{
+    <main
+      {...swipeHandlers}
+      style={{
       position: 'fixed', inset: 0,
       background: 'var(--color-bg)',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',

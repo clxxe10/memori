@@ -53,3 +53,41 @@ html, body {
 /* 모바일: ~767px */
 /* 아이패드: 768px~1023px */
 /* PC: 1024px~ */
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.tap-feedback {
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+.tap-feedback:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+
+.card-feedback {
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease;
+}
+.card-feedback:active {
+  transform: scale(0.98);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+textarea {
+  font-size: 16px !important;
+}
+
+@keyframes pageIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.page-enter {
+  animation: pageIn 0.2s ease-out forwards;
+}

@@ -44,12 +44,15 @@
 
 'use client'
 
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useCallback, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Search, Star } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import SelectDropdown from '@/components/ui/SelectDropdown'
+import EmptyState from '@/components/ui/EmptyState'
+import { FolderSkeleton } from '@/components/ui/Skeleton'
+import PullToRefresh from '@/components/ui/PullToRefresh'
 
 type PublicFolder = {
   id: string
@@ -78,53 +81,54 @@ function SearchPageContent() {
   const [myUserId, setMyUserId] = useState<string | null>(null)
   const pagePadding = usePagePadding()
 
-  useEffect(() => {
-    const fetchPublicFolders = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) setMyUserId(user.id)
+  const fetchPublicFolders = useCallback(async () => {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) setMyUserId(user.id)
 
-      const { data: folderData } = await supabase
-        .from('folders')
-        .select('*')
-        .eq('is_public', true)
+    const { data: folderData } = await supabase
+      .from('folders')
+      .select('*')
+      .eq('is_public', true)
 
-      if (!folderData) {
-        setLoading(false)
-        return
-      }
-
-      const foldersWithCount = await Promise.all(
-        folderData.map(async (folder) => {
-          const { count: wordCount } = await supabase
-            .from('words')
-            .select('*', { count: 'exact', head: true })
-            .eq('folder_id', folder.id)
-
-          const { count: likeCount } = await supabase
-            .from('folder_likes')
-            .select('*', { count: 'exact', head: true })
-            .eq('folder_id', folder.id)
-
-          return {
-            ...folder,
-            word_count: wordCount || 0,
-            like_count: likeCount || 0,
-          }
-        })
-      )
-
-      const sorted = foldersWithCount.sort((a, b) => {
-        const scoreA = (a.like_count * 2) + (a.word_count * 0.1)
-        const scoreB = (b.like_count * 2) + (b.word_count * 0.1)
-        return scoreB - scoreA
-      })
-
-      setFolders(sorted)
+    if (!folderData) {
       setLoading(false)
+      return
     }
-    fetchPublicFolders()
+
+    const foldersWithCount = await Promise.all(
+      folderData.map(async (folder) => {
+        const { count: wordCount } = await supabase
+          .from('words')
+          .select('*', { count: 'exact', head: true })
+          .eq('folder_id', folder.id)
+
+        const { count: likeCount } = await supabase
+          .from('folder_likes')
+          .select('*', { count: 'exact', head: true })
+          .eq('folder_id', folder.id)
+
+        return {
+          ...folder,
+          word_count: wordCount || 0,
+          like_count: likeCount || 0,
+        }
+      })
+    )
+
+    const sorted = foldersWithCount.sort((a, b) => {
+      const scoreA = (a.like_count * 2) + (a.word_count * 0.1)
+      const scoreB = (b.like_count * 2) + (b.word_count * 0.1)
+      return scoreB - scoreA
+    })
+
+    setFolders(sorted)
+    setLoading(false)
   }, [])
+
+  useEffect(() => {
+    fetchPublicFolders()
+  }, [fetchPublicFolders])
 
   const filtered = folders.filter(f => {
     if (myOnly && f.user_id !== myUserId) return false
@@ -196,6 +200,7 @@ function SearchPageContent() {
       paddingBottom: '100px',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
+      <PullToRefresh onRefresh={async () => { await fetchPublicFolders() }}>
       <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding: pagePadding }}>
 
         {/* 헤더 */}
@@ -270,17 +275,15 @@ function SearchPageContent() {
 
         {/* 결과 */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--color-text-secondary)' }}>불러오는 중...</div>
-        ) : filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 0' }}>
-            <div style={{ fontSize: '40px', marginBottom: '12px' }}>🔍</div>
-            <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '6px' }}>
-              {query ? `"${query}" 검색 결과가 없어요` : '공개된 단어장이 없어요'}
-            </p>
-            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
-              단어장을 공개로 설정하면 여기에 표시돼요
-            </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {[1, 2, 3, 4, 5].map(i => <FolderSkeleton key={i} />)}
           </div>
+        ) : filtered.length === 0 ? (
+          <EmptyState
+            icon="🔍"
+            title="검색 결과가 없어요"
+            desc={query ? `"${query}"에 해당하는 단어장이 없어요` : '아직 공개된 단어장이 없어요'}
+          />
         ) : (
           <>
             {query && (
@@ -387,6 +390,7 @@ function SearchPageContent() {
         )}
 
       </div>
+      </PullToRefresh>
     </main>
   )
 }
