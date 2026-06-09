@@ -742,10 +742,15 @@ function SpeedContent() {
       </div>
 
       <div style={{
-        padding: '12px 16px',
-        paddingBottom: '12px',
-        background: 'var(--color-bg)',
         flexShrink: 0,
+        padding: '12px 16px',
+        paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+        background: 'var(--color-bg)',
+        borderTop: '1px solid var(--color-border)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+        alignItems: 'center',
       }}>
         <div style={{ height: '3px', background: 'var(--color-surface-2)', borderRadius: '3px', marginBottom: '8px', overflow: 'hidden' }}>
           <div style={{
@@ -782,15 +787,17 @@ function SpeedContent() {
           autoCapitalize="off"
           spellCheck={false}
           style={{
-            width: '100%', height: '52px',
+            flex: 1,
+            alignSelf: 'stretch',
+            height: '44px',
+            borderRadius: '12px',
+            border: '1px solid var(--color-border)',
+            padding: '0 14px',
+            fontSize: '16px',
             background: 'var(--color-surface)',
-            border: '1.5px solid var(--color-border)',
-            borderRadius: '14px', padding: '0 16px',
-            fontSize: '16px', fontWeight: 600,
             color: 'var(--color-text-primary)',
-            outline: 'none', boxSizing: 'border-box' as const,
-            zIndex: 20,
-            position: 'relative',
+            outline: 'none',
+            boxSizing: 'border-box' as const,
           }}
         />
       </div>
