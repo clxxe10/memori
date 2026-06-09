@@ -744,7 +744,7 @@ function SpeedContent() {
       <div style={{
         flexShrink: 0,
         padding: '12px 16px',
-        paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+        paddingBottom: '90px',
         background: 'var(--color-bg)',
         borderTop: '1px solid var(--color-border)',
         display: 'flex',
