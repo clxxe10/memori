@@ -97,6 +97,20 @@ function SpeedContent() {
   }, [])
 
   useEffect(() => {
+    const handleResize = () => {
+      if (window.visualViewport) {
+        document.documentElement.style.setProperty(
+          '--viewport-height',
+          `${window.visualViewport.height}px`
+        )
+      }
+    }
+    handleResize()
+    window.visualViewport?.addEventListener('resize', handleResize)
+    return () => window.visualViewport?.removeEventListener('resize', handleResize)
+  }, [])
+
+  useEffect(() => {
     const style = document.createElement('style')
     style.textContent = `
       @keyframes wordCorrect {
@@ -305,11 +319,9 @@ function SpeedContent() {
     }
   }, [])
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value
-    setInput(val)
-
-    const trimmed = val.trim().toLowerCase()
+  const handleSubmit = (val?: string) => {
+    const raw = val ?? inputRef.current?.value ?? input
+    const trimmed = raw.trim().toLowerCase()
     if (!trimmed) return
 
     const normalize = (str: string) =>
@@ -377,6 +389,10 @@ function SpeedContent() {
       setFallingWords([...fallingWordsRef.current])
       setInput('')
     }
+  }
+
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value)
   }
 
   const handleRestart = () => {
@@ -601,7 +617,8 @@ function SpeedContent() {
 
   return (
     <main style={{
-      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+      position: 'fixed', top: 0, left: 0, right: 0,
+      height: 'var(--viewport-height, 100vh)',
       background: 'var(--color-bg)',
       display: 'flex', flexDirection: 'column',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
@@ -724,7 +741,12 @@ function SpeedContent() {
         </div>
       </div>
 
-      <div style={{ padding: '0 16px', paddingBottom: 'env(safe-area-inset-bottom, 80px)', flexShrink: 0, zIndex: 20, position: 'relative' }}>
+      <div style={{
+        padding: '12px 16px',
+        paddingBottom: '12px',
+        background: 'var(--color-bg)',
+        flexShrink: 0,
+      }}>
         <div style={{ height: '3px', background: 'var(--color-surface-2)', borderRadius: '3px', marginBottom: '8px', overflow: 'hidden' }}>
           <div style={{
             height: '100%', borderRadius: '3px',
@@ -743,8 +765,14 @@ function SpeedContent() {
         </div>
         <input
           ref={inputRef}
+          type="search"
           value={input}
           onChange={handleInput}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSubmit()
+            }
+          }}
           onFocus={() => {
             window.scrollTo(0, 0)
           }}
