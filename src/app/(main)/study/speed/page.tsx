@@ -97,17 +97,36 @@ function SpeedContent() {
   }, [])
 
   useEffect(() => {
+    const originalStyle = document.body.style.cssText
+    document.body.style.cssText = `
+    position: fixed;
+    width: 100%;
+    overflow: hidden;
+    top: 0;
+  `
+
+    const tabBar = document.getElementById('tab-bar')
+    if (tabBar) tabBar.style.display = 'none'
+
     const handleResize = () => {
       if (window.visualViewport) {
         document.documentElement.style.setProperty(
           '--viewport-height',
           `${window.visualViewport.height}px`
         )
+        window.scrollTo(0, 0)
       }
     }
     handleResize()
     window.visualViewport?.addEventListener('resize', handleResize)
-    return () => window.visualViewport?.removeEventListener('resize', handleResize)
+    window.visualViewport?.addEventListener('scroll', handleResize)
+
+    return () => {
+      document.body.style.cssText = originalStyle
+      if (tabBar) tabBar.style.display = ''
+      window.visualViewport?.removeEventListener('resize', handleResize)
+      window.visualViewport?.removeEventListener('scroll', handleResize)
+    }
   }, [])
 
   useEffect(() => {

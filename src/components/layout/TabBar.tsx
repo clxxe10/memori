@@ -66,7 +66,7 @@ export default function TabBar() {
   }
 
   return (
-    <nav style={{
+    <nav id="tab-bar" style={{
       position: 'fixed', bottom: 20, left: '50%',
       transform: 'translateX(-50%)',
       background: 'var(--color-surface)',
