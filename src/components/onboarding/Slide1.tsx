@@ -19,6 +19,9 @@ export default function Slide1({ onNext }: { onNext: () => void }) {
         background: 'var(--color-text-primary)', color: 'var(--color-bg)',
         border: 'none', borderRadius: '14px',
         fontSize: '16px', fontWeight: 800, cursor: 'pointer',
+        position: 'relative',
+        zIndex: 10,
+        pointerEvents: 'auto',
       }}>
         시작하기 →
       </button>
