@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 export default function SplashPage() {
   const router = useRouter()
@@ -33,10 +34,17 @@ export default function SplashPage() {
     `
     document.head.appendChild(style)
 
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+
       const onboardingDone = localStorage.getItem('onboarding_done')
       if (onboardingDone) {
-        router.replace('/home')
+        if (session) {
+          router.replace('/home')
+        } else {
+          router.replace('/login')
+        }
       } else {
         router.replace('/onboarding')
       }
