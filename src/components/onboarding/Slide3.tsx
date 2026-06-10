@@ -1,249 +1,186 @@
 'use client'
-
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-const GOALS = ['5개', '10개', '15개', '20개', '30개', '50개']
-const TIMES = ['오전 7:00', '오전 8:00', '오전 9:00', '오후 6:00', '오후 8:00', '오후 10:00']
+type Props = {
+  onNext: () => void
+  onBack: () => void
+  onGoogleLogin: () => void
+  email: string
+  setEmail: (v: string) => void
+  name: string
+  setName: (v: string) => void
+}
 
-export default function Slide3({ onNext, onSkip: _onSkip }: { onNext: () => void; onSkip: () => void }) {
-  const [goal, setGoal] = useState('10개')
-  const [notifOn, setNotifOn] = useState(true)
-  const [time, setTime] = useState('오전 8:00')
-  const [showGoalDrop, setShowGoalDrop] = useState(false)
-  const [showTimeDrop, setShowTimeDrop] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [myColor, setMyColor] = useState('#1C1C1E')
+export default function Slide3({ onNext, onBack, onGoogleLogin, email, setEmail, name, setName }: Props) {
+  const router = useRouter()
+  const [mode, setMode] = useState<'select' | 'name' | 'email' | 'password'>('select')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleGoogle = async () => {
+    const supabase = createClient()
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/auth/callback` }
+    })
+  }
 
   const handleNext = async () => {
-    setSaving(true)
-    try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const goalNum = parseInt(goal.replace('개', ''), 10) || 10
-        await supabase.from('user_learning_stats').upsert({
-          user_id: user.id,
-          daily_goal: goalNum,
-          notification_enabled: notifOn,
-          notification_time: time,
-        }, { onConflict: 'user_id' })
-        localStorage.setItem('daily_goal', String(goalNum))
-        localStorage.setItem('notification_enabled', String(notifOn))
-        localStorage.setItem('notification_time', time)
-      }
-      localStorage.setItem('my-color', myColor)
-      document.documentElement.style.setProperty('--color-my', myColor)
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setSaving(false)
-      onNext()
+    setError('')
+    if (mode === 'select') { setMode('name'); return }
+    if (mode === 'name') {
+      if (!name.trim()) { setError('이름을 입력해주세요'); return }
+      setMode('email'); return
     }
+    if (mode === 'email') {
+      if (!email.trim() || !email.includes('@')) { setError('올바른 이메일을 입력해주세요'); return }
+      setMode('password'); return
+    }
+    if (mode === 'password') {
+      if (password.length < 6) { setError('비밀번호는 6자 이상이에요'); return }
+      setLoading(true)
+      try {
+        const supabase = createClient()
+        const { error: signUpError } = await supabase.auth.signUp({
+          email, password,
+          options: { data: { full_name: name } }
+        })
+        if (signUpError) { setError(signUpError.message); return }
+        onNext()
+      } finally {
+        setLoading(false)
+      }
+    }
+  }
+
+  const getTitle = () => {
+    if (mode === 'select') return '시작하는 방법을\n선택해주세요'
+    if (mode === 'name') return '이름이 뭐예요?'
+    if (mode === 'email') return '이메일 주소를\n알려주세요'
+    return '비밀번호를\n설정해주세요'
   }
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: '52px 24px 40px' }}>
-
       <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', marginBottom: '24px' }}>
-        {[1, 2, 3, 4].map(i => (
-          <div key={i} style={{
-            height: '5px', borderRadius: '3px',
-            background: i === 3 ? 'var(--color-text-primary)' : 'var(--color-border)',
-            width: i === 3 ? '18px' : '5px',
-          }} />
+        {[1,2,3,4,5].map(i => (
+          <div key={i} style={{ height: '5px', borderRadius: '3px', background: i === 3 ? 'var(--color-text-primary)' : 'var(--color-border)', width: i === 3 ? '18px' : '5px' }} />
         ))}
       </div>
 
-      <h1 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--color-text-primary)', letterSpacing: '-0.8px', lineHeight: 1.2, marginBottom: '6px' }}>
-        나만의 루틴을<br/>설정해봐요
+      <h1 style={{ fontSize: '26px', fontWeight: 900, color: 'var(--color-text-primary)', letterSpacing: '-0.8px', lineHeight: 1.2, marginBottom: '32px', whiteSpace: 'pre-line' }}>
+        {getTitle()}
       </h1>
-      <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '28px' }}>
-        나중에 언제든지 바꿀 수 있어요
-      </p>
 
-      <div style={{ position: 'relative', marginBottom: '12px' }}>
-        <div style={{
-          background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-          borderRadius: '14px', padding: '14px 16px',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.05), 0 1px 0 rgba(255,255,255,0.5) inset',
-          cursor: 'pointer',
-        }} onClick={() => { setShowGoalDrop(p => !p); setShowTimeDrop(false) }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '20px' }}>📚</span>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>하루 목표</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(28,28,30,0.07)', borderRadius: '8px', padding: '5px 10px' }}>
-            <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{goal}</span>
-            <span style={{ fontSize: '10px', color: 'var(--color-text-tertiary)' }}>{showGoalDrop ? '▲' : '▼'}</span>
-          </div>
-        </div>
-        {showGoalDrop && (
-          <div style={{
-            position: 'absolute', top: '58px', left: 0, right: 0,
-            background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-            borderRadius: '14px', overflow: 'hidden',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 50,
-          }}>
-            {[...GOALS, '직접 입력'].map((g, i) => (
-              <button key={g} type="button" onClick={() => { setGoal(g); setShowGoalDrop(false) }}
-                style={{
-                  width: '100%', padding: '12px 16px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  background: goal === g ? 'var(--color-surface-2)' : 'transparent',
-                  border: 'none',
-                  borderBottom: i < GOALS.length ? '1px solid var(--color-border)' : 'none',
-                  cursor: 'pointer', fontSize: '14px',
-                  color: 'var(--color-text-primary)', textAlign: 'left' as const,
-                  fontWeight: goal === g ? 700 : 400,
-                }}>
-                {g}
-                {goal === g && <span style={{ color: 'var(--color-my)', fontSize: '14px' }}>✓</span>}
-              </button>
-            ))}
+      <div style={{ flex: 1 }}>
+        {mode === 'select' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <button onClick={handleGoogle} style={{
+              width: '100%', height: '52px',
+              background: 'var(--color-text-primary)', color: 'var(--color-bg)',
+              border: 'none', borderRadius: '14px',
+              fontSize: '15px', fontWeight: 600, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+            }}>
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              Google로 계속하기
+            </button>
+            <button onClick={() => setMode('name')} style={{
+              width: '100%', height: '52px',
+              background: 'transparent', color: 'var(--color-text-primary)',
+              border: '1.5px solid var(--color-border)', borderRadius: '14px',
+              fontSize: '15px', fontWeight: 600, cursor: 'pointer',
+            }}>
+              이메일로 가입하기
+            </button>
+            <button onClick={() => router.push('/login')} style={{
+              background: 'none', border: 'none', fontSize: '13px',
+              color: 'var(--color-text-secondary)', cursor: 'pointer',
+              textDecoration: 'underline', textUnderlineOffset: '3px', padding: '4px 0',
+            }}>
+              이미 계정이 있어요 · 로그인
+            </button>
           </div>
         )}
-      </div>
 
-      <div style={{
-        background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-        borderRadius: '14px', padding: '14px 16px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.05), 0 1px 0 rgba(255,255,255,0.5) inset',
-        marginBottom: '12px',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: notifOn ? '12px' : '0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '20px' }}>🔔</span>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>학습 알림</span>
-          </div>
-          <div onClick={() => setNotifOn(p => !p)}
-            style={{
-              width: '44px', height: '24px', borderRadius: '20px',
-              background: notifOn ? 'var(--color-text-primary)' : 'var(--color-border)',
-              position: 'relative', cursor: 'pointer', transition: 'background 0.2s',
-            }}>
-            <div style={{
-              position: 'absolute', top: '3px',
-              left: notifOn ? '23px' : '3px',
-              width: '18px', height: '18px', borderRadius: '50%',
-              background: notifOn ? 'var(--color-bg)' : 'var(--color-surface)',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-              transition: 'left 0.2s',
-            }} />
-          </div>
-        </div>
-        {notifOn && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '12px', borderTop: '1px solid var(--color-border)', position: 'relative' }}>
-            <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>알림 시간</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(28,28,30,0.07)', borderRadius: '8px', padding: '5px 10px', cursor: 'pointer' }}
-              onClick={() => { setShowTimeDrop(p => !p); setShowGoalDrop(false) }}>
-              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{time}</span>
-              <span style={{ fontSize: '10px', color: 'var(--color-text-tertiary)' }}>{showTimeDrop ? '▲' : '▼'}</span>
-            </div>
-            {showTimeDrop && (
-              <div style={{
-                position: 'absolute', top: '44px', right: 0,
-                background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-                borderRadius: '14px', overflow: 'hidden',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 50, minWidth: '140px',
-              }}>
-                {TIMES.map((t, i) => (
-                  <button key={t} type="button" onClick={() => { setTime(t); setShowTimeDrop(false) }}
-                    style={{
-                      width: '100%', padding: '11px 14px',
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      background: time === t ? 'var(--color-surface-2)' : 'transparent',
-                      border: 'none',
-                      borderBottom: i < TIMES.length - 1 ? '1px solid var(--color-border)' : 'none',
-                      cursor: 'pointer', fontSize: '13px',
-                      color: 'var(--color-text-primary)', textAlign: 'left' as const,
-                      fontWeight: time === t ? 700 : 400,
-                    }}>
-                    {t}
-                    {time === t && <span style={{ color: 'var(--color-my)' }}>✓</span>}
-                  </button>
-                ))}
-              </div>
+        {mode !== 'select' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {mode === 'name' && (
+              <input
+                autoFocus
+                value={name}
+                onChange={e => setName(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleNext()}
+                placeholder="홍길동"
+                style={{
+                  width: '100%', height: '52px',
+                  background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+                  borderRadius: '14px', padding: '0 16px',
+                  fontSize: '17px', color: 'var(--color-text-primary)',
+                  outline: 'none', boxSizing: 'border-box' as const,
+                }}
+              />
+            )}
+            {mode === 'email' && (
+              <input
+                autoFocus
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleNext()}
+                placeholder="hello@example.com"
+                style={{
+                  width: '100%', height: '52px',
+                  background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+                  borderRadius: '14px', padding: '0 16px',
+                  fontSize: '17px', color: 'var(--color-text-primary)',
+                  outline: 'none', boxSizing: 'border-box' as const,
+                }}
+              />
+            )}
+            {mode === 'password' && (
+              <input
+                autoFocus
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleNext()}
+                placeholder="6자 이상"
+                style={{
+                  width: '100%', height: '52px',
+                  background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+                  borderRadius: '14px', padding: '0 16px',
+                  fontSize: '17px', color: 'var(--color-text-primary)',
+                  outline: 'none', boxSizing: 'border-box' as const,
+                }}
+              />
+            )}
+            {error && (
+              <p style={{ fontSize: '13px', color: '#E24B4A', margin: 0 }}>{error}</p>
             )}
           </div>
         )}
       </div>
 
-      <div style={{
-        background: 'var(--color-surface)',
-        border: '1px solid var(--color-border)',
-        borderRadius: '14px', padding: '14px 16px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-        marginBottom: '12px',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-          <div>
-            <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>마이컬러</p>
-            <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: 0 }}>앱 포인트 색상을 설정해요</p>
-          </div>
-          <div style={{ position: 'relative', width: '36px', height: '36px' }}>
-            <div style={{
-              width: '36px', height: '36px', borderRadius: '50%',
-              background: myColor,
-              border: '2px solid var(--color-border)',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-            }} />
-            <input
-              type="color"
-              value={myColor}
-              onChange={e => setMyColor(e.target.value)}
-              style={{
-                position: 'absolute', inset: 0,
-                opacity: 0, width: '100%', height: '100%',
-                cursor: 'pointer',
-              }}
-            />
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {['#1C1C1E', '#007AFF', '#34C759', '#FF9500', '#FF3B30', '#AF52DE', '#FF2D55', '#5AC8FA'].map(color => (
-            <div
-              key={color}
-              onClick={() => setMyColor(color)}
-              style={{
-                width: '28px', height: '28px', borderRadius: '50%',
-                background: color, cursor: 'pointer',
-                border: myColor === color ? '2px solid var(--color-text-primary)' : '2px solid transparent',
-                boxShadow: myColor === color ? `0 0 0 2px var(--color-bg), 0 0 0 4px ${color}` : '0 1px 4px rgba(0,0,0,0.15)',
-                transition: 'all 0.15s',
-              }}
-            />
-          ))}
-          <div style={{ position: 'relative', width: '28px', height: '28px' }}>
-            <div style={{
-              width: '28px', height: '28px', borderRadius: '50%',
-              background: 'conic-gradient(#ffb3c6,#ffd6a5,#fdffb6,#caffbf,#a0c4ff,#bdb2ff,#ffb3c6)',
-              border: '2px solid var(--color-border)', cursor: 'pointer',
-            }} />
-            <input
-              type="color"
-              value={myColor}
-              onChange={e => setMyColor(e.target.value)}
-              style={{
-                position: 'absolute', inset: 0,
-                opacity: 0, width: '100%', height: '100%',
-                cursor: 'pointer',
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      <p style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', textAlign: 'center', marginBottom: '20px' }}>
-        설정은 프로필 → 설정에서 변경 가능해요
-      </p>
-
-      <button type="button" onClick={handleNext} disabled={saving}
-        style={{ width: '100%', height: '52px', background: 'var(--color-text-primary)', color: 'var(--color-bg)', border: 'none', borderRadius: '14px', fontSize: '16px', fontWeight: 800, cursor: 'pointer', opacity: saving ? 0.7 : 1 }}>
-        {saving ? '저장 중...' : '다음 →'}
-      </button>
+      {mode !== 'select' && (
+        <button onClick={handleNext} disabled={loading} style={{
+          width: '100%', height: '52px',
+          background: 'var(--color-text-primary)', color: 'var(--color-bg)',
+          border: 'none', borderRadius: '14px',
+          fontSize: '16px', fontWeight: 800, cursor: 'pointer',
+          opacity: loading ? 0.7 : 1, marginTop: '16px',
+        }}>
+          {loading ? '처리 중...' : '다음 →'}
+        </button>
+      )}
     </div>
   )
 }
