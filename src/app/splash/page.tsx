@@ -35,18 +35,33 @@ export default function SplashPage() {
     document.head.appendChild(style)
 
     const timer = setTimeout(async () => {
-      const supabase = createClient()
-      const { data: { session } } = await supabase.auth.getSession()
+      try {
+        const supabase = createClient()
 
-      const onboardingDone = localStorage.getItem('onboarding_done')
-      if (onboardingDone) {
-        if (session) {
+        // 세션 새로고침 시도
+        const { data: { session } } = await supabase.auth.getSession()
+
+        // 세션 없으면 refreshSession 시도
+        let validSession = session
+        if (!session) {
+          const { data: refreshData } = await supabase.auth.refreshSession()
+          validSession = refreshData.session
+        }
+
+        const onboardingDone = localStorage.getItem('onboarding_done')
+
+        if (!onboardingDone) {
+          router.replace('/onboarding')
+          return
+        }
+
+        if (validSession) {
           router.replace('/home')
         } else {
           router.replace('/login')
         }
-      } else {
-        router.replace('/onboarding')
+      } catch (e) {
+        router.replace('/login')
       }
     }, 2200)
 
