@@ -187,13 +187,25 @@ export default function Slide3({ onNext, onBack, onGoogleLogin, email, setEmail,
 
       {mode !== 'select' && (
         <button onClick={handleNext} disabled={loading} style={{
-          width: '100%', height: '52px',
-          background: 'var(--color-text-primary)', color: 'var(--color-bg)',
-          border: 'none', borderRadius: '14px',
-          fontSize: '16px', fontWeight: 800, cursor: 'pointer',
-          opacity: loading ? 0.7 : 1, marginTop: '16px',
+          position: 'fixed',
+          bottom: '40px',
+          right: '28px',
+          width: '52px',
+          height: '52px',
+          borderRadius: '50%',
+          background: 'var(--color-text-primary)',
+          color: 'var(--color-bg)',
+          border: 'none',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '22px',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+          zIndex: 100,
+          opacity: loading ? 0.7 : 1,
         }}>
-          {loading ? '처리 중...' : '다음 →'}
+          →
         </button>
       )}
       </div>

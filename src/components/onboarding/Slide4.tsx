@@ -118,29 +118,58 @@ export default function Slide4({ onNext, onBack, email, name }: { onNext: () => 
 
       {/* 마이컬러 */}
       <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '14px', padding: '14px 16px', marginBottom: '20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-          <div>
-            <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>마이컬러</p>
-            <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: 0 }}>앱 포인트 색상을 설정해요</p>
-          </div>
-          <div style={{ position: 'relative', width: '36px', height: '36px' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: myColor, border: '2px solid var(--color-border)' }} />
-            <input type="color" value={myColor} onChange={e => setMyColor(e.target.value)} style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }} />
-          </div>
+        <div style={{ marginBottom: '12px' }}>
+          <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>마이컬러</p>
+          <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: 0 }}>앱 포인트 색상을 설정해요</p>
         </div>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {['#1C1C1E','#007AFF','#34C759','#FF9500','#FF3B30','#AF52DE','#FF2D55','#5AC8FA'].map(color => (
-            <div key={color} onClick={() => setMyColor(color)} style={{ width: '28px', height: '28px', borderRadius: '50%', background: color, cursor: 'pointer', border: myColor === color ? '2px solid var(--color-text-primary)' : '2px solid transparent', boxShadow: myColor === color ? `0 0 0 2px var(--color-bg), 0 0 0 4px ${color}` : '0 1px 4px rgba(0,0,0,0.15)', transition: 'all 0.15s' }} />
-          ))}
-          <div style={{ position: 'relative', width: '28px', height: '28px' }}>
-            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'conic-gradient(#ffb3c6,#ffd6a5,#fdffb6,#caffbf,#a0c4ff,#bdb2ff,#ffb3c6)', border: '2px solid var(--color-border)' }} />
-            <input type="color" value={myColor} onChange={e => setMyColor(e.target.value)} style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }} />
+        <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ position: 'relative', width: '72px', height: '72px' }}>
+            <svg width="72" height="72" viewBox="0 0 72 72">
+              <defs>
+                <linearGradient id="cw2" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#FF3B30"/>
+                  <stop offset="16%" stopColor="#FF9500"/>
+                  <stop offset="33%" stopColor="#FFCC00"/>
+                  <stop offset="50%" stopColor="#34C759"/>
+                  <stop offset="66%" stopColor="#007AFF"/>
+                  <stop offset="83%" stopColor="#AF52DE"/>
+                  <stop offset="100%" stopColor="#FF3B30"/>
+                </linearGradient>
+              </defs>
+              <circle cx="36" cy="36" r="30" fill="none" stroke="url(#cw2)" strokeWidth="10"/>
+              <circle cx="36" cy="36" r="12" fill="var(--color-bg, white)" stroke="rgba(0,0,0,0.06)" strokeWidth="0.5"/>
+              <circle cx="36" cy="36" r="6" fill={myColor} opacity="0.9"/>
+            </svg>
+            <input
+              type="color"
+              value={myColor}
+              onChange={e => setMyColor(e.target.value)}
+              style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }}
+            />
           </div>
         </div>
       </div>
 
-      <button onClick={handleNext} disabled={saving} style={{ width: '100%', height: '52px', background: 'var(--color-text-primary)', color: 'var(--color-bg)', border: 'none', borderRadius: '14px', fontSize: '16px', fontWeight: 800, cursor: 'pointer', opacity: saving ? 0.7 : 1 }}>
-        {saving ? '저장 중...' : '다음 →'}
+      <button onClick={handleNext} disabled={saving} style={{
+        position: 'fixed',
+        bottom: '40px',
+        right: '28px',
+        width: '52px',
+        height: '52px',
+        borderRadius: '50%',
+        background: 'var(--color-text-primary)',
+        color: 'var(--color-bg)',
+        border: 'none',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '22px',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+        zIndex: 100,
+        opacity: saving ? 0.7 : 1,
+      }}>
+        →
       </button>
       </div>
     </div>
