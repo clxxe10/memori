@@ -20,6 +20,7 @@ export default function OnboardingPage() {
   return (
     <main style={{
       position: 'fixed', inset: 0,
+      height: '100dvh',
       background: 'var(--color-bg)',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
       overflow: 'hidden',
