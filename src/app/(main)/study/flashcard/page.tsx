@@ -6,7 +6,7 @@ import { ArrowLeft, Volume2, RotateCcw, ChevronLeft, ChevronRight } from 'lucide
 import { createClient } from '@/lib/supabase/client'
 import { calculateNextReview } from '@/lib/srs'
 import { recordStudyProgress } from '@/lib/studyTracker'
-import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import { usePagePadding } from '@/lib/responsive'
 import { useSwipe } from '@/hooks/useSwipe'
 import { haptics } from '@/lib/haptics'
 
@@ -262,7 +262,7 @@ function FlashcardContent() {
         flexDirection: 'column',
         height: '100%',
         padding,
-        maxWidth: CONTENT_MAX_WIDTH,
+        maxWidth: 'min(560px, 100%)',
         margin: '0 auto',
         width: '100%',
         boxSizing: 'border-box',

@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Bookmark, Camera, Pencil, Plus, Volume2, Settings } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import { useBreakpoint } from '@/hooks/useBreakpoint'
 import SelectDropdown from '@/components/ui/SelectDropdown'
 import EmptyState from '@/components/ui/EmptyState'
 import { WordSkeleton } from '@/components/ui/Skeleton'
@@ -38,6 +39,7 @@ export default function VocabularyDetailPage() {
   const params = useParams()
   const folderId = params.id as string
   const padding = usePagePadding()
+  const bp = useBreakpoint()
 
   const [folder, setFolder] = useState<Folder | null>(null)
   const [words, setWords] = useState<Word[]>([])
@@ -232,7 +234,11 @@ export default function VocabularyDetailPage() {
 
         {/* 단어 카드 리스트 */}
         {loading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '8px' }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: bp === 'mobile' ? '1fr' : 'repeat(auto-fill, minmax(360px, 1fr))',
+            gap: '8px',
+          }}>
             {[1, 2, 3, 4, 5, 6].map(i => <WordSkeleton key={i} />)}
           </div>
         ) : filtered.length === 0 ? (
@@ -244,7 +250,11 @@ export default function VocabularyDetailPage() {
             onAction={() => router.push(`/vocabulary/${folderId}/add`)}
           />
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '8px' }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: bp === 'mobile' ? '1fr' : 'repeat(auto-fill, minmax(360px, 1fr))',
+            gap: '8px',
+          }}>
             {filtered.map(word => {
               const posStyle = getPosStyle(word.part_of_speech)
               const diffStyle = getDiffStyle(word.difficulty)

@@ -21,7 +21,8 @@ import { useRouter } from 'next/navigation'
 import { ChevronRight, Plus, Search, X } from 'lucide-react'
 
 import { createClient } from '@/lib/supabase/client'
-import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import { usePagePadding } from '@/lib/responsive'
+import { useBreakpoint } from '@/hooks/useBreakpoint'
 import SelectDropdown from '@/components/ui/SelectDropdown'
 import EmptyState from '@/components/ui/EmptyState'
 import { showToast } from '@/components/ui/Toast'
@@ -46,6 +47,7 @@ export default function VocabularyPage() {
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const pagePadding = usePagePadding()
+  const bp = useBreakpoint()
   const [creating, setCreating] = useState(false)
   const [newFolder, setNewFolder] = useState({
     name: '',
@@ -176,7 +178,7 @@ export default function VocabularyPage() {
       }}
     >
       <PullToRefresh onRefresh={async () => { await fetchFolders() }}>
-      <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding: pagePadding }}>
+      <div style={{ maxWidth: '640px', margin: '0 auto', padding: pagePadding }}>
         <div style={{ marginBottom: '20px' }}>
           <h1
             style={{
@@ -235,7 +237,11 @@ export default function VocabularyPage() {
             onAction={() => setShowModal(true)}
           />
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '10px' }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr',
+            gap: '8px',
+          }}>
             {filtered.map((folder) => {
               const total = folder.word_count || 0
               const mastered = folder.mastered_count || 0

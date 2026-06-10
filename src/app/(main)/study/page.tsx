@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import { ChevronRight, HelpCircle, Star } from 'lucide-react'
 import HelpSheet from '@/components/ui/HelpSheet'
 import { createClient } from '@/lib/supabase/client'
-import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import { usePagePadding } from '@/lib/responsive'
+import { useBreakpoint } from '@/hooks/useBreakpoint'
 
 const ALL_MODES = [
   {
@@ -90,6 +91,7 @@ export default function StudyPage() {
   const [loadingFolders, setLoadingFolders] = useState(false)
   const [helpMode, setHelpMode] = useState<string | null>(null)
   const pagePadding = usePagePadding()
+  const bp = useBreakpoint()
 
   useEffect(() => {
     const saved = localStorage.getItem('study_favorites')
@@ -176,7 +178,7 @@ export default function StudyPage() {
       paddingBottom: '100px',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
-      <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding: pagePadding }}>
+      <div style={{ maxWidth: bp === 'mobile' ? '100%' : '720px', margin: '0 auto', padding: pagePadding }}>
 
         {/* 헤더 */}
         <div style={{ marginBottom: '20px' }}>
@@ -217,7 +219,13 @@ export default function StudyPage() {
         </div>
 
         {/* 모드 리스트 */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '8px' }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          maxWidth: '640px',
+          margin: '0 auto',
+          gap: '8px',
+        }}>
           {modes.map(mode => (
             <div
               key={mode.id}

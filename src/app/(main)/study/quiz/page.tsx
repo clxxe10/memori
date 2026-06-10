@@ -6,7 +6,7 @@ import { ArrowLeft, Volume2, RotateCcw } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { calculateNextReview } from '@/lib/srs'
 import { recordStudyProgress } from '@/lib/studyTracker'
-import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import { usePagePadding } from '@/lib/responsive'
 
 type Word = {
   id: string
@@ -148,7 +148,7 @@ function QuizContent() {
 
   return (
     <main style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'var(--color-bg)', display: 'flex', flexDirection: 'column', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding, maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding, maxWidth: 'min(560px, 100%)', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', flexShrink: 0 }}>
           <button onClick={() => router.back()} style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer' }}>

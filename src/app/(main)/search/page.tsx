@@ -48,7 +48,8 @@ import { Suspense, useCallback, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Search, Star } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import { usePagePadding } from '@/lib/responsive'
+import { useBreakpoint } from '@/hooks/useBreakpoint'
 import SelectDropdown from '@/components/ui/SelectDropdown'
 import EmptyState from '@/components/ui/EmptyState'
 import { FolderSkeleton } from '@/components/ui/Skeleton'
@@ -80,6 +81,7 @@ function SearchPageContent() {
   const [importedIds, setImportedIds] = useState<Set<string>>(new Set())
   const [myUserId, setMyUserId] = useState<string | null>(null)
   const pagePadding = usePagePadding()
+  const bp = useBreakpoint()
 
   const fetchPublicFolders = useCallback(async () => {
     const supabase = createClient()
@@ -201,7 +203,7 @@ function SearchPageContent() {
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
       <PullToRefresh onRefresh={async () => { await fetchPublicFolders() }}>
-      <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding: pagePadding }}>
+      <div style={{ maxWidth: '640px', margin: '0 auto', padding: pagePadding }}>
 
         {/* 헤더 */}
         <div style={{ marginBottom: '16px' }}>
@@ -296,7 +298,11 @@ function SearchPageContent() {
                 인기 단어장
               </p>
             )}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '8px' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr',
+              gap: '8px',
+            }}>
               {filtered.map(folder => {
                 const isImported = importedIds.has(folder.id)
                 return (

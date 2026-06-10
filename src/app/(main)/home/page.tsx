@@ -4,7 +4,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Play, BookOpen, Clock, ChevronRight } from 'lucide-react'
-import { CONTENT_MAX_WIDTH, useIsDesktop, usePagePadding } from '@/lib/responsive'
+import { usePagePadding } from '@/lib/responsive'
+import { useBreakpoint } from '@/hooks/useBreakpoint'
 import PullToRefresh from '@/components/ui/PullToRefresh'
 
 export default function HomePage() {
@@ -23,7 +24,7 @@ export default function HomePage() {
   const [todayWord, setTodayWord] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const pagePadding = usePagePadding()
-  const isDesktop = useIsDesktop()
+  const bp = useBreakpoint()
 
   const fetchData = useCallback(async () => {
     try {
@@ -187,7 +188,7 @@ export default function HomePage() {
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
       <PullToRefresh onRefresh={async () => { await fetchData() }}>
-      <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding: pagePadding }}>
+      <div style={{ maxWidth: bp === 'mobile' ? '100%' : '720px', margin: '0 auto', padding: pagePadding }}>
 
         {/* 상단 인사말 */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
@@ -275,7 +276,7 @@ export default function HomePage() {
         )}
 
         {/* 통계 카드 2개 */}
-        <div style={{ display: 'grid', gridTemplateColumns: isDesktop ? '1fr 1fr 1fr 1fr' : '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: bp === 'mobile' ? '1fr 1fr' : '1fr 1fr 1fr 1fr', gap: '8px', marginBottom: '12px' }}>
           {[
             { icon: BookOpen, label: '마스터 단어', value: masteredWords.toString() },
             { icon: Clock, label: 'Today', value: formatStudyTime(totalStudyTime) },
