@@ -64,7 +64,22 @@ export default function Slide3({ onNext, onBack, onGoogleLogin, email, setEmail,
   }
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: '52px 24px 40px' }}>
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      minHeight: '100dvh',
+      background: 'var(--color-bg)',
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '480px',
+        minHeight: '100dvh',
+        height: '100dvh',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '52px 24px 40px',
+      }}>
       <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', marginBottom: '24px' }}>
         {[1,2,3,4,5].map(i => (
           <div key={i} style={{ height: '5px', borderRadius: '3px', background: i === 3 ? 'var(--color-text-primary)' : 'var(--color-border)', width: i === 3 ? '18px' : '5px' }} />
@@ -181,6 +196,7 @@ export default function Slide3({ onNext, onBack, onGoogleLogin, email, setEmail,
           {loading ? '처리 중...' : '다음 →'}
         </button>
       )}
+      </div>
     </div>
   )
 }

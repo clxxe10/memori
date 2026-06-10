@@ -7,7 +7,22 @@ const features = [
 ]
 export default function Slide2({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: '52px 24px 40px' }}>
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      minHeight: '100dvh',
+      background: 'var(--color-bg)',
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '480px',
+        minHeight: '100dvh',
+        height: '100dvh',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '52px 24px 40px',
+      }}>
       <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', marginBottom: '24px' }}>
         {[1,2,3,4,5].map(i => (
           <div key={i} style={{ height: '5px', borderRadius: '3px', background: i === 2 ? 'var(--color-text-primary)' : 'var(--color-border)', width: i === 2 ? '18px' : '5px' }} />
@@ -35,6 +50,7 @@ export default function Slide2({ onNext, onBack }: { onNext: () => void; onBack:
       <button onClick={onNext} style={{ width: '100%', height: '52px', background: 'var(--color-text-primary)', color: 'var(--color-bg)', border: 'none', borderRadius: '14px', fontSize: '16px', fontWeight: 800, cursor: 'pointer' }}>
         다음 →
       </button>
+      </div>
     </div>
   )
 }

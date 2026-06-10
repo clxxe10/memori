@@ -1,7 +1,22 @@
 'use client'
 export default function Slide1({ onNext }: { onNext: () => void }) {
   return (
-    <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', padding: '60px 28px 48px' }}>
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      minHeight: '100dvh',
+      background: 'var(--color-bg)',
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '480px',
+        minHeight: '100dvh',
+        height: '100dvh',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '60px 28px 48px',
+      }}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '3px', marginBottom: '8px' }}>
           <span style={{ fontSize: '36px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-1.5px' }}>Memori</span>
@@ -25,6 +40,7 @@ export default function Slide1({ onNext }: { onNext: () => void }) {
       }}>
         시작하기 →
       </button>
+      </div>
     </div>
   )
 }

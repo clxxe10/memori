@@ -30,7 +30,22 @@ export default function Slide5({ onFinish }: { onFinish: () => void }) {
   }, [])
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: '52px 24px 40px' }}>
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      minHeight: '100dvh',
+      background: 'var(--color-bg)',
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: '480px',
+        minHeight: '100dvh',
+        height: '100dvh',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '52px 24px 40px',
+      }}>
       <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', marginBottom: '0' }}>
         {[1,2,3,4,5].map(i => (
           <div key={i} style={{ height: '5px', borderRadius: '3px', background: 'var(--color-text-primary)', width: i === 5 ? '18px' : '5px' }} />
@@ -62,6 +77,7 @@ export default function Slide5({ onFinish }: { onFinish: () => void }) {
         <button onClick={onFinish} style={{ width: '100%', height: '44px', background: 'transparent', border: '1.5px solid var(--color-border)', borderRadius: '14px', fontSize: '14px', color: 'var(--color-text-secondary)', cursor: 'pointer', fontWeight: 500 }}>
           나중에 할게요
         </button>
+      </div>
       </div>
     </div>
   )
