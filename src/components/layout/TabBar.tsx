@@ -30,6 +30,14 @@ export default function TabBar() {
     return () => window.removeEventListener('resize', check)
   }, [])
 
+  useEffect(() => {
+    const el = document.getElementById('tab-bar')
+    if (el) {
+      const cs = window.getComputedStyle(el)
+      setDebugInfo(prev => prev + ` | pos:${cs.position} disp:${cs.display} dir:${cs.flexDirection} w:${cs.width} h:${cs.height} bottom:${cs.bottom} left:${cs.left}`)
+    }
+  }, [isDesktop])
+
   const isActive = (path: string) => pathname.startsWith(path)
 
   const debugBox = (
