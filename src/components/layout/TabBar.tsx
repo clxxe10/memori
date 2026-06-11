@@ -28,7 +28,7 @@ export default function TabBar() {
 
   if (isDesktop) {
     return (
-      <aside style={{
+      <aside id="tab-bar" style={{
         position: 'fixed', top: '50%', left: '20px',
         transform: 'translateY(-50%)',
         width: '64px',
