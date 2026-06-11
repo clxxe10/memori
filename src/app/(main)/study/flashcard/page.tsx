@@ -37,6 +37,7 @@ function FlashcardContent() {
   const [stats, setStats] = useState({ know: 0, dontKnow: 0 })
   const [folderName, setFolderName] = useState('')
   const [cardAnim, setCardAnim] = useState('')
+  const [exitDirection, setExitDirection] = useState<'left' | 'right' | null>(null)
   useEffect(() => {
     const style = document.createElement('style')
     style.textContent = `
@@ -182,12 +183,20 @@ function FlashcardContent() {
     onSwipeLeft: () => {
       if (!flipped) { setFlipped(true); return }
       haptics.medium()
-      handleAnswer(false)
+      setExitDirection('left')
+      setTimeout(() => {
+        handleAnswer(false)
+        setExitDirection(null)
+      }, 250)
     },
     onSwipeRight: () => {
       if (!flipped) { setFlipped(true); return }
       haptics.success()
-      handleAnswer(true)
+      setExitDirection('right')
+      setTimeout(() => {
+        handleAnswer(true)
+        setExitDirection(null)
+      }, 250)
     },
     threshold: 60,
   })
@@ -350,6 +359,13 @@ function FlashcardContent() {
               textAlign: 'center',
               border: flipped ? '2px solid rgba(28,28,30,0.10)' : '2px solid transparent',
               overflow: 'hidden',
+              transform: exitDirection === 'left'
+                ? 'translateX(-150%) rotate(-20deg)'
+                : exitDirection === 'right'
+                ? 'translateX(150%) rotate(20deg)'
+                : 'translateX(0) rotate(0deg)',
+              opacity: exitDirection ? 0 : 1,
+              transition: exitDirection ? 'all 0.25s ease-in' : 'none',
             }}
           >
             <button
@@ -437,13 +453,25 @@ function FlashcardContent() {
         {/* 알아요/몰라요 버튼 */}
         <div style={{ display: 'flex', gap: '10px', flexShrink: 0 }}>
           <button
-            onClick={() => handleAnswer(false)}
+            onClick={() => {
+              setExitDirection('left')
+              setTimeout(() => {
+                handleAnswer(false)
+                setExitDirection(null)
+              }, 250)
+            }}
             style={{ flex: 1, height: '52px', background: 'transparent', border: '1.5px solid var(--color-border)', color: 'var(--color-text-primary)', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}
           >
             몰라요
           </button>
           <button
-            onClick={() => handleAnswer(true)}
+            onClick={() => {
+              setExitDirection('right')
+              setTimeout(() => {
+                handleAnswer(true)
+                setExitDirection(null)
+              }, 250)
+            }}
             style={{ flex: 1, height: '52px', background: 'transparent', border: '1.5px solid var(--color-border)', color: 'var(--color-text-primary)', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}
           >
             알아요
