@@ -29,38 +29,42 @@ export default function TabBar() {
   if (isDesktop) {
     return (
       <aside style={{
-        position: 'fixed', top: 0, left: 0, bottom: 0,
-        width: '240px', background: 'var(--color-surface)',
-        borderRight: '1px solid var(--color-border)',
+        position: 'fixed', top: '50%', left: '20px',
+        transform: 'translateY(-50%)',
+        width: '64px',
+        background: 'rgba(255,255,255,0.15)',
+        backdropFilter: 'blur(40px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+        border: '0.5px solid rgba(255,255,255,0.3)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.4)',
+        borderRadius: '32px',
         display: 'flex', flexDirection: 'column',
-        padding: '32px 16px', zIndex: 100,
+        alignItems: 'center', gap: '8px',
+        padding: '16px 8px',
+        zIndex: 100,
         fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
-      }}>
-        <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '40px', paddingLeft: '12px' }}>
-          Memori
-        </div>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
-          {TABS.map(tab => {
-            const active = isActive(tab.path)
-            return (
-              <button
-                key={tab.path}
-                onClick={() => router.push(tab.path)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '12px',
-                  padding: '12px 16px', borderRadius: '12px', border: 'none',
-                  background: active ? 'var(--color-my)' : 'transparent',
-                  color: active ? 'var(--color-my-contrast)' : 'var(--color-text-secondary)',
-                  cursor: 'pointer', fontSize: '15px', fontWeight: active ? 700 : 400,
-                  transition: 'all 0.15s', textAlign: 'left' as const, width: '100%',
-                }}
-              >
-                <tab.icon size={20} />
-                {tab.label}
-              </button>
-            )
-          })}
-        </nav>
+      }} className="tab-bar-container">
+        {TABS.map(tab => {
+          const active = isActive(tab.path)
+          return (
+            <button
+              key={tab.path}
+              onClick={() => router.push(tab.path)}
+              title={tab.label}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: '48px', height: '48px',
+                borderRadius: '16px', border: 'none',
+                background: active ? 'var(--color-my)' : 'transparent',
+                color: active ? 'var(--color-my-contrast)' : 'var(--color-text-secondary)',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+            >
+              <tab.icon size={22} />
+            </button>
+          )
+        })}
       </aside>
     )
   }

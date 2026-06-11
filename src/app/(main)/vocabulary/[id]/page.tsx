@@ -220,20 +220,26 @@ export default function VocabularyDetailPage() {
   }
 
   const posColors: Record<string, string> = {
-    '명사': '#007AFF',
-    '동사': '#34C759',
-    '형용사': '#FF9500',
-    '부사': '#AF52DE',
-    '전치사': '#FF3B30',
-    '접속사': '#5AC8FA',
-    '대명사': '#FF2D55',
-    'noun': '#007AFF',
-    'verb': '#34C759',
-    'adjective': '#FF9500',
-    'adverb': '#AF52DE',
-    'preposition': '#FF3B30',
-    'conjunction': '#5AC8FA',
-    'pronoun': '#FF2D55',
+    // 명사
+    '명사': '#5E9EFF', 'noun': '#5E9EFF', 'n': '#5E9EFF', 'n.': '#5E9EFF',
+    // 동사
+    '동사': '#34C77A', 'verb': '#34C77A', 'v': '#34C77A', 'v.': '#34C77A',
+    // 형용사
+    '형용사': '#FFA94D', 'adjective': '#FFA94D', 'adj': '#FFA94D', 'adj.': '#FFA94D',
+    // 부사
+    '부사': '#B98CFF', 'adverb': '#B98CFF', 'adv': '#B98CFF', 'adv.': '#B98CFF',
+    // 전치사
+    '전치사': '#FF6B6B', 'preposition': '#FF6B6B', 'prep': '#FF6B6B', 'prep.': '#FF6B6B',
+    // 접속사
+    '접속사': '#4FD1C5', 'conjunction': '#4FD1C5', 'conj': '#4FD1C5', 'conj.': '#4FD1C5',
+    // 대명사
+    '대명사': '#F687B3', 'pronoun': '#F687B3', 'pron': '#F687B3', 'pron.': '#F687B3',
+    // 감탄사
+    '감탄사': '#FFD43B', 'interjection': '#FFD43B', 'interj': '#FFD43B', 'interj.': '#FFD43B',
+    // 관사
+    '관사': '#A0AEC0', 'article': '#A0AEC0', 'art': '#A0AEC0', 'art.': '#A0AEC0',
+    // 숙어/구
+    '숙어': '#63B3ED', 'idiom': '#63B3ED', 'phrase': '#63B3ED', '구': '#63B3ED',
   }
 
   const getPosStyle = (pos: string | null) => {
@@ -330,6 +336,8 @@ export default function VocabularyDetailPage() {
           }}>
             {filtered.map(word => {
               const diffStyle = getDiffStyle(word.difficulty)
+              const normalizedPos = (word.part_of_speech || '').trim().toLowerCase()
+              const posColor = posColors[word.part_of_speech || ''] || posColors[normalizedPos] || '#9CA3AF'
               return (
                 <WordCard key={word.id} word={word} onDelete={() => handleDeleteWord(word.id)}>
                 <div style={{
@@ -354,7 +362,7 @@ export default function VocabularyDetailPage() {
                           width: '7px',
                           height: '7px',
                           borderRadius: '50%',
-                          background: posColors[word.part_of_speech || ''] || 'var(--color-text-tertiary)',
+                          background: posColor,
                           flexShrink: 0,
                         }} />
                         <span style={{

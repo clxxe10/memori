@@ -370,7 +370,7 @@ function SpeedContent() {
       setFlashWord(matched.id)
       setTimeout(() => setFlashWord(null), 400)
 
-      const colors = ['#FFB800', '#34C759', 'var(--color-my)', '#EC4899', '#0EA5E9']
+      const colors = ['#FFB800', 'var(--color-correct)', 'var(--color-my)', '#EC4899', '#0EA5E9']
       const newParticles = Array.from({ length: 6 }, (_, i) => ({
         id: `p_${Date.now()}_${i}`,
         x: matched.x,
@@ -558,8 +558,8 @@ function SpeedContent() {
         )}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '20px' }}>
           {[
-            { val: correct, lbl: '맞힘', color: '#34C759' },
-            { val: missed, lbl: '놓침', color: '#E24B4A' },
+            { val: correct, lbl: '맞힘', color: 'var(--color-correct)' },
+            { val: missed, lbl: '놓침', color: 'var(--color-incorrect)' },
             { val: `x${maxCombo}`, lbl: '최고콤보', color: '#FFB800' },
           ].map((s, i) => (
             <div key={i} style={{ background: 'var(--color-surface)', borderRadius: '14px', padding: '12px 8px', border: '1px solid var(--color-border)', textAlign: 'center' }}>
@@ -607,9 +607,9 @@ function SpeedContent() {
                     <span style={{
                       width: '20px', height: '20px',
                       borderRadius: '50%',
-                      background: 'rgba(226,75,74,0.1)',
+                      background: 'var(--color-incorrect-bg)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '10px', color: '#E24B4A',
+                      fontSize: '10px', color: 'var(--color-incorrect)',
                       fontWeight: 700, flexShrink: 0,
                     }}>✗</span>
                     <span style={{
@@ -718,14 +718,14 @@ function SpeedContent() {
               maxWidth: '120px',
               minWidth: '80px',
               background: fw.status === 'correct'
-                ? 'rgba(52,199,89,0.12)'
+                ? 'var(--color-correct-bg)'
                 : fw.status === 'missed'
-                ? 'rgba(226,75,74,0.12)'
+                ? 'var(--color-incorrect-bg)'
                 : 'var(--color-surface-2)',
               border: `1.5px solid ${
-                fw.status === 'correct' ? 'rgba(52,199,89,0.4)' :
-                fw.status === 'missed' ? 'rgba(226,75,74,0.4)' :
-                fw.y > 75 ? 'rgba(226,75,74,0.3)' :
+                fw.status === 'correct' ? 'var(--color-correct)' :
+                fw.status === 'missed' ? 'var(--color-incorrect)' :
+                fw.y > 75 ? 'var(--color-incorrect)' :
                 'var(--color-border)'
               }`,
               borderRadius: '12px',
@@ -733,13 +733,13 @@ function SpeedContent() {
               textAlign: 'center',
               whiteSpace: 'nowrap',
               boxShadow: fw.y > 75
-                ? '0 0 12px rgba(226,75,74,0.2)'
+                ? '0 0 12px color-mix(in srgb, var(--color-incorrect) 20%, transparent)'
                 : '0 2px 12px rgba(0,0,0,0.06)',
               transition: 'border-color 0.3s',
               zIndex: fw.status === 'falling' ? 5 : 4,
             }}
           >
-            <div style={{ fontSize: '17px', fontWeight: 800, color: fw.status === 'correct' ? '#34C759' : fw.status === 'missed' ? '#E24B4A' : 'var(--color-text-primary)' }}>
+            <div style={{ fontSize: '17px', fontWeight: 800, color: fw.status === 'correct' ? 'var(--color-correct)' : fw.status === 'missed' ? 'var(--color-incorrect)' : 'var(--color-text-primary)' }}>
               {mode === 'word-to-meaning' ? fw.word : fw.meaning}
             </div>
             {fw.part_of_speech && (
@@ -753,9 +753,9 @@ function SpeedContent() {
         <div style={{
           position: 'absolute', bottom: '8%', left: 0, right: 0,
           height: '1px',
-          background: 'linear-gradient(90deg, transparent, rgba(226,75,74,0.4), transparent)',
+          background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-incorrect) 40%, transparent), transparent)',
         }} />
-        <div style={{ position: 'absolute', bottom: 'calc(8% + 4px)', right: '12px', fontSize: '8px', color: 'rgba(226,75,74,0.4)', fontWeight: 700, letterSpacing: '1px' }}>
+        <div style={{ position: 'absolute', bottom: 'calc(8% + 4px)', right: '12px', fontSize: '8px', color: 'color-mix(in srgb, var(--color-incorrect) 40%, transparent)', fontWeight: 700, letterSpacing: '1px' }}>
           DANGER
         </div>
       </div>

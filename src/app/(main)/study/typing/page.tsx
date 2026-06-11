@@ -108,13 +108,13 @@ function TypingContent() {
       <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>완료!</h1>
       <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '32px' }}>총 {words.length}개 풀었어요</p>
       <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', width: '100%', maxWidth: '320px' }}>
-        <div style={{ flex: 1, background: '#D1FAE5', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
-          <div style={{ fontSize: '24px', fontWeight: 800, color: '#065F46' }}>{stats.correct}</div>
-          <div style={{ fontSize: '13px', color: '#065F46', marginTop: '4px' }}>정답</div>
+        <div style={{ flex: 1, background: 'var(--color-correct-bg)', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
+          <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-correct)' }}>{stats.correct}</div>
+          <div style={{ fontSize: '13px', color: 'var(--color-correct)', marginTop: '4px' }}>정답</div>
         </div>
-        <div style={{ flex: 1, background: '#FFE5E5', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
-          <div style={{ fontSize: '24px', fontWeight: 800, color: '#D92D20' }}>{stats.wrong}</div>
-          <div style={{ fontSize: '13px', color: '#D92D20', marginTop: '4px' }}>오답</div>
+        <div style={{ flex: 1, background: 'var(--color-incorrect-bg)', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
+          <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-incorrect)' }}>{stats.wrong}</div>
+          <div style={{ fontSize: '13px', color: 'var(--color-incorrect)', marginTop: '4px' }}>오답</div>
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', maxWidth: '320px' }}>
@@ -175,20 +175,20 @@ function TypingContent() {
               autoFocus
               style={{
                 width: '100%', height: '54px',
-                background: result === 'correct' ? '#D1FAE5' : result === 'wrong' ? '#FFE5E5' : 'var(--color-surface)',
-                border: `1.5px solid ${result === 'correct' ? '#065F46' : result === 'wrong' ? '#D92D20' : 'var(--color-border)'}`,
+                background: result === 'correct' ? 'var(--color-correct-bg)' : result === 'wrong' ? 'var(--color-incorrect-bg)' : 'var(--color-surface)',
+                border: `1.5px solid ${result === 'correct' ? 'var(--color-correct)' : result === 'wrong' ? 'var(--color-incorrect)' : 'var(--color-border)'}`,
                 borderRadius: '14px', padding: '0 16px',
                 fontSize: '17px', color: 'var(--color-text-primary)', outline: 'none',
                 boxSizing: 'border-box' as const, marginBottom: '8px',
               }}
             />
             {result === 'wrong' && (
-              <div style={{ fontSize: '14px', color: '#D92D20', textAlign: 'center', marginBottom: '8px' }}>
+              <div style={{ fontSize: '14px', color: 'var(--color-incorrect)', textAlign: 'center', marginBottom: '8px' }}>
                 정답: <strong>{word.word}</strong>
               </div>
             )}
             {result === 'correct' && (
-              <div style={{ fontSize: '14px', color: '#065F46', textAlign: 'center', marginBottom: '8px' }}>
+              <div style={{ fontSize: '14px', color: 'var(--color-correct)', textAlign: 'center', marginBottom: '8px' }}>
                 정답이에요! 🎉
               </div>
             )}

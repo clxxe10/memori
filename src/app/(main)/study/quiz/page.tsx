@@ -117,13 +117,13 @@ function QuizContent() {
       <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>완료!</h1>
       <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '32px' }}>총 {words.length}개 풀었어요</p>
       <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', width: '100%', maxWidth: '320px' }}>
-        <div style={{ flex: 1, background: '#D1FAE5', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
-          <div style={{ fontSize: '24px', fontWeight: 800, color: '#065F46' }}>{stats.correct}</div>
-          <div style={{ fontSize: '13px', color: '#065F46', marginTop: '4px' }}>정답</div>
+        <div style={{ flex: 1, background: 'var(--color-correct-bg)', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
+          <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-correct)' }}>{stats.correct}</div>
+          <div style={{ fontSize: '13px', color: 'var(--color-correct)', marginTop: '4px' }}>정답</div>
         </div>
-        <div style={{ flex: 1, background: '#FFE5E5', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
-          <div style={{ fontSize: '24px', fontWeight: 800, color: '#D92D20' }}>{stats.wrong}</div>
-          <div style={{ fontSize: '13px', color: '#D92D20', marginTop: '4px' }}>오답</div>
+        <div style={{ flex: 1, background: 'var(--color-incorrect-bg)', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
+          <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-incorrect)' }}>{stats.wrong}</div>
+          <div style={{ fontSize: '13px', color: 'var(--color-incorrect)', marginTop: '4px' }}>오답</div>
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', maxWidth: '320px' }}>
@@ -178,9 +178,9 @@ function QuizContent() {
             const isSelected = selectedOption === i
             const isCorrect = opt === word.meaning
             let bg = 'var(--color-surface)', border = '1.5px solid var(--color-border)', color = 'var(--color-text-primary)'
-            if (isSelected && isCorrect) { bg = '#D1FAE5'; border = '1.5px solid #065F46'; color = '#065F46' }
-            if (isSelected && !isCorrect) { bg = '#FFE5E5'; border = '1.5px solid #D92D20'; color = '#D92D20' }
-            if (selectedOption !== null && !isSelected && isCorrect) { bg = '#D1FAE5'; border = '1.5px solid #065F46'; color = '#065F46' }
+            if (isSelected && isCorrect) { bg = 'var(--color-correct-bg)'; border = '1.5px solid var(--color-correct)'; color = 'var(--color-correct)' }
+            if (isSelected && !isCorrect) { bg = 'var(--color-incorrect-bg)'; border = '1.5px solid var(--color-incorrect)'; color = 'var(--color-incorrect)' }
+            if (selectedOption !== null && !isSelected && isCorrect) { bg = 'var(--color-correct-bg)'; border = '1.5px solid var(--color-correct)'; color = 'var(--color-correct)' }
             return (
               <button key={i} onClick={() => handleSelect(opt, i)}
                 style={{ width: '100%', padding: '16px', background: bg, border, borderRadius: '14px', fontSize: '15px', color, fontWeight: 500, textAlign: 'left' as const, cursor: 'pointer', transition: 'all 0.15s', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>

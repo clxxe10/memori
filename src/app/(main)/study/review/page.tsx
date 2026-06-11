@@ -228,13 +228,13 @@ function ReviewContent() {
       <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>복습 완료!</h1>
       <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '32px' }}>총 {words.length}개 복습했어요</p>
       <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', width: '100%', maxWidth: '320px' }}>
-        <div style={{ flex: 1, background: '#D1FAE5', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
-          <div style={{ fontSize: '24px', fontWeight: 800, color: '#065F46' }}>{stats.know}</div>
-          <div style={{ fontSize: '13px', color: '#065F46', marginTop: '4px' }}>알아요</div>
+        <div style={{ flex: 1, background: 'var(--color-correct-bg)', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
+          <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-correct)' }}>{stats.know}</div>
+          <div style={{ fontSize: '13px', color: 'var(--color-correct)', marginTop: '4px' }}>알아요</div>
         </div>
-        <div style={{ flex: 1, background: '#FFE5E5', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
-          <div style={{ fontSize: '24px', fontWeight: 800, color: '#D92D20' }}>{stats.dontKnow}</div>
-          <div style={{ fontSize: '13px', color: '#D92D20', marginTop: '4px' }}>몰라요</div>
+        <div style={{ flex: 1, background: 'var(--color-incorrect-bg)', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
+          <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-incorrect)' }}>{stats.dontKnow}</div>
+          <div style={{ fontSize: '13px', color: 'var(--color-incorrect)', marginTop: '4px' }}>몰라요</div>
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', maxWidth: '320px' }}>
@@ -294,8 +294,8 @@ function ReviewContent() {
               )}
             </div>
             <div style={{ display: 'flex', gap: '10px', flexShrink: 0 }}>
-              <button onClick={() => handleAnswer(false)} style={{ flex: 1, height: '52px', background: '#FFE5E5', color: '#D92D20', border: 'none', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}>몰라요</button>
-              <button onClick={() => handleAnswer(true)} style={{ flex: 1, height: '52px', background: '#D1FAE5', color: '#065F46', border: 'none', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}>알아요</button>
+              <button onClick={() => handleAnswer(false)} style={{ flex: 1, height: '52px', background: 'var(--color-incorrect-bg)', color: 'var(--color-incorrect)', border: 'none', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}>몰라요</button>
+              <button onClick={() => handleAnswer(true)} style={{ flex: 1, height: '52px', background: 'var(--color-correct-bg)', color: 'var(--color-correct)', border: 'none', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}>알아요</button>
             </div>
           </>
         )}
@@ -314,8 +314,8 @@ function ReviewContent() {
                 const isSelected = selectedOption === i
                 const isCorrect = opt === word.meaning
                 let bg = 'var(--color-surface)', border = '1.5px solid var(--color-border)', color = 'var(--color-text-primary)'
-                if (isSelected && isCorrect) { bg = '#D1FAE5'; border = '1.5px solid #065F46'; color = '#065F46' }
-                if (isSelected && !isCorrect) { bg = '#FFE5E5'; border = '1.5px solid #D92D20'; color = '#D92D20' }
+                if (isSelected && isCorrect) { bg = 'var(--color-correct-bg)'; border = '1.5px solid var(--color-correct)'; color = 'var(--color-correct)' }
+                if (isSelected && !isCorrect) { bg = 'var(--color-incorrect-bg)'; border = '1.5px solid var(--color-incorrect)'; color = 'var(--color-incorrect)' }
                 return (
                   <button key={i} onClick={() => !selectedOption && handleOptionSelect(opt)}
                     style={{ width: '100%', padding: '14px 16px', background: bg, border, borderRadius: '14px', fontSize: '14px', color, fontWeight: 500, textAlign: 'left', cursor: 'pointer' }}>
@@ -341,8 +341,8 @@ function ReviewContent() {
               placeholder="영어 단어 입력..."
               style={{
                 width: '100%', height: '52px',
-                background: inputResult === 'correct' ? '#D1FAE5' : inputResult === 'wrong' ? '#FFE5E5' : 'var(--color-surface)',
-                border: `1.5px solid ${inputResult === 'correct' ? '#065F46' : inputResult === 'wrong' ? '#D92D20' : 'var(--color-border)'}`,
+                background: inputResult === 'correct' ? 'var(--color-correct-bg)' : inputResult === 'wrong' ? 'var(--color-incorrect-bg)' : 'var(--color-surface)',
+                border: `1.5px solid ${inputResult === 'correct' ? 'var(--color-correct)' : inputResult === 'wrong' ? 'var(--color-incorrect)' : 'var(--color-border)'}`,
                 borderRadius: '14px', padding: '0 16px',
                 fontSize: '16px', color: 'var(--color-text-primary)', outline: 'none',
                 marginBottom: '12px', boxSizing: 'border-box' as const,
@@ -352,7 +352,7 @@ function ReviewContent() {
               <div style={{ marginTop: '8px', textAlign: 'center' }}>
                 <div style={{
                   fontSize: '14px', fontWeight: 600,
-                  color: inputResult === 'correct' ? '#065F46' : '#D92D20',
+                  color: inputResult === 'correct' ? 'var(--color-correct)' : 'var(--color-incorrect)',
                   marginBottom: '8px',
                 }}>
                   {inputResult === 'correct' ? '정답이에요! 🎉' : `정답: ${word.word}`}
