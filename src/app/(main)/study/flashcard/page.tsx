@@ -438,13 +438,13 @@ function FlashcardContent() {
         <div style={{ display: 'flex', gap: '10px', flexShrink: 0 }}>
           <button
             onClick={() => handleAnswer(false)}
-            style={{ flex: 1, height: '52px', background: '#FFE5E5', color: '#D92D20', border: 'none', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}
+            style={{ flex: 1, height: '52px', background: 'transparent', border: '1.5px solid var(--color-border)', color: 'var(--color-text-primary)', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}
           >
             몰라요
           </button>
           <button
             onClick={() => handleAnswer(true)}
-            style={{ flex: 1, height: '52px', background: '#D1FAE5', color: '#065F46', border: 'none', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}
+            style={{ flex: 1, height: '52px', background: 'transparent', border: '1.5px solid var(--color-border)', color: 'var(--color-text-primary)', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}
           >
             알아요
           </button>

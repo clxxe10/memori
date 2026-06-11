@@ -1,202 +1,226 @@
 'use client'
-
-import { useEffect, useState, Suspense, useRef } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { ArrowLeft, Volume2, Play, Pause, RotateCcw } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { recordStudyProgress } from '@/lib/studyTracker'
-import { usePagePadding } from '@/lib/responsive'
-
-type Word = {
-  id: string
-  word: string
-  meaning: string
-  part_of_speech: string | null
-  pronunciation: string | null
-}
 
 function BlinkContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const folderId = searchParams.get('folderId')
-  const padding = usePagePadding('100px')
 
-  const [words, setWords] = useState<Word[]>([])
-  const [current, setCurrent] = useState(0)
+  const [words, setWords] = useState<any[]>([])
+  const [index, setIndex] = useState(0)
+  const [showBack, setShowBack] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(true)
+  const [speed, setSpeed] = useState(2000)
+  const [showMode, setShowMode] = useState<'word' | 'meaning'>('word')
   const [loading, setLoading] = useState(true)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [speed, setSpeed] = useState(1.5)
-  const [showMeaning, setShowMeaning] = useState(false)
-  const [finished, setFinished] = useState(false)
-  const [folderName, setFolderName] = useState('')
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+
   useEffect(() => {
+    if (!folderId) return
     const fetchWords = async () => {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      if (folderId) {
-        const { data: folder } = await supabase.from('folders').select('name').eq('id', folderId).single()
-        if (folder) setFolderName(folder.name)
-      }
-      let query = supabase.from('words').select('*').eq('user_id', user.id)
-      if (folderId) query = query.eq('folder_id', folderId)
-      const { data } = await query
-      if (data) setWords(data.sort(() => Math.random() - 0.5))
+      const { data } = await supabase
+        .from('words')
+        .select('*')
+        .eq('folder_id', folderId)
+      if (data) setWords(data)
       setLoading(false)
     }
     fetchWords()
   }, [folderId])
 
   useEffect(() => {
-    if (isPlaying) {
-      intervalRef.current = setInterval(() => {
-        setShowMeaning(prev => {
-          if (prev) {
-            setCurrent(c => {
-              if (c + 1 >= words.length) {
-                setIsPlaying(false)
-                void recordStudyProgress(words.length)
-                setFinished(true)
-                return c
-              }
-              return c + 1
-            })
-            return false
-          }
-          return true
+    if (!isPlaying || words.length === 0) return
+    
+    // 앞면 보여주다가 -> 뒷면 보여주다가 -> 다음 단어
+    timerRef.current = setTimeout(() => {
+      if (!showBack) {
+        setShowBack(true)
+      } else {
+        setShowBack(false)
+        setIndex(prev => {
+          if (prev >= words.length - 1) return 0
+          return prev + 1
         })
-      }, speed * 1000)
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current)
+      }
+    }, speed)
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
     }
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, [isPlaying, speed, words.length])
+  }, [isPlaying, words, index, showBack, speed])
 
-  const handleSpeak = (text: string) => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
-    window.speechSynthesis.cancel()
-    const utter = new SpeechSynthesisUtterance(text)
-    utter.lang = 'en-US'; utter.rate = 0.9
-    const voices = window.speechSynthesis.getVoices()
-    const found = voices.find(v => v.name.includes('Samantha') && v.lang.startsWith('en'))
-    if (found) utter.voice = found
-    window.speechSynthesis.speak(utter)
-  }
+  const currentWord = words[index]
 
-  const SPEEDS = [{ label: '0.5x', val: 3 }, { label: '1x', val: 1.5 }, { label: '2x', val: 0.8 }, { label: '3x', val: 0.4 }]
-
-  const getPosStyle = (pos: string | null) => {
-    if (!pos) return { bg: 'rgba(142,142,147,0.12)', color: '#636366' }
-    if (pos.includes('동사')) return { bg: 'rgba(52,199,89,0.12)', color: '#1A7F3C' }
-    if (pos.includes('명사')) return { bg: 'rgba(0,122,255,0.12)', color: '#0055B3' }
-    if (pos.includes('형용사')) return { bg: 'rgba(255,149,0,0.12)', color: '#B86800' }
-    if (pos.includes('부사')) return { bg: 'rgba(175,82,222,0.12)', color: '#7B2FBE' }
-    if (pos.includes('접속사')) return { bg: 'rgba(255,59,48,0.12)', color: '#C0392B' }
-    if (pos.includes('전치사')) return { bg: 'rgba(0,199,190,0.12)', color: '#007A76' }
-    if (pos.includes('감탄사')) return { bg: 'rgba(255,204,0,0.12)', color: '#8B6800' }
-    return { bg: 'rgba(142,142,147,0.12)', color: '#636366' }
-  }
-
-  if (loading) return <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif' }}><p style={{ color: 'var(--color-text-secondary)' }}>불러오는 중...</p></main>
-
-  if (finished) return (
-    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif', padding: '0 24px' }}>
-      <div style={{ fontSize: '56px', marginBottom: '16px' }}>🎉</div>
-      <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>완료!</h1>
-      <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '32px' }}>총 {words.length}개 학습했어요</p>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', maxWidth: '320px' }}>
-        <button onClick={() => { setCurrent(0); setFinished(false); setShowMeaning(false) }} style={{ width: '100%', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-          <RotateCcw size={18} /> 다시 학습하기
-        </button>
-        <button onClick={() => router.push('/home')} style={{ width: '100%', height: '52px', background: 'var(--color-surface-2)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
-      </div>
-    </main>
+  if (loading) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+      <div style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>불러오는 중...</div>
+    </div>
   )
 
   if (words.length === 0) return (
-    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif', padding: '0 24px' }}>
-      <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>단어가 없어요</p>
-      <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
-    </main>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+      <div style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>단어가 없어요</div>
+    </div>
   )
 
-  const word = words[current]
-  const posStyle = getPosStyle(word.part_of_speech)
-  const progress = (current / words.length) * 100
-
   return (
-    <main style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'var(--color-bg)', display: 'flex', flexDirection: 'column', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding, maxWidth: 'min(560px, 100%)', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+    <div style={{
+      position: 'fixed', inset: 0,
+      display: 'flex', flexDirection: 'column',
+      background: 'var(--color-bg)',
+      fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+    }}>
+      {/* 헤더 */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '16px 20px',
+        paddingTop: 'max(16px, env(safe-area-inset-top))',
+      }}>
+        <button onClick={() => router.back()} style={{
+          background: 'none', border: 'none', cursor: 'pointer',
+          fontSize: '16px', color: 'var(--color-text-secondary)',
+          padding: '4px',
+        }}>← 뒤로</button>
+        <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>
+          {index + 1} / {words.length}
+        </span>
+        <div style={{ width: '48px' }} />
+      </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', flexShrink: 0 }}>
-          <button onClick={() => { setIsPlaying(false); router.back() }} style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer' }}>
-            <ArrowLeft size={22} color="var(--color-text-primary)" />
-          </button>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>깜빡이</div>
-            {folderName && <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>{folderName}</div>}
-          </div>
-          <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>{current + 1}/{words.length}</div>
+      {/* 컨트롤 */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        gap: '12px', padding: '0 20px 16px',
+      }}>
+        {/* 단어/뜻 토글 */}
+        <div style={{
+          display: 'flex', background: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
+          borderRadius: '20px', padding: '3px', gap: '2px',
+        }}>
+          {(['word', 'meaning'] as const).map(mode => (
+            <button key={mode} onClick={() => setShowMode(mode)} style={{
+              padding: '5px 14px', borderRadius: '16px', border: 'none',
+              background: showMode === mode ? 'var(--color-text-primary)' : 'transparent',
+              color: showMode === mode ? 'var(--color-bg)' : 'var(--color-text-secondary)',
+              fontSize: '13px', fontWeight: showMode === mode ? 700 : 400,
+              cursor: 'pointer', transition: 'all 0.2s',
+            }}>
+              {mode === 'word' ? '단어' : '뜻'}
+            </button>
+          ))}
         </div>
 
-        <div style={{ height: '4px', background: 'var(--color-track)', borderRadius: '4px', marginBottom: '14px', flexShrink: 0 }}>
-          <div style={{ height: '4px', background: 'var(--color-my)', borderRadius: '4px', width: `${progress}%`, transition: 'width 0.3s ease' }} />
-        </div>
+        {/* 속도 */}
+        <select
+          value={speed}
+          onChange={e => setSpeed(Number(e.target.value))}
+          style={{
+            background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+            borderRadius: '12px', padding: '6px 10px',
+            fontSize: '13px', color: 'var(--color-text-primary)', cursor: 'pointer',
+          }}
+        >
+          <option value={3000}>느리게</option>
+          <option value={2000}>보통</option>
+          <option value={1200}>빠르게</option>
+          <option value={700}>매우 빠르게</option>
+        </select>
+      </div>
 
-        <div style={{ flex: 1, minHeight: 0, background: 'var(--color-surface)', borderRadius: '24px', boxShadow: '0 8px 40px rgba(0,0,0,0.09)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px', marginBottom: '16px', textAlign: 'center', position: 'relative' }}>
-          <button onClick={() => handleSpeak(word.word)} style={{ position: 'absolute', top: '14px', left: '14px', width: '30px', height: '30px', borderRadius: '50%', background: 'var(--color-surface-2)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Volume2 size={14} color="var(--color-text-secondary)" />
-          </button>
-          <span style={{ background: posStyle.bg, color: posStyle.color, borderRadius: '8px', padding: '3px 10px', fontSize: '11px', fontWeight: 600, marginBottom: '14px', display: 'inline-block' }}>
-            {word.part_of_speech || '기타'}
-          </span>
-          <div style={{ fontSize: '34px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-1px', marginBottom: '10px', lineHeight: 1.1 }}>
-            {word.word}
+      {/* 카드 */}
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}>
+        <div
+          onClick={() => setShowBack(prev => !prev)}
+          style={{
+            width: '100%', maxWidth: '680px',
+            minHeight: '280px',
+            background: 'var(--color-surface)',
+            borderRadius: '24px',
+            border: '1px solid var(--color-border)',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            padding: '60px 40px', gap: '16px',
+            cursor: 'pointer',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+            transition: 'opacity 0.15s ease',
+          }}
+        >
+          {/* 앞면 */}
+          <div style={{
+            fontSize: '38px', fontWeight: 800,
+            color: 'var(--color-text-primary)',
+            textAlign: 'center', letterSpacing: '-0.5px',
+          }}>
+            {showMode === 'word' ? currentWord?.word : currentWord?.meaning}
           </div>
-          {word.pronunciation && <div style={{ fontSize: '13px', color: 'var(--color-text-tertiary)', marginBottom: '12px' }}>{word.pronunciation}</div>}
-          {showMeaning && (
-            <>
-              <div style={{ width: '36px', height: '2px', background: 'var(--color-track)', borderRadius: '2px', marginBottom: '12px' }} />
-              <div style={{ fontSize: '22px', fontWeight: 700, color: '#3C3C43' }}>{word.meaning}</div>
-            </>
+
+          {/* 뒷면 */}
+          {showBack && (
+            <div style={{
+              fontSize: '24px',
+              color: 'var(--color-text-primary)',
+              textAlign: 'center',
+              paddingTop: '12px',
+              borderTop: '1px solid var(--color-border)',
+              width: '100%',
+            }}>
+              {showMode === 'word' ? currentWord?.meaning : currentWord?.word}
+            </div>
           )}
         </div>
-
-        <div style={{ flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-            <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>재생 속도</span>
-            <div style={{ display: 'flex', gap: '6px' }}>
-              {SPEEDS.map(s => (
-                <button key={s.label} onClick={() => setSpeed(s.val)}
-                  style={{ width: '40px', height: '28px', borderRadius: '8px', border: 'none', background: speed === s.val ? 'var(--color-my)' : 'var(--color-surface-2)', color: speed === s.val ? 'var(--color-my-contrast)' : 'var(--color-text-secondary)', fontSize: '11px', fontWeight: 600, cursor: 'pointer' }}>
-                  {s.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button onClick={() => { if (current > 0) { setCurrent(p => p - 1); setShowMeaning(false) } }}
-              disabled={current === 0}
-              style={{ width: '52px', height: '52px', borderRadius: '14px', background: 'var(--color-surface-2)', border: 'none', cursor: current === 0 ? 'not-allowed' : 'pointer', fontSize: '18px', opacity: current === 0 ? 0.4 : 1 }}>←</button>
-            <button onClick={() => setIsPlaying(p => !p)}
-              style={{ flex: 1, height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-              {isPlaying ? <><Pause size={18} /> 일시정지</> : <><Play size={18} /> 재생</>}
-            </button>
-            <button onClick={() => { if (current < words.length - 1) { setCurrent(p => p + 1); setShowMeaning(false) } }}
-              disabled={current === words.length - 1}
-              style={{ width: '52px', height: '52px', borderRadius: '14px', background: 'var(--color-surface-2)', border: 'none', cursor: current === words.length - 1 ? 'not-allowed' : 'pointer', fontSize: '18px', opacity: current === words.length - 1 ? 0.4 : 1 }}>→</button>
-          </div>
-        </div>
-
       </div>
-    </main>
+
+      {/* 하단 재생/정지 */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        gap: '16px', padding: '20px',
+        paddingBottom: 'max(100px, calc(env(safe-area-inset-bottom) + 80px))',
+      }}>
+        <button onClick={() => {
+          setIndex(prev => prev === 0 ? words.length - 1 : prev - 1)
+          setShowBack(false)
+        }} style={{
+          width: '44px', height: '44px', borderRadius: '50%',
+          background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+          cursor: 'pointer', fontSize: '18px', color: 'var(--color-text-primary)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>←</button>
+
+        <button onClick={() => setIsPlaying(prev => !prev)} style={{
+          width: '56px', height: '56px', borderRadius: '50%',
+          background: 'var(--color-text-primary)', border: 'none',
+          cursor: 'pointer', fontSize: '20px', color: 'var(--color-bg)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+        }}>
+          {isPlaying ? '⏸' : '▶'}
+        </button>
+
+        <button onClick={() => {
+          setIndex(prev => prev >= words.length - 1 ? 0 : prev + 1)
+          setShowBack(false)
+        }} style={{
+          width: '44px', height: '44px', borderRadius: '50%',
+          background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+          cursor: 'pointer', fontSize: '18px', color: 'var(--color-text-primary)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>→</button>
+      </div>
+    </div>
   )
 }
 
 export default function BlinkPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)' }}><p style={{ color: 'var(--color-text-secondary)' }}>불러오는 중...</p></div>}>
+    <Suspense fallback={
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+        <div style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>불러오는 중...</div>
+      </div>
+    }>
       <BlinkContent />
     </Suspense>
   )

@@ -1,14 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Bookmark, Camera, Pencil, Plus, Volume2, Settings } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
+import { useSwipe } from '@/hooks/useSwipe'
+import { haptics } from '@/lib/haptics'
 import SelectDropdown from '@/components/ui/SelectDropdown'
 import EmptyState from '@/components/ui/EmptyState'
 import { WordSkeleton } from '@/components/ui/Skeleton'
+import { showToast } from '@/components/ui/Toast'
 
 type Word = {
   id: string
@@ -33,6 +36,52 @@ type Folder = {
 }
 
 const FILTERS = ['전체', '북마크', '어려워요', '미학습']
+
+function WordCard({ word, onDelete, children }: { word: Word; onDelete: () => void; children: ReactNode }) {
+  const [swipeX, setSwipeX] = useState(0)
+  const [confirming, setConfirming] = useState(false)
+
+  const swipeHandlers = useSwipe({
+    onSwipeLeft: () => {
+      haptics.medium()
+      setConfirming(true)
+    },
+    threshold: 60,
+  })
+
+  if (confirming) {
+    return (
+      <div style={{
+        background: '#E85454', borderRadius: '16px',
+        padding: '16px', display: 'flex',
+        alignItems: 'center', justifyContent: 'space-between',
+        gap: '12px',
+      }}>
+        <span style={{ color: 'white', fontSize: '14px', fontWeight: 600 }}>
+          이 단어를 삭제할까요?
+        </span>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button onClick={() => setConfirming(false)} style={{
+            padding: '8px 14px', borderRadius: '10px',
+            border: 'none', background: 'rgba(255,255,255,0.2)',
+            color: 'white', fontSize: '13px', cursor: 'pointer',
+          }}>취소</button>
+          <button onClick={() => { haptics.error(); onDelete() }} style={{
+            padding: '8px 14px', borderRadius: '10px',
+            border: 'none', background: 'white',
+            color: '#E85454', fontSize: '13px', fontWeight: 700, cursor: 'pointer',
+          }}>삭제</button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div {...swipeHandlers}>
+      {children}
+    </div>
+  )
+}
 
 export default function VocabularyDetailPage() {
   const router = useRouter()
@@ -121,6 +170,13 @@ export default function VocabularyDetailPage() {
     setWords(prev => prev.map(w => w.id === word.id ? { ...w, is_bookmarked: !w.is_bookmarked } : w))
   }
 
+  const handleDeleteWord = async (wordId: string) => {
+    const supabase = createClient()
+    await supabase.from('words').delete().eq('id', wordId)
+    setWords(prev => prev.filter(w => w.id !== wordId))
+    showToast('삭제되었습니다', 'success')
+  }
+
   const handleSpeak = (text: string) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
     window.speechSynthesis.cancel()
@@ -161,6 +217,23 @@ export default function VocabularyDetailPage() {
         window.speechSynthesis.onvoiceschanged = null
       }
     }
+  }
+
+  const posColors: Record<string, string> = {
+    '명사': '#007AFF',
+    '동사': '#34C759',
+    '형용사': '#FF9500',
+    '부사': '#AF52DE',
+    '전치사': '#FF3B30',
+    '접속사': '#5AC8FA',
+    '대명사': '#FF2D55',
+    'noun': '#007AFF',
+    'verb': '#34C759',
+    'adjective': '#FF9500',
+    'adverb': '#AF52DE',
+    'preposition': '#FF3B30',
+    'conjunction': '#5AC8FA',
+    'pronoun': '#FF2D55',
   }
 
   const getPosStyle = (pos: string | null) => {
@@ -256,10 +329,10 @@ export default function VocabularyDetailPage() {
             gap: '8px',
           }}>
             {filtered.map(word => {
-              const posStyle = getPosStyle(word.part_of_speech)
               const diffStyle = getDiffStyle(word.difficulty)
               return (
-                <div key={word.id} style={{
+                <WordCard key={word.id} word={word} onDelete={() => handleDeleteWord(word.id)}>
+                <div style={{
                   background: 'var(--color-surface)', borderRadius: '18px', padding: '14px 16px',
                   border: '1px solid var(--color-border)',
                   boxShadow: '0 2px 12px rgba(0,0,0,0.09)',
@@ -269,11 +342,29 @@ export default function VocabularyDetailPage() {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '3px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
                       <span style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)' }}>{word.word}</span>
-                      <span style={{
-                        background: posStyle.bg, color: posStyle.color,
-                        borderRadius: '6px', padding: '2px 7px',
-                        fontSize: '10px', fontWeight: 600,
-                      }}>{word.part_of_speech || '기타'}</span>
+                      <div style={{
+                        background: 'transparent',
+                        border: 'none',
+                        padding: '0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                      }}>
+                        <div style={{
+                          width: '7px',
+                          height: '7px',
+                          borderRadius: '50%',
+                          background: posColors[word.part_of_speech || ''] || 'var(--color-text-tertiary)',
+                          flexShrink: 0,
+                        }} />
+                        <span style={{
+                          fontSize: '12px',
+                          color: 'var(--color-text-secondary)',
+                          fontWeight: 500,
+                        }}>
+                          {word.part_of_speech}
+                        </span>
+                      </div>
                       <button
                         onClick={() => handleSpeak(word.word)}
                         style={{ background: 'none', border: 'none', padding: '2px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
@@ -330,6 +421,7 @@ export default function VocabularyDetailPage() {
                   </div>
 
                 </div>
+                </WordCard>
               )
             })}
           </div>

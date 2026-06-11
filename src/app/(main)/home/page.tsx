@@ -1,11 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Play, BookOpen, Clock, ChevronRight } from 'lucide-react'
 import { usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
+import { useCountUp } from '@/hooks/useCountUp'
 import PullToRefresh from '@/components/ui/PullToRefresh'
 
 export default function HomePage() {
@@ -23,8 +24,48 @@ export default function HomePage() {
   const [monthlyData, setMonthlyData] = useState<Record<string, number>>({})
   const [todayWord, setTodayWord] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [streakAnimating, setStreakAnimating] = useState(false)
+  const prevStreakRef = useRef<number | null>(null)
   const pagePadding = usePagePadding()
   const bp = useBreakpoint()
+
+  const animatedReviewCount = useCountUp(reviewCount)
+  const animatedTotalWords = useCountUp(totalWords)
+  const animatedMasteredWords = useCountUp(masteredWords)
+  const animatedStreakDays = useCountUp(streakDays)
+  const animatedTotalStudyTime = useCountUp(totalStudyTime)
+
+  useEffect(() => {
+    const style = document.createElement('style')
+    style.textContent = `
+      @keyframes streakBounce {
+        0% { transform: scale(1); }
+        30% { transform: scale(1.3) rotate(-8deg); }
+        50% { transform: scale(1.15) rotate(5deg); }
+        70% { transform: scale(1.2) rotate(-3deg); }
+        100% { transform: scale(1) rotate(0deg); }
+      }
+      @keyframes streakGlow {
+        0%, 100% { filter: drop-shadow(0 0 0 rgba(255,149,0,0)); }
+        50% { filter: drop-shadow(0 0 12px rgba(255,149,0,0.6)); }
+      }
+      .streak-bounce {
+        animation: streakBounce 0.6s cubic-bezier(0.34,1.56,0.64,1), streakGlow 0.6s ease-out;
+      }
+    `
+    document.head.appendChild(style)
+    return () => { document.head.removeChild(style) }
+  }, [])
+
+  useEffect(() => {
+    if (prevStreakRef.current !== null && streakDays > prevStreakRef.current) {
+      setStreakAnimating(true)
+      const timer = setTimeout(() => setStreakAnimating(false), 600)
+      prevStreakRef.current = streakDays
+      return () => clearTimeout(timer)
+    }
+    prevStreakRef.current = streakDays
+  }, [streakDays])
 
   const fetchData = useCallback(async () => {
     try {
@@ -170,7 +211,7 @@ export default function HomePage() {
   const nickname = user?.user_metadata?.nickname ||
     user?.user_metadata?.full_name?.split(' ')[0] || '사용자'
 
-  const progress = totalWords > 0 ? Math.round((masteredWords / totalWords) * 100) : 0
+  const animatedProgress = animatedTotalWords > 0 ? Math.round((animatedMasteredWords / animatedTotalWords) * 100) : 0
 
   const formatStudyTime = (seconds: number) => {
     if (seconds < 60) return 'Just now'
@@ -203,8 +244,10 @@ export default function HomePage() {
               display: 'flex', alignItems: 'center', gap: '4px',
               background: 'var(--color-my)', borderRadius: '20px', padding: '5px 10px',
             }}>
-              <span style={{ fontSize: '12px' }}>🔥</span>
-              <span style={{ fontSize: '11px', color: 'var(--color-my-contrast)', fontWeight: 700 }}>{streakDays}일</span>
+              <div className={streakAnimating ? 'streak-bounce' : ''} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ fontSize: '12px' }}>🔥</span>
+                <span style={{ fontSize: '11px', color: 'var(--color-my-contrast)', fontWeight: 700 }}>{animatedStreakDays}일</span>
+              </div>
             </div>
             <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#E8EAF0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
               {user?.user_metadata?.avatar_url ? (
@@ -226,7 +269,7 @@ export default function HomePage() {
             <div>
               <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '4px', margin: 0 }}>오늘 복습할 단어</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginTop: '4px' }}>
-                <span style={{ fontSize: '40px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-1px', lineHeight: 1 }}>{reviewCount}</span>
+                <span style={{ fontSize: '40px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-1px', lineHeight: 1 }}>{animatedReviewCount}</span>
                 <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>개</span>
               </div>
             </div>
@@ -239,10 +282,10 @@ export default function HomePage() {
             </button>
           </div>
           <div style={{ height: '5px', background: 'var(--color-track)', borderRadius: '5px', marginBottom: '6px' }}>
-            <div style={{ height: '5px', background: 'var(--color-my)', borderRadius: '5px', width: `${Math.min(progress, 100)}%` }} />
+            <div style={{ height: '5px', background: 'var(--color-my)', borderRadius: '5px', width: `${Math.min(animatedProgress, 100)}%` }} />
           </div>
           <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: 0 }}>
-            전체 {totalWords}개 중 {masteredWords}개 마스터 · {progress}%
+            전체 {animatedTotalWords}개 중 {animatedMasteredWords}개 마스터 · {animatedProgress}%
           </p>
         </div>
 
@@ -278,8 +321,8 @@ export default function HomePage() {
         {/* 통계 카드 2개 */}
         <div style={{ display: 'grid', gridTemplateColumns: bp === 'mobile' ? '1fr 1fr' : '1fr 1fr 1fr 1fr', gap: '8px', marginBottom: '12px' }}>
           {[
-            { icon: BookOpen, label: '마스터 단어', value: masteredWords.toString() },
-            { icon: Clock, label: 'Today', value: formatStudyTime(totalStudyTime) },
+            { icon: BookOpen, label: '마스터 단어', value: animatedMasteredWords.toString() },
+            { icon: Clock, label: 'Today', value: formatStudyTime(animatedTotalStudyTime) },
           ].map((item) => (
             <div key={item.label} style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '14px', border: '1px solid var(--color-border)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
               <div style={{ width: '22px', height: '3px', background: 'var(--color-my)', borderRadius: '3px', marginBottom: '8px' }} />

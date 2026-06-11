@@ -66,16 +66,17 @@ export default function TabBar() {
   }
 
   return (
-    <nav id="tab-bar" style={{
+    <nav id="tab-bar" className="tab-bar-container" style={{
       position: 'fixed', bottom: 20, left: '50%',
       transform: 'translateX(-50%)',
-      background: 'var(--color-surface)',
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
+      background: 'rgba(255,255,255,0.15)',
+      backdropFilter: 'blur(40px) saturate(180%)',
+      WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+      border: '0.5px solid rgba(255,255,255,0.3)',
+      boxShadow: '0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.4)',
       borderRadius: '40px', padding: '10px 8px',
       display: 'flex', justifyContent: 'space-around',
       alignItems: 'center', gap: '4px',
-      boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
       zIndex: 100,
       width: 'min(calc(100% - 48px), 500px)',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
