@@ -1,15 +1,17 @@
 'use client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Slide1 from '@/components/onboarding/Slide1'
 import Slide2 from '@/components/onboarding/Slide2'
 import Slide3 from '@/components/onboarding/Slide3'
 import Slide4 from '@/components/onboarding/Slide4'
 import Slide5 from '@/components/onboarding/Slide5'
 
-export default function OnboardingPage() {
+function OnboardingContent() {
   const router = useRouter()
-  const [step, setStep] = useState(1)
+  const searchParams = useSearchParams()
+  const initialStep = Number(searchParams.get('step')) || 1
+  const [step, setStep] = useState(initialStep)
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
 
@@ -31,5 +33,13 @@ export default function OnboardingPage() {
       {step === 4 && <Slide4 onNext={() => setStep(5)} onBack={() => setStep(3)} email={email} name={name} />}
       {step === 5 && <Slide5 onFinish={handleFinish} />}
     </main>
+  )
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={null}>
+      <OnboardingContent />
+    </Suspense>
   )
 }
