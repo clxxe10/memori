@@ -16,12 +16,14 @@ export default function TabBar() {
   const router = useRouter()
   const pathname = usePathname()
   const [isDesktop, setIsDesktop] = useState(false)
+  const [debugInfo, setDebugInfo] = useState('')
 
   useEffect(() => {
     const check = () => {
       const isWide = window.innerWidth >= 1280
       const isTouchDevice = window.matchMedia('(pointer: coarse)').matches
       setIsDesktop(isWide && !isTouchDevice)
+      setDebugInfo(`width:${window.innerWidth} desktop:${isWide && !isTouchDevice} touch:${isTouchDevice}`)
     }
     check()
     window.addEventListener('resize', check)
@@ -30,8 +32,21 @@ export default function TabBar() {
 
   const isActive = (path: string) => pathname.startsWith(path)
 
+  const debugBox = (
+    <div style={{
+      position: 'fixed', top: 8, left: 8,
+      background: 'red', color: 'white',
+      fontSize: '10px', padding: '4px 8px',
+      borderRadius: '6px', zIndex: 9999,
+    }}>
+      {debugInfo}
+    </div>
+  )
+
   if (isDesktop) {
     return (
+      <>
+      {debugBox}
       <aside id="tab-bar" style={{
         position: 'fixed', top: '50%', left: '20px',
         transform: 'translateY(-50%)',
@@ -70,10 +85,13 @@ export default function TabBar() {
           )
         })}
       </aside>
+      </>
     )
   }
 
   return (
+    <>
+    {debugBox}
     <nav id="tab-bar" className="tab-bar-container" style={{
       position: 'fixed', bottom: 20, left: '50%',
       transform: 'translateX(-50%)',
@@ -116,5 +134,6 @@ export default function TabBar() {
         )
       })}
     </nav>
+    </>
   )
 }
