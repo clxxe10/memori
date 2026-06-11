@@ -36,6 +36,14 @@ export default function LoginPage() {
     })
   }
 
+  const handleKakao = async () => {
+    const supabase = createClient()
+    await supabase.auth.signInWithOAuth({
+      provider: 'kakao',
+      options: { redirectTo: `${window.location.origin}/auth/callback` }
+    })
+  }
+
   const inputStyle = {
     width: '100%', height: '52px',
     background: 'var(--color-surface-2)',
@@ -146,6 +154,20 @@ export default function LoginPage() {
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>
           Google로 계속하기
+        </button>
+
+        <button onClick={handleKakao} style={{
+          width: '100%', height: '52px',
+          background: '#FEE500', color: '#191919',
+          border: 'none', borderRadius: '14px',
+          fontSize: '15px', fontWeight: 600, cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+          marginBottom: '24px',
+        }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3C6.48 3 2 6.58 2 11c0 2.85 1.86 5.36 4.66 6.79-.2.75-.74 2.78-.85 3.21-.13.53.2.52.42.38.17-.11 2.7-1.83 3.8-2.58.63.09 1.28.14 1.97.14 5.52 0 10-3.58 10-8s-4.48-8-10-8z" fill="#191919"/>
+          </svg>
+          카카오로 계속하기
         </button>
 
         <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', textAlign: 'center' }}>
