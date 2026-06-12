@@ -78,14 +78,14 @@ export default function TabBar() {
 
   return (
     <nav id="tab-bar" className="tab-bar-container" style={{
-      position: 'fixed', bottom: 20, left: '50%',
+      position: 'fixed', bottom: 28, left: '50%',
       transform: 'translateX(-50%)',
       background: 'rgba(255,255,255,0.15)',
       backdropFilter: 'blur(40px) saturate(180%)',
       WebkitBackdropFilter: 'blur(40px) saturate(180%)',
       border: '0.5px solid rgba(255,255,255,0.3)',
       boxShadow: '0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.4)',
-      borderRadius: '40px', padding: '10px 8px',
+      borderRadius: '40px', padding: '13px 8px',
       display: 'flex', flexDirection: 'row', flexWrap: 'nowrap',
       justifyContent: 'space-around',
       alignItems: 'center', gap: '4px',

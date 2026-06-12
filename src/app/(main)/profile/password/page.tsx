@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -10,22 +10,57 @@ import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 export default function ProfilePasswordPage() {
   const router = useRouter()
   const padding = usePagePadding()
+  const [currentPassword, setCurrentPassword] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [saving, setSaving] = useState(false)
+  const [isEmailUser, setIsEmailUser] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      setIsEmailUser(user?.app_metadata?.provider === 'email')
+    }
+    fetchUser()
+  }, [])
 
   const handleChange = async () => {
-    if (password.length < 8) {
-      showToast('8자 이상 입력해주세요', 'error')
-      return
-    }
-    if (password !== confirmPassword) {
-      showToast('비밀번호가 일치하지 않아요', 'error')
+    if (!currentPassword.trim()) {
+      showToast('현재 비밀번호를 입력해주세요')
       return
     }
 
     setSaving(true)
     const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.email) {
+      setSaving(false)
+      showToast('현재 비밀번호가 올바르지 않아요', 'error')
+      return
+    }
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword,
+    })
+    if (signInError) {
+      setSaving(false)
+      showToast('현재 비밀번호가 올바르지 않아요', 'error')
+      return
+    }
+
+    if (password.length < 8) {
+      setSaving(false)
+      showToast('8자 이상 입력해주세요', 'error')
+      return
+    }
+    if (password !== confirmPassword) {
+      setSaving(false)
+      showToast('비밀번호가 일치하지 않아요', 'error')
+      return
+    }
+
     const { error } = await supabase.auth.updateUser({ password })
     setSaving(false)
 
@@ -53,7 +88,7 @@ export default function ProfilePasswordPage() {
     marginBottom: '8px', display: 'block',
   }
 
-  const canSubmit = password.length >= 8 && confirmPassword.length >= 8
+  const canSubmit = currentPassword.length > 0 && password.length >= 8 && confirmPassword.length >= 8
 
   return (
     <main style={{
@@ -74,7 +109,25 @@ export default function ProfilePasswordPage() {
           </h1>
         </div>
 
+        {isEmailUser === false && (
+          <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.5 }}>
+            소셜 로그인 계정은 비밀번호를 설정할 수 없어요
+          </p>
+        )}
+
+        {isEmailUser === true && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+          <div>
+            <label style={labelStyle}>현재 비밀번호</label>
+            <input
+              type="password"
+              value={currentPassword}
+              onChange={e => setCurrentPassword(e.target.value)}
+              placeholder="현재 비밀번호 입력..."
+              style={inputStyle}
+            />
+          </div>
 
           <div>
             <label style={labelStyle}>새 비밀번호</label>
@@ -118,6 +171,7 @@ export default function ProfilePasswordPage() {
           </button>
 
         </div>
+        )}
       </div>
     </main>
   )
