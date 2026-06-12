@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { applyMyColor } from '@/lib/colorUtils'
 
 const GOALS = ['5개', '10개', '15개', '20개', '30개', '50개']
 const TIMES = ['오전 7:00', '오전 8:00', '오전 9:00', '오후 6:00', '오후 8:00', '오후 10:00']
@@ -27,8 +28,8 @@ export default function Slide4({ onNext, onBack, email, name }: { onNext: () => 
           notification_time: time,
         }, { onConflict: 'user_id' })
       }
-      localStorage.setItem('my-color', myColor)
-      document.documentElement.style.setProperty('--color-my', myColor)
+      localStorage.setItem('app_my_color', myColor)
+      applyMyColor(myColor)
     } catch (e) {
       console.error(e)
     } finally {
@@ -124,28 +125,24 @@ export default function Slide4({ onNext, onBack, email, name }: { onNext: () => 
         </div>
         <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'center' }}>
           <div style={{ position: 'relative', width: '72px', height: '72px' }}>
-            <svg width="72" height="72" viewBox="0 0 72 72">
-              <defs>
-                <linearGradient id="cw2" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#FF3B30"/>
-                  <stop offset="16%" stopColor="#FF9500"/>
-                  <stop offset="33%" stopColor="#FFCC00"/>
-                  <stop offset="50%" stopColor="#34C759"/>
-                  <stop offset="66%" stopColor="#007AFF"/>
-                  <stop offset="83%" stopColor="#AF52DE"/>
-                  <stop offset="100%" stopColor="#FF3B30"/>
-                </linearGradient>
-              </defs>
-              <circle cx="36" cy="36" r="30" fill="none" stroke="url(#cw2)" strokeWidth="10"/>
-              <circle cx="36" cy="36" r="12" fill="var(--color-bg, white)" stroke="rgba(0,0,0,0.06)" strokeWidth="0.5"/>
-              <circle cx="36" cy="36" r="6" fill={myColor} opacity="0.9"/>
-            </svg>
             <input
               type="color"
               value={myColor}
               onChange={e => setMyColor(e.target.value)}
-              style={{ position: 'absolute', inset: 0, opacity: 0, width: '100%', height: '100%', cursor: 'pointer' }}
+              style={{
+                width: '72px', height: '72px', borderRadius: '50%',
+                border: 'none', cursor: 'pointer', padding: 0,
+                position: 'absolute', inset: 0, opacity: 0, zIndex: 1,
+              }}
             />
+            <div style={{
+              width: '72px', height: '72px', borderRadius: '50%',
+              background: 'conic-gradient(#ffb3c6, #ffd6a5, #fdffb6, #caffbf, #a0c4ff, #bdb2ff, #ffb3c6)',
+              border: '2px solid var(--color-border)', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: myColor, border: '2px solid var(--color-surface)' }} />
+            </div>
           </div>
         </div>
       </div>
