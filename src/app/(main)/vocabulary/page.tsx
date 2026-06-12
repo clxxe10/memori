@@ -327,22 +327,25 @@ export default function VocabularyPage() {
         onClick={() => setShowModal(true)}
         style={{
           position: 'fixed',
-          bottom: '90px',
+          bottom: '105px',
           right: '24px',
           width: '52px',
           height: '52px',
           borderRadius: '50%',
-          background: 'var(--color-my)',
-          border: 'none',
+          background: 'var(--vocab-card-bg)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          border: '0.5px solid var(--vocab-card-border)',
+          borderTop: '1px solid var(--vocab-card-border-top)',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 4px 16px rgba(28,28,30,0.35)',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
           zIndex: 40,
         }}
       >
-        <Plus size={22} color="var(--color-my-contrast)" />
+        <Plus size={22} color="var(--color-text-primary)" />
       </button>
 
       {showModal && (
