@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Sparkles } from 'lucide-react'
 
@@ -13,6 +13,14 @@ export default function AddWordPage() {
   const router = useRouter()
   const params = useParams()
   const folderId = params.id as string
+
+  useEffect(() => {
+    const tabBar = document.getElementById('tab-bar')
+    if (tabBar) tabBar.style.display = 'none'
+    return () => {
+      if (tabBar) tabBar.style.display = ''
+    }
+  }, [])
   const [word, setWord] = useState('')
   const [meaning, setMeaning] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)

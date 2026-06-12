@@ -575,7 +575,7 @@ export default function VocabularyDetailPage() {
               position: 'fixed',
               inset: 0,
               background: 'rgba(0,0,0,0.3)',
-              zIndex: 100,
+              zIndex: 200,
             }}
           />
           <div
@@ -586,8 +586,8 @@ export default function VocabularyDetailPage() {
               right: 0,
               background: 'var(--color-surface)',
               borderRadius: '24px 24px 0 0',
-              padding: '12px 20px 48px',
-              zIndex: 101,
+              padding: '12px 20px max(48px, calc(env(safe-area-inset-bottom) + 90px))',
+              zIndex: 201,
             }}
           >
             <div
