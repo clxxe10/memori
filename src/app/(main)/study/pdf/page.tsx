@@ -212,7 +212,7 @@ export default function PDFPage() {
   return (
     <main style={{
       minHeight: '100vh', backgroundColor: 'var(--color-bg)',
-      paddingBottom: '40px',
+      paddingBottom: '140px',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
       <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding }}>

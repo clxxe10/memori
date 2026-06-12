@@ -431,7 +431,7 @@ export default function HomePage() {
             <div style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px', border: '1px solid var(--color-border)', marginBottom: '12px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>📅 학습 캘린더</p>
+                <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>학습 캘린더</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <button
                     onClick={() => setCalendarMonth(new Date(year, month - 1, 1))}
@@ -533,9 +533,6 @@ export default function HomePage() {
             boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
           }}
         >
-          <div style={{ width: '46px', height: '46px', borderRadius: '14px', background: 'rgba(251,191,36,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', flexShrink: 0 }}>
-            🚀
-          </div>
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
               <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>스피드 모드</span>
@@ -556,9 +553,6 @@ export default function HomePage() {
             boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
           }}
         >
-          <div style={{ width: '46px', height: '46px', borderRadius: '14px', background: 'rgba(28,28,30,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', flexShrink: 0 }}>
-            📄
-          </div>
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
               <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>PDF 시험지</span>

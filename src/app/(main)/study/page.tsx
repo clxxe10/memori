@@ -197,7 +197,7 @@ export default function StudyPage() {
           marginBottom: '20px',
         }}>
           {[
-            { key: 'favorites', label: '⭐ 즐겨찾기' },
+            { key: 'favorites', label: '즐겨찾기' },
             { key: 'all', label: '모든 모드' },
           ].map(t => (
             <button
