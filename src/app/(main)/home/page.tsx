@@ -372,14 +372,6 @@ export default function HomePage() {
                     border: '1px solid var(--color-border)',
                   }}
                 >
-                  <div style={{
-                    width: '36px', height: '36px', borderRadius: '10px',
-                    background: folder.color ? `${folder.color}60` : 'rgba(28,28,30,0.07)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '18px', flexShrink: 0,
-                  }}>
-                    {folder.icon || '📚'}
-                  </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {folder.name}

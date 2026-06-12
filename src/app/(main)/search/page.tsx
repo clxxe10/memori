@@ -317,14 +317,6 @@ function SearchPageContent() {
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{
-                        width: '44px', height: '44px', borderRadius: '13px',
-                        background: folder.color ? `${folder.color}60` : 'rgba(28,28,30,0.07)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '22px', flexShrink: 0,
-                      }}>
-                        {folder.icon || '📚'}
-                      </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
                           <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
