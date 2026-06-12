@@ -100,9 +100,13 @@ export default function ProfilePage() {
   }
 
   const groupCardStyle = {
-    background: 'var(--color-surface)',
-    borderRadius: '16px',
-    border: '1px solid var(--color-border)',
+    background: 'var(--vocab-card-bg)',
+    backdropFilter: 'blur(20px) saturate(180%)',
+    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+    borderRadius: '18px',
+    border: '0.5px solid var(--vocab-card-border)',
+    borderTop: '1px solid var(--vocab-card-border-top)',
+    boxShadow: '0 2px 12px rgba(0,0,0,0.09)',
     overflow: 'hidden' as const,
     marginBottom: '16px',
   }
@@ -129,9 +133,13 @@ export default function ProfilePage() {
 
         {/* 프로필 카드 */}
         <div style={{
-          background: 'var(--color-surface)', borderRadius: '22px', padding: '24px 20px',
-          border: '1px solid var(--color-border)',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+          background: 'var(--vocab-card-bg)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          borderRadius: '22px', padding: '24px 20px',
+          border: '0.5px solid var(--vocab-card-border)',
+          borderTop: '1px solid var(--vocab-card-border-top)',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.09)',
           textAlign: 'center', marginBottom: '20px',
         }}>
           <div style={{
