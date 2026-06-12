@@ -314,14 +314,13 @@ function FlashcardContent() {
             }}
             disabled={current === 0}
             style={{
-              position: 'absolute', left: 0, zIndex: 10,
-              width: '32px', height: '32px', borderRadius: '50%',
-              background: current === 0 ? 'var(--color-surface-2)' : 'var(--color-surface)',
-              border: '1px solid var(--color-border)',
+              position: 'absolute', top: '50%', left: '12px', zIndex: 10,
+              transform: 'translateY(-50%)',
+              width: '32px', height: '32px',
+              background: 'transparent', border: 'none',
               cursor: current === 0 ? 'not-allowed' : 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.09)',
-              flexShrink: 0,
+              opacity: current === 0 ? 0.3 : 0.6,
             }}
           >
             <ChevronLeft size={15} color={current === 0 ? 'var(--color-text-tertiary)' : 'var(--color-text-primary)'} />
@@ -356,7 +355,7 @@ function FlashcardContent() {
             style={{
               position: 'absolute',
               top: 0, bottom: 0,
-              left: '40px', right: '40px',
+              left: '28px', right: '28px',
               background: 'var(--color-surface)',
               borderRadius: '24px',
               boxShadow: '0 8px 40px rgba(0,0,0,0.09)',
@@ -440,14 +439,13 @@ function FlashcardContent() {
             }}
             disabled={current === words.length - 1}
             style={{
-              position: 'absolute', right: 0, zIndex: 10,
-              width: '32px', height: '32px', borderRadius: '50%',
-              background: current === words.length - 1 ? 'var(--color-surface-2)' : 'var(--color-surface)',
-              border: '1px solid var(--color-border)',
+              position: 'absolute', top: '50%', right: '12px', zIndex: 10,
+              transform: 'translateY(-50%)',
+              width: '32px', height: '32px',
+              background: 'transparent', border: 'none',
               cursor: current === words.length - 1 ? 'not-allowed' : 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.09)',
-              flexShrink: 0,
+              opacity: current === words.length - 1 ? 0.3 : 0.6,
             }}
           >
             <ChevronRight size={15} color={current === words.length - 1 ? 'var(--color-text-tertiary)' : 'var(--color-text-primary)'} />

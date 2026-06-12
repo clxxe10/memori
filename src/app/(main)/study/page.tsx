@@ -356,7 +356,6 @@ export default function StudyPage() {
                       cursor: 'pointer', textAlign: 'left',
                     }}
                   >
-                    <div style={{ width: '42px', height: '42px', borderRadius: '13px', background: 'rgba(28,28,30,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>🔁</div>
                     <div>
                       <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>전체 복습</div>
                       <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>틀린 단어 전체를 복습해요</div>
@@ -379,9 +378,6 @@ export default function StudyPage() {
                           opacity: (folder.word_count || 0) === 0 ? 0.4 : 1,
                         }}
                       >
-                        <div style={{ width: '42px', height: '42px', borderRadius: '13px', background: folder.color ? `${folder.color}60` : 'rgba(28,28,30,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>
-                          {folder.icon || '📚'}
-                        </div>
                         <div>
                           <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{folder.name}</div>
                           <div style={{ fontSize: '12px', color: (folder.word_count || 0) === 0 ? '#E24B4A' : 'var(--color-text-secondary)', marginTop: '2px' }}>
@@ -415,9 +411,6 @@ export default function StudyPage() {
                       cursor: 'pointer', textAlign: 'left',
                     }}
                   >
-                    <div style={{ width: '42px', height: '42px', borderRadius: '13px', background: 'rgba(28,28,30,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>
-                      📚
-                    </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>전체 단어장</div>
                       <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>모든 단어를 학습해요</div>
@@ -462,9 +455,6 @@ export default function StudyPage() {
                           opacity: (folder.word_count || 0) === 0 ? 0.4 : 1,
                         }}
                       >
-                        <div style={{ width: '42px', height: '42px', borderRadius: '13px', background: folder.color ? `${folder.color}60` : 'rgba(28,28,30,0.09)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>
-                          {folder.icon || '📚'}
-                        </div>
                         <div style={{ flex: 1 }}>
                           <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{folder.name}</div>
                           <div style={{ fontSize: '12px', color: (folder.word_count || 0) === 0 ? '#E24B4A' : 'var(--color-text-secondary)', marginTop: '2px' }}>

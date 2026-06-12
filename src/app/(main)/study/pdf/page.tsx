@@ -271,9 +271,6 @@ export default function PDFPage() {
                     cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
                   }}
                 >
-                  <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: folder.color ? `${folder.color}60` : 'rgba(28,28,30,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>
-                    {folder.icon || '📚'}
-                  </div>
                   <span style={{ flex: 1, fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{folder.name}</span>
                   <ChevronRight size={16} color="var(--color-text-tertiary)" />
                 </div>
