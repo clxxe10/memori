@@ -28,11 +28,9 @@ type Word = {
 type Folder = {
   id: string
   name: string
-  icon: string
-  color?: string
+  description?: string
   category?: string
   is_public?: boolean
-  language?: string
 }
 
 const FILTERS = ['전체', '북마크', '어려워요', '미학습']
@@ -98,11 +96,9 @@ export default function VocabularyDetailPage() {
   const [showEditSheet, setShowEditSheet] = useState(false)
   const [editForm, setEditForm] = useState({
     name: '',
-    icon: '',
-    color: '',
+    description: '',
     category: '',
     is_public: false,
-    language: '영어',
   })
 
   const fetchWords = async () => {
@@ -112,11 +108,9 @@ export default function VocabularyDetailPage() {
       setFolder(folderData)
       setEditForm({
         name: folderData.name || '',
-        icon: folderData.icon || '📚',
-        color: folderData.color || '#B8D4FF',
+        description: folderData.description || '',
         category: folderData.category || '',
         is_public: folderData.is_public || false,
-        language: folderData.language || '영어',
       })
     }
     const { data: wordData } = await supabase
@@ -146,11 +140,9 @@ export default function VocabularyDetailPage() {
     const supabase = createClient()
     await supabase.from('folders').update({
       name: editForm.name,
-      icon: editForm.icon,
-      color: editForm.color,
+      description: editForm.description.trim() || null,
       category: editForm.category,
       is_public: editForm.is_public,
-      language: editForm.language,
     }).eq('id', folderId)
     setFolder(prev => prev ? { ...prev, ...editForm } : prev)
     setShowEditSheet(false)
@@ -278,8 +270,11 @@ export default function VocabularyDetailPage() {
           </button>
           <div style={{ flex: 1 }}>
             <h1 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.4px', margin: 0 }}>
-              {folder?.icon} {folder?.name}
+              {folder?.name}
             </h1>
+            {folder?.description && (
+              <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '2px 0 0' }}>{folder.description}</p>
+            )}
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: 0 }}>{words.length}개 단어</p>
           </div>
           <button
@@ -488,25 +483,13 @@ export default function VocabularyDetailPage() {
               </div>
 
               <div>
-                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>아이콘</p>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>설명 <span style={{ fontWeight: 400, color: 'var(--color-text-tertiary)' }}>(선택)</span></p>
                 <input
-                  value={editForm.icon}
-                  onChange={e => setEditForm(f => ({ ...f, icon: e.target.value.slice(0, 4) }))}
-                  placeholder="이모지 또는 텍스트"
-                  style={{ width: '100%', height: '46px', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: '12px', padding: '0 14px', fontSize: '18px', color: 'var(--color-text-primary)', outline: 'none', boxSizing: 'border-box' as const }}
+                  value={editForm.description}
+                  onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
+                  placeholder="이 단어장에 대한 간단한 설명"
+                  style={{ width: '100%', height: '46px', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: '12px', padding: '0 14px', fontSize: '14px', color: 'var(--color-text-primary)', outline: 'none', boxSizing: 'border-box' }}
                 />
-              </div>
-
-              <div>
-                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>배경 컬러</p>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                  {['#B8D4FF','#B5EAD7','#FFDAC1','#FFB7C5','#E2C9FF','#FFFACD','#C9F0FF','#D4EDDA'].map(c => (
-                    <button key={c} onClick={() => setEditForm(f => ({ ...f, color: c }))}
-                      style={{ width: '28px', height: '28px', borderRadius: '50%', background: c, border: 'none', cursor: 'pointer', boxShadow: editForm.color === c ? '0 0 0 2px #fff, 0 0 0 3.5px #1C1C1E' : '0 0 0 1px rgba(0,0,0,0.08)', transform: editForm.color === c ? 'scale(1.15)' : 'scale(1)', transition: 'all 0.15s' }} />
-                  ))}
-                  <input type="color" value={editForm.color} onChange={e => setEditForm(f => ({ ...f, color: e.target.value }))}
-                    style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1.5px solid var(--color-border)', cursor: 'pointer', padding: 0, background: 'none' }} />
-                </div>
               </div>
 
               <div>
@@ -522,25 +505,6 @@ export default function VocabularyDetailPage() {
                     { value: '기타', label: '기타' },
                   ]}
                   placeholder="카테고리 선택"
-                />
-              </div>
-
-              <div>
-                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>학습 언어</p>
-                <SelectDropdown
-                  value={editForm.language}
-                  onChange={val => setEditForm(f => ({ ...f, language: val }))}
-                  options={[
-                    { value: '영어', label: '영어', flag: '🇺🇸' },
-                    { value: '한국어', label: '한국어', flag: '🇰🇷' },
-                    { value: '일본어', label: '일본어', flag: '🇯🇵' },
-                    { value: '중국어', label: '중국어', flag: '🇨🇳' },
-                    { value: '프랑스어', label: '프랑스어', flag: '🇫🇷' },
-                    { value: '스페인어', label: '스페인어', flag: '🇪🇸' },
-                    { value: '독일어', label: '독일어', flag: '🇩🇪' },
-                    { value: '기타', label: '기타', flag: '🌐' },
-                  ]}
-                  placeholder="학습 언어 선택"
                 />
               </div>
 

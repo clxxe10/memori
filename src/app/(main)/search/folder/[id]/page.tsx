@@ -51,6 +51,7 @@ type Folder = {
   icon: string
   color?: string
   category?: string
+  description?: string
   user_id: string
   author_nickname?: string
 }
@@ -166,8 +167,9 @@ export default function PublicFolderPage() {
       .insert({
         user_id: myUserId,
         name: folder?.name,
-        icon: folder?.icon,
-        color: folder?.color,
+        icon: '📚',
+        color: '#1C1C1E',
+        description: folder?.description || null,
         category: folder?.category,
         is_public: false,
       })
@@ -246,14 +248,16 @@ export default function PublicFolderPage() {
         {/* 단어장 정보 카드 */}
         <div style={{ background: 'var(--color-surface)', borderRadius: '20px', padding: '16px', border: '1px solid var(--color-border)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', marginBottom: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: folder?.color ? `${folder.color}60` : 'rgba(28,28,30,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', flexShrink: 0 }}>
-              {folder?.icon || '📚'}
-            </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '3px' }}>
                 by @{folder?.author_nickname || '익명'}
               </div>
               <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '3px' }}>{folder?.name}</div>
+              {folder?.description && (
+                <div style={{ fontSize: '12px', color: 'var(--color-text-tertiary)', marginBottom: '4px' }}>
+                  {folder.description}
+                </div>
+              )}
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                 {folder?.category && (
                   <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-text-primary)', background: 'rgba(28,28,30,0.07)', borderRadius: '6px', padding: '2px 7px' }}>
