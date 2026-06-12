@@ -260,22 +260,27 @@ export default function HomePage() {
         </div>
 
         {/* 복습 배너 카드 */}
-        <div style={{
-          background: 'linear-gradient(135deg, var(--color-my-light) 0%, color-mix(in srgb, var(--color-surface) 60%, transparent) 100%)',
-          borderRadius: '22px', padding: '20px', marginBottom: '12px',
-          border: '1.5px solid var(--color-my-light)',
+        <div className="review-card-glass" style={{
+          background: 'rgba(255,255,255,0.5)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+          borderRadius: '28px', padding: '26px', marginBottom: '12px',
+          border: '0.5px solid rgba(255,255,255,0.4)',
+          borderTop: '1px solid rgba(255,255,255,0.6)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
             <div>
               <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '4px', margin: 0 }}>오늘 복습할 단어</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginTop: '4px' }}>
-                <span style={{ fontSize: '40px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-1px', lineHeight: 1 }}>{animatedReviewCount}</span>
+                <span style={{ fontSize: '52px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-1px', lineHeight: 1 }}>{animatedReviewCount}</span>
                 <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>개</span>
               </div>
             </div>
             <button
+              className="tap-feedback"
               onClick={() => router.push('/study/review')}
-              style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '20px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '20px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', transition: 'transform 0.15s' }}
             >
               <Play size={12} fill="currentColor" />
               복습 시작
