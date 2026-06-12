@@ -84,7 +84,7 @@ const ALL_MODES = [
 export default function StudyPage() {
   const router = useRouter()
   const [tab, setTab] = useState<'favorites' | 'all'>('favorites')
-  const [favorites, setFavorites] = useState<string[]>(['flashcard', 'quiz', 'listening'])
+  const [favorites, setFavorites] = useState<string[]>(['flashcard', 'blink', 'typing'])
   const [showFolderSheet, setShowFolderSheet] = useState(false)
   const [selectedMode, setSelectedMode] = useState<string | null>(null)
   const [folders, setFolders] = useState<Array<{ id: string; name: string; icon: string; word_count?: number; color?: string }>>([])

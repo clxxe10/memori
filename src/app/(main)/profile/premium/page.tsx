@@ -59,14 +59,14 @@ export default function PremiumPage() {
   return (
     <main style={{
       minHeight: '100vh',
-      backgroundColor: 'var(--color-bg)',
+      background: 'var(--premium-bg)',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
       paddingBottom: '40px',
     }}>
 
       {/* 히어로 */}
       <div style={{
-        background: 'linear-gradient(160deg, var(--color-text-primary) 0%, rgba(60,60,62,1) 50%, var(--color-text-primary) 100%)',
+        background: 'transparent',
         padding: '52px 20px 24px',
         textAlign: 'center',
         position: 'relative',
@@ -75,13 +75,13 @@ export default function PremiumPage() {
           onClick={() => router.back()}
           style={{ position: 'absolute', top: '52px', left: '20px', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
         >
-          <ArrowLeft size={22} color="rgba(255,255,255,0.7)" />
+          <ArrowLeft size={22} color="var(--color-text-primary)" />
         </button>
         <div style={{ fontSize: '44px', marginBottom: '10px' }}>👑</div>
-        <h1 style={{ fontSize: '22px', fontWeight: 900, color: '#FFFFFF', letterSpacing: '-0.5px', marginBottom: '6px' }}>
+        <h1 style={{ fontSize: '22px', fontWeight: 900, color: 'var(--color-text-primary)', letterSpacing: '-0.5px', marginBottom: '6px' }}>
           Memori Premium
         </h1>
-        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+        <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: 0 }}>
           광고 없이, 제한 없이 학습해요
         </p>
       </div>
