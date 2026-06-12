@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useRef, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, Volume2, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -38,6 +38,8 @@ function FlashcardContent() {
   const [folderName, setFolderName] = useState('')
   const [cardAnim, setCardAnim] = useState('')
   const [exitDirection, setExitDirection] = useState<'left' | 'right' | null>(null)
+  const [dragX, setDragX] = useState(0)
+  const dragStartX = useRef(0)
   useEffect(() => {
     const style = document.createElement('style')
     style.textContent = `
@@ -134,8 +136,6 @@ function FlashcardContent() {
     const word = words[current]
     const supabase = createClient()
 
-    setCardAnim(know ? 'card-slide-out-left' : 'card-slide-out-right')
-
     const { nextInterval, nextEaseFactor, nextReviewDate } = calculateNextReview(
       word.correct_count || 0,
       word.review_interval || 0,
@@ -159,17 +159,13 @@ function FlashcardContent() {
       dontKnow: !know ? prev.dontKnow + 1 : prev.dontKnow,
     }))
 
-    setTimeout(() => {
-      if (current + 1 >= words.length) {
-        recordStudyProgress(words.length)
-        setFinished(true)
-      } else {
-        setCurrent(prev => prev + 1)
-        setFlipped(false)
-        setCardAnim(know ? 'card-slide-in-right' : 'card-slide-in-left')
-        setTimeout(() => setCardAnim(''), 220)
-      }
-    }, 180)
+    if (current + 1 >= words.length) {
+      recordStudyProgress(words.length)
+      setFinished(true)
+    } else {
+      setCurrent(prev => prev + 1)
+      setFlipped(false)
+    }
   }
 
   const handleRestart = () => {
@@ -187,7 +183,7 @@ function FlashcardContent() {
       setTimeout(() => {
         handleAnswer(false)
         setExitDirection(null)
-      }, 250)
+      }, 450)
     },
     onSwipeRight: () => {
       if (!flipped) { setFlipped(true); return }
@@ -196,7 +192,7 @@ function FlashcardContent() {
       setTimeout(() => {
         handleAnswer(true)
         setExitDirection(null)
-      }, 250)
+      }, 450)
     },
     threshold: 60,
   })
@@ -335,7 +331,21 @@ function FlashcardContent() {
 
           {/* 카드 */}
           <div
+            key={current}
             {...swipeHandlers}
+            onTouchStart={(e) => {
+              dragStartX.current = e.touches[0].clientX
+              swipeHandlers.onTouchStart(e)
+            }}
+            onTouchMove={(e) => {
+              if (exitDirection) return
+              const dx = e.touches[0].clientX - dragStartX.current
+              setDragX(dx)
+            }}
+            onTouchEnd={(e) => {
+              swipeHandlers.onTouchEnd(e)
+              setDragX(0)
+            }}
             className={cardAnim}
             onClick={() => {
               setCardAnim('card-flip-out')
@@ -363,9 +373,13 @@ function FlashcardContent() {
                 ? 'translateX(-150%) rotate(-20deg)'
                 : exitDirection === 'right'
                 ? 'translateX(150%) rotate(20deg)'
-                : 'translateX(0) rotate(0deg)',
+                : `translateX(${dragX}px) rotate(${dragX / 20}deg)`,
               opacity: exitDirection ? 0 : 1,
-              transition: exitDirection ? 'all 0.25s ease-in' : 'none',
+              transition: exitDirection
+                ? 'all 0.45s ease-in'
+                : dragX !== 0
+                ? 'none'
+                : 'transform 0.2s ease-out',
             }}
           >
             <button
@@ -458,7 +472,7 @@ function FlashcardContent() {
               setTimeout(() => {
                 handleAnswer(false)
                 setExitDirection(null)
-              }, 250)
+              }, 450)
             }}
             style={{ flex: 1, height: '52px', background: 'transparent', border: '1.5px solid var(--color-border)', color: 'var(--color-text-primary)', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}
           >
@@ -470,7 +484,7 @@ function FlashcardContent() {
               setTimeout(() => {
                 handleAnswer(true)
                 setExitDirection(null)
-              }, 250)
+              }, 450)
             }}
             style={{ flex: 1, height: '52px', background: 'transparent', border: '1.5px solid var(--color-border)', color: 'var(--color-text-primary)', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}
           >

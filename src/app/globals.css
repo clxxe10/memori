@@ -129,3 +129,10 @@ nav.tab-bar-container {
   align-items: center !important;
   justify-content: space-around !important;
 }
+
+button:not(:disabled) {
+  transition: transform 0.1s ease;
+}
+button:not(:disabled):not(.no-press-anim):active {
+  transform: scale(0.96);
+}
