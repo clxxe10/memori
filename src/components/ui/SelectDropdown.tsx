@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 type Option = { value: string; label: string; flag?: string }
 
@@ -20,10 +21,16 @@ export default function SelectDropdown({
 }: Props) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 })
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
+      if (
+        ref.current && !ref.current.contains(e.target as Node) &&
+        menuRef.current && !menuRef.current.contains(e.target as Node)
+      ) {
         setOpen(false)
       }
     }
@@ -57,8 +64,15 @@ export default function SelectDropdown({
   return (
     <div ref={ref} style={{ position: 'relative' }}>
       <button
+        ref={buttonRef}
         type="button"
-        onClick={() => setOpen(p => !p)}
+        onClick={() => {
+          if (!open && buttonRef.current) {
+            const rect = buttonRef.current.getBoundingClientRect()
+            setCoords({ top: rect.bottom + 4, left: rect.left, width: rect.width })
+          }
+          setOpen(p => !p)
+        }}
         style={{
           height: '40px', padding: '0 14px',
           background: 'var(--color-surface)',
@@ -77,15 +91,19 @@ export default function SelectDropdown({
         </span>
       </button>
 
-      {open && (
-        <div style={{
-          position: 'absolute', top: '44px', left: 0,
+      {open && createPortal(
+        <div ref={menuRef} style={{
+          position: 'fixed',
+          top: coords.top,
+          left: coords.left,
+          minWidth: Math.max(coords.width, 140),
           background: 'var(--color-surface)',
           border: '1px solid var(--color-border)',
           borderRadius: '14px', overflow: 'hidden',
           boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-          zIndex: 100, minWidth: '140px',
-          maxHeight: '200px', overflowY: 'auto',
+          zIndex: 9999,
+          maxHeight: '240px', overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
         }}>
           {options.map((opt, i) => {
             const isSelected = multiple
@@ -113,7 +131,8 @@ export default function SelectDropdown({
               </button>
             )
           })}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

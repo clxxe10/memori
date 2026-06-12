@@ -35,6 +35,7 @@ type Folder = {
   icon: string
   color?: string
   category?: string
+  description?: string
   is_public?: boolean
   word_count?: number
   mastered_count?: number
@@ -51,10 +52,8 @@ export default function VocabularyPage() {
   const [creating, setCreating] = useState(false)
   const [newFolder, setNewFolder] = useState({
     name: '',
-    icon: '📚',
-    color: '#B8D4FF',
+    description: '',
     category: '',
-    language: '영어',
     is_public: false,
   })
 
@@ -119,17 +118,17 @@ export default function VocabularyPage() {
         `user_${user.id?.slice(0, 6)}`
 
       const finalCategory = newFolder.category
-      const finalIcon = newFolder.icon.trim() || '📚'
 
       const { data, error } = await supabase
         .from('folders')
         .insert({
           user_id: user.id,
           name: newFolder.name.trim(),
-          icon: finalIcon,
-          color: newFolder.color,
+          icon: '📚',
+          color: '#1C1C1E',
           category: finalCategory || null,
-          language: newFolder.language,
+          language: '영어',
+          description: newFolder.description.trim() || null,
           is_public: newFolder.is_public,
           author_nickname: authorNickname,
         })
@@ -142,7 +141,10 @@ export default function VocabularyPage() {
           .insert({
             user_id: user.id,
             name: newFolder.name.trim(),
-            icon: finalIcon,
+            icon: '📚',
+            color: '#1C1C1E',
+            language: '영어',
+            description: newFolder.description.trim() || null,
             author_nickname: authorNickname,
           })
           .select()
@@ -160,10 +162,8 @@ export default function VocabularyPage() {
 
       setNewFolder({
         name: '',
-        icon: '📚',
-        color: '#B8D4FF',
+        description: '',
         category: '',
-        language: '영어',
         is_public: false,
       })
       setShowModal(false)
@@ -277,21 +277,6 @@ export default function VocabularyPage() {
                     cursor: 'pointer',
                   }}
                 >
-                  <div
-                    style={{
-                      width: '44px',
-                      height: '44px',
-                      borderRadius: '13px',
-                      background: folder.color ? `${folder.color}80` : 'rgba(28,28,30,0.09)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                      fontSize: '22px',
-                    }}
-                  >
-                    {folder.icon || '📚'}
-                  </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                       <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{folder.name}</span>
@@ -308,7 +293,7 @@ export default function VocabularyPage() {
                         {percent}%
                       </span>
                     </div>
-                    {folder.category && <p style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', marginBottom: '4px' }}>{folder.category}</p>}
+                    {folder.description && <p style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{folder.description}</p>}
                     <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '5px' }}>{total}개 단어</div>
                     <div style={{ height: '3px', background: 'var(--color-surface-2)', borderRadius: '3px' }}>
                       <div style={{ height: '3px', background: 'var(--color-my)', borderRadius: '3px', width: `${percent}%` }} />
@@ -388,118 +373,56 @@ export default function VocabularyPage() {
                 <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>
                   이름
                 </label>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <input
-                    value={newFolder.icon}
-                    onChange={e => setNewFolder(f => ({ ...f, icon: e.target.value.slice(0, 4) }))}
-                    placeholder="📚"
-                    style={{
-                      width: '52px', height: '52px', textAlign: 'center',
-                      fontSize: '24px', borderRadius: '14px',
-                      border: '1px solid var(--color-border)',
-                      background: 'var(--color-surface-2)',
-                      outline: 'none', boxSizing: 'border-box' as const,
-                      color: 'var(--color-text-primary)',
-                    }}
-                  />
-                  <input
-                    value={newFolder.name}
-                    onChange={e => setNewFolder(f => ({ ...f, name: e.target.value }))}
-                    placeholder="예: 토익 필수 단어"
-                    style={{
-                      flex: 1, height: '52px', padding: '0 16px',
-                      fontSize: '16px', borderRadius: '14px',
-                      border: '1px solid var(--color-border)',
-                      background: 'var(--color-surface-2)',
-                      color: 'var(--color-text-primary)',
-                      outline: 'none', boxSizing: 'border-box' as const,
-                    }}
-                  />
-                </div>
+                <input
+                  value={newFolder.name}
+                  onChange={e => setNewFolder(f => ({ ...f, name: e.target.value }))}
+                  placeholder="예: 토익 필수 단어"
+                  style={{
+                    width: '100%', height: '52px', padding: '0 16px',
+                    fontSize: '16px', borderRadius: '14px',
+                    border: '1px solid var(--color-border)',
+                    background: 'var(--color-surface-2)',
+                    color: 'var(--color-text-primary)',
+                    outline: 'none', boxSizing: 'border-box',
+                  }}
+                />
               </div>
 
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>
-                  색상
+                  설명 <span style={{ fontWeight: 400, color: 'var(--color-text-tertiary)' }}>(선택)</span>
                 </label>
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
-                  {['#B8D4FF', '#B5EAD7', '#FFDAC1', '#FFB7C5', '#E2C9FF', '#FFFACD', '#C9F0FF', '#D4EDDA'].map(c => (
-                    <button
-                      key={c}
-                      type="button"
-                      onClick={() => setNewFolder(f => ({ ...f, color: c }))}
-                      style={{
-                        width: '36px', height: '36px', borderRadius: '50%',
-                        background: c, border: 'none', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: newFolder.color === c ? '0 0 0 2px var(--color-surface), 0 0 0 3.5px var(--color-text-primary)' : '0 0 0 1px rgba(0,0,0,0.08)',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {newFolder.color === c && (
-                        <span style={{ fontSize: '14px', fontWeight: 800, color: '#1C1C1E', lineHeight: 1 }}>✓</span>
-                      )}
-                    </button>
-                  ))}
-                  <div style={{ position: 'relative', width: '36px', height: '36px', flexShrink: 0 }}>
-                    <input
-                      type="color"
-                      value={newFolder.color}
-                      onChange={e => setNewFolder(f => ({ ...f, color: e.target.value }))}
-                      style={{ width: '36px', height: '36px', borderRadius: '50%', border: 'none', cursor: 'pointer', padding: 0, opacity: 0, position: 'absolute', inset: 0, zIndex: 1 }}
-                    />
-                    <div style={{
-                      width: '36px', height: '36px', borderRadius: '50%',
-                      background: 'conic-gradient(#ffb3c6,#ffd6a5,#fdffb6,#caffbf,#a0c4ff,#bdb2ff,#ffb3c6)',
-                      border: '1px solid var(--color-border)', cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      {!['#B8D4FF', '#B5EAD7', '#FFDAC1', '#FFB7C5', '#E2C9FF', '#FFFACD', '#C9F0FF', '#D4EDDA'].includes(newFolder.color) && (
-                        <span style={{ fontSize: '12px', fontWeight: 800, color: '#1C1C1E', lineHeight: 1 }}>✓</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                <input
+                  value={newFolder.description}
+                  onChange={e => setNewFolder(f => ({ ...f, description: e.target.value }))}
+                  placeholder="이 단어장에 대한 간단한 설명"
+                  style={{
+                    width: '100%', height: '52px', padding: '0 16px',
+                    fontSize: '14px', borderRadius: '14px',
+                    border: '1px solid var(--color-border)',
+                    background: 'var(--color-surface-2)',
+                    color: 'var(--color-text-primary)',
+                    outline: 'none', boxSizing: 'border-box',
+                  }}
+                />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>
-                    카테고리
-                  </label>
-                  <SelectDropdown
-                    value={newFolder.category}
-                    onChange={val => setNewFolder(f => ({ ...f, category: val }))}
-                    options={[
-                      { value: '수능', label: '수능' },
-                      { value: '토익', label: '토익' },
-                      { value: '일상', label: '일상' },
-                      { value: '비즈니스', label: '비즈니스' },
-                      { value: '기타', label: '기타' },
-                    ]}
-                    placeholder="카테고리 선택"
-                  />
-                </div>
-                <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>
-                    학습 언어
-                  </label>
-                  <SelectDropdown
-                    value={newFolder.language}
-                    onChange={val => setNewFolder(f => ({ ...f, language: val }))}
-                    options={[
-                      { value: '영어', label: '영어', flag: '🇺🇸' },
-                      { value: '한국어', label: '한국어', flag: '🇰🇷' },
-                      { value: '일본어', label: '일본어', flag: '🇯🇵' },
-                      { value: '중국어', label: '중국어', flag: '🇨🇳' },
-                      { value: '프랑스어', label: '프랑스어', flag: '🇫🇷' },
-                      { value: '스페인어', label: '스페인어', flag: '🇪🇸' },
-                      { value: '독일어', label: '독일어', flag: '🇩🇪' },
-                      { value: '기타', label: '기타', flag: '🌐' },
-                    ]}
-                    placeholder="학습 언어 선택"
-                  />
-                </div>
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>
+                  카테고리
+                </label>
+                <SelectDropdown
+                  value={newFolder.category}
+                  onChange={val => setNewFolder(f => ({ ...f, category: val }))}
+                  options={[
+                    { value: '수능', label: '수능' },
+                    { value: '토익', label: '토익' },
+                    { value: '일상', label: '일상' },
+                    { value: '비즈니스', label: '비즈니스' },
+                    { value: '기타', label: '기타' },
+                  ]}
+                  placeholder="카테고리 선택"
+                />
               </div>
 
               <div style={{
