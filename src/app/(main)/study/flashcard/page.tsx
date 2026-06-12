@@ -177,7 +177,6 @@ function FlashcardContent() {
 
   const swipeHandlers = useSwipe({
     onSwipeLeft: () => {
-      if (!flipped) { setFlipped(true); return }
       haptics.medium()
       setExitDirection('left')
       setTimeout(() => {
@@ -186,7 +185,6 @@ function FlashcardContent() {
       }, 450)
     },
     onSwipeRight: () => {
-      if (!flipped) { setFlipped(true); return }
       haptics.success()
       setExitDirection('right')
       setTimeout(() => {
