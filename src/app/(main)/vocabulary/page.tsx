@@ -260,12 +260,16 @@ export default function VocabularyPage() {
               return (
                 <div
                   key={folder.id}
+                  className="vocab-folder-glass"
                   onClick={() => router.push(`/vocabulary/${folder.id}`)}
                   style={{
-                    background: 'var(--color-surface)',
+                    background: 'var(--vocab-card-bg)',
+                    backdropFilter: 'blur(20px) saturate(180%)',
+                    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
                     borderRadius: '18px',
                     padding: '14px 16px',
-                    border: '1px solid var(--color-border)',
+                    border: '0.5px solid var(--vocab-card-border)',
+                    borderTop: '1px solid var(--vocab-card-border-top)',
                     boxShadow: '0 2px 12px rgba(0,0,0,0.09)',
                     display: 'flex',
                     alignItems: 'center',
