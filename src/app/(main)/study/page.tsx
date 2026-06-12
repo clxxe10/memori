@@ -233,10 +233,13 @@ export default function StudyPage() {
               role="button"
               style={{
                 width: '100%',
-                background: 'var(--color-surface)',
+                background: 'var(--vocab-card-bg)',
+                backdropFilter: 'blur(20px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
                 borderRadius: '18px',
-                padding: '14px 16px',
-                border: '1px solid var(--color-border)',
+                padding: '18px 18px',
+                border: '0.5px solid var(--vocab-card-border)',
+                borderTop: '1px solid var(--vocab-card-border-top)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
@@ -246,19 +249,6 @@ export default function StudyPage() {
                 position: 'relative',
               }}
             >
-              <div style={{
-                width: '46px',
-                height: '46px',
-                minWidth: '46px',
-                borderRadius: '14px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '22px',
-                flexShrink: 0,
-              }}>
-                {mode.emoji}
-              </div>
               <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
                   <span style={{
