@@ -33,6 +33,11 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchData = async () => {
       const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        const { data } = await supabase.auth.refreshSession()
+        if (!data.session) { router.push('/login'); return }
+      }
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
       setUser(user)
