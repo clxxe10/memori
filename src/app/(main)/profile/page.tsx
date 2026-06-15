@@ -547,15 +547,14 @@ export default function ProfilePage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
                 onClick={async () => {
-                  const supabase = createClient()
-                  const { data: { user } } = await supabase.auth.getUser()
-                  if (!user) return
-                  await supabase.from('words').delete().eq('user_id', user.id)
-                  await supabase.from('folders').delete().eq('user_id', user.id)
-                  await supabase.from('user_learning_stats').delete().eq('user_id', user.id)
-                  await supabase.from('user_daily_study').delete().eq('user_id', user.id)
-                  await supabase.auth.signOut()
-                  router.push('/login')
+                  const res = await fetch('/api/delete-account', { method: 'DELETE' })
+                  if (res.ok) {
+                    const supabase = createClient()
+                    await supabase.auth.signOut()
+                    router.push('/login')
+                  } else {
+                    alert('탈퇴 처리 중 오류가 발생했어요. 다시 시도해주세요.')
+                  }
                 }}
                 style={{ width: '100%', height: '52px', background: '#E24B4A', color: '#fff', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}
               >
