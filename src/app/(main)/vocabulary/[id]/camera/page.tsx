@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Camera, Image, Loader2 } from 'lucide-react'
 
 import { createClient } from '@/lib/supabase/client'
+import { detectLanguage } from '@/lib/detectLanguage'
 import { showToast } from '@/components/ui/Toast'
 import { canUsePhotoExtract, incrementExtractCount } from '@/lib/premium'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
@@ -172,6 +173,13 @@ export default function CameraPage() {
           example: w.example || null,
         }))
       )
+      if (selected.length > 0) {
+        const detectedLang = detectLanguage(selected[0].word)
+        await supabase
+          .from('folders')
+          .update({ language: detectedLang })
+          .eq('id', folderId)
+      }
       showToast('단어장에 추가됐어요!')
       router.back()
     } catch {

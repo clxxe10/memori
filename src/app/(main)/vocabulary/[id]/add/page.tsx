@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Sparkles } from 'lucide-react'
 
 import { createClient } from '@/lib/supabase/client'
+import { detectLanguage } from '@/lib/detectLanguage'
 import { showToast } from '@/components/ui/Toast'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useKeyboard } from '@/hooks/useKeyboard'
@@ -90,6 +91,11 @@ export default function AddWordPage() {
         example: generated?.example || null,
       })
       if (error) throw error
+      const detectedLang = detectLanguage(word.trim())
+      await supabase
+        .from('folders')
+        .update({ language: detectedLang })
+        .eq('id', folderId)
       showToast('단어가 추가됐어요!')
       router.back()
     } catch {

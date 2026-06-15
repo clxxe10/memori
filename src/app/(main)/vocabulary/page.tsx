@@ -21,6 +21,7 @@ import { useRouter } from 'next/navigation'
 import { ChevronRight, Plus, Search, X } from 'lucide-react'
 
 import { createClient } from '@/lib/supabase/client'
+import { detectLanguage } from '@/lib/detectLanguage'
 import { usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import SelectDropdown from '@/components/ui/SelectDropdown'
@@ -127,7 +128,7 @@ export default function VocabularyPage() {
           icon: '📚',
           color: '#1C1C1E',
           category: finalCategory || null,
-          language: '영어',
+          language: '영어', // 단어 추가 시 자동으로 업데이트됨 (기본값 유지)
           description: newFolder.description.trim() || null,
           is_public: newFolder.is_public,
           author_nickname: authorNickname,
@@ -143,7 +144,7 @@ export default function VocabularyPage() {
             name: newFolder.name.trim(),
             icon: '📚',
             color: '#1C1C1E',
-            language: '영어',
+            language: '영어', // 단어 추가 시 자동으로 업데이트됨 (기본값 유지)
             description: newFolder.description.trim() || null,
             author_nickname: authorNickname,
           })
