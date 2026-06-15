@@ -553,18 +553,38 @@ export default function ProfilePage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
                 onClick={async () => {
-                  const supabase = createClient()
-                  const { data: { session } } = await supabase.auth.getSession()
-                  const res = await fetch('/api/delete-account', {
-                    method: 'DELETE',
-                    headers: {
-                      'Authorization': `Bearer ${session?.access_token}`
+                  try {
+                    const supabase = createClient()
+
+                    // 세션 가져오기 (getSession 먼저, 없으면 refreshSession)
+                    let session = (await supabase.auth.getSession()).data.session
+                    if (!session) {
+                      const { data } = await supabase.auth.refreshSession()
+                      session = data.session
                     }
-                  })
-                  if (res.ok) {
-                    await supabase.auth.signOut()
-                    router.push('/login')
-                  } else {
+
+                    if (!session?.access_token) {
+                      alert('로그인 상태를 확인해주세요.')
+                      return
+                    }
+
+                    const res = await fetch('/api/delete-account', {
+                      method: 'DELETE',
+                      headers: {
+                        'Authorization': `Bearer ${session.access_token}`
+                      }
+                    })
+
+                    if (res.ok) {
+                      await supabase.auth.signOut()
+                      router.push('/login')
+                    } else {
+                      const err = await res.json()
+                      console.error('탈퇴 오류:', err)
+                      alert('탈퇴 처리 중 오류가 발생했어요. 다시 시도해주세요.')
+                    }
+                  } catch (e) {
+                    console.error('탈퇴 예외:', e)
                     alert('탈퇴 처리 중 오류가 발생했어요. 다시 시도해주세요.')
                   }
                 }}
