@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Bookmark, Camera, Pencil, Plus, Volume2, Settings } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { detectLanguage, languageToTTSCode } from '@/lib/detectLanguage'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import { useSwipe } from '@/hooks/useSwipe'
@@ -173,40 +174,28 @@ export default function VocabularyDetailPage() {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
     window.speechSynthesis.cancel()
 
-    const speak = () => {
-      const utter = new SpeechSynthesisUtterance(text)
-      utter.lang = 'en-US'
-      utter.rate = 0.9
-      utter.pitch = 1.0
+    const utter = new SpeechSynthesisUtterance(text)
+    const detectedLang = detectLanguage(text)
+    const langCode = languageToTTSCode(detectedLang)
+    utter.lang = langCode
+    utter.rate = 0.85
+    utter.volume = 1
+    utter.pitch = 1
 
+    const trySpeak = () => {
       const voices = window.speechSynthesis.getVoices()
-      const preferred = [
-        'Samantha', 'Alex', 'Karen', 'Daniel',
-        'Google US English', 'Microsoft Aria Online',
-        'Microsoft Guy Online',
-      ]
-      for (const name of preferred) {
-        const found = voices.find(v =>
-          v.name.includes(name) && v.lang.startsWith('en')
-        )
-        if (found) { utter.voice = found; break }
-      }
-
-      if (!utter.voice) {
-        const enVoice = voices.find(v => v.lang.startsWith('en-US'))
-        if (enVoice) utter.voice = enVoice
-      }
-
+      const found = voices.find(v => v.lang.startsWith(langCode.split('-')[0]))
+      if (found) utter.voice = found
       window.speechSynthesis.speak(utter)
     }
 
     const voices = window.speechSynthesis.getVoices()
     if (voices.length > 0) {
-      speak()
+      trySpeak()
     } else {
       window.speechSynthesis.onvoiceschanged = () => {
-        speak()
         window.speechSynthesis.onvoiceschanged = null
+        trySpeak()
       }
     }
   }
