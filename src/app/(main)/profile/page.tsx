@@ -33,13 +33,14 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchData = async () => {
       const supabase = createClient()
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        const { data } = await supabase.auth.refreshSession()
-        if (!data.session) { router.push('/login'); return }
+      let { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        // 세션 복구 시도
+        await new Promise(resolve => setTimeout(resolve, 500))
+        const { data: { user: retryUser } } = await supabase.auth.getUser()
+        if (!retryUser) return
+        user = retryUser
       }
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/login'); return }
       setUser(user)
       const name = user.user_metadata?.nickname || user.user_metadata?.full_name || '사용자'
       setNickname(name)
