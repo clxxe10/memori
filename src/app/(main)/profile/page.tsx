@@ -553,9 +553,15 @@ export default function ProfilePage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
                 onClick={async () => {
-                  const res = await fetch('/api/delete-account', { method: 'DELETE' })
+                  const supabase = createClient()
+                  const { data: { session } } = await supabase.auth.getSession()
+                  const res = await fetch('/api/delete-account', {
+                    method: 'DELETE',
+                    headers: {
+                      'Authorization': `Bearer ${session?.access_token}`
+                    }
+                  })
                   if (res.ok) {
-                    const supabase = createClient()
                     await supabase.auth.signOut()
                     router.push('/login')
                   } else {
