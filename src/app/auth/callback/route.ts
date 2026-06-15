@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     if (user) {
       const createdAt = new Date(user.created_at).getTime()
       const lastSignIn = new Date(user.last_sign_in_at ?? user.created_at).getTime()
-      const isNewUser = Math.abs(lastSignIn - createdAt) < 10000
+      const isNewUser = Math.abs(lastSignIn - createdAt) < 30000
       if (isNewUser) {
         return NextResponse.redirect(`${origin}/onboarding?step=4`)
       }
