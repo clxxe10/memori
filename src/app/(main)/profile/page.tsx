@@ -556,15 +556,26 @@ export default function ProfilePage() {
                   try {
                     const supabase = createClient()
 
-                    // 세션 가져오기 (getSession 먼저, 없으면 refreshSession)
                     let session = (await supabase.auth.getSession()).data.session
                     if (!session) {
                       const { data } = await supabase.auth.refreshSession()
                       session = data.session
                     }
 
+                    // 그래도 없으면 getUser로 시도
                     if (!session?.access_token) {
-                      alert('로그인 상태를 확인해주세요.')
+                      const { data: { user } } = await supabase.auth.getUser()
+                      if (!user) {
+                        alert('로그인 상태를 확인해주세요.')
+                        return
+                      }
+                      // user는 있는데 session이 없는 경우 - 데이터만 삭제하고 signOut
+                      await supabase.from('words').delete().eq('user_id', user.id)
+                      await supabase.from('folders').delete().eq('user_id', user.id)
+                      await supabase.from('user_learning_stats').delete().eq('user_id', user.id)
+                      await supabase.from('user_daily_study').delete().eq('user_id', user.id)
+                      await supabase.auth.signOut()
+                      router.push('/login')
                       return
                     }
 
