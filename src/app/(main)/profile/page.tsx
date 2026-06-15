@@ -556,47 +556,32 @@ export default function ProfilePage() {
                   try {
                     const supabase = createClient()
 
-                    let session = (await supabase.auth.getSession()).data.session
-                    if (!session) {
-                      const { data } = await supabase.auth.refreshSession()
-                      session = data.session
-                    }
-
-                    // 그래도 없으면 getUser로 시도
-                    if (!session?.access_token) {
-                      const { data: { user } } = await supabase.auth.getUser()
-                      if (!user) {
-                        alert('로그인 상태를 확인해주세요.')
-                        return
-                      }
-                      // user는 있는데 session이 없는 경우 - 데이터만 삭제하고 signOut
-                      await supabase.from('words').delete().eq('user_id', user.id)
-                      await supabase.from('folders').delete().eq('user_id', user.id)
-                      await supabase.from('user_learning_stats').delete().eq('user_id', user.id)
-                      await supabase.from('user_daily_study').delete().eq('user_id', user.id)
-                      await supabase.auth.signOut()
-                      router.push('/login')
+                    // user state에서 직접 가져오기 (이미 fetchData에서 setUser 완료된 상태)
+                    if (!user) {
+                      alert('로그인 상태를 확인해주세요.')
                       return
                     }
 
-                    const res = await fetch('/api/delete-account', {
-                      method: 'DELETE',
-                      headers: {
-                        'Authorization': `Bearer ${session.access_token}`
-                      }
-                    })
+                    // 데이터 삭제
+                    await supabase.from('words').delete().eq('user_id', user.id)
+                    await supabase.from('folders').delete().eq('user_id', user.id)
+                    await supabase.from('user_learning_stats').delete().eq('user_id', user.id)
+                    await supabase.from('user_daily_study').delete().eq('user_id', user.id)
 
-                    if (res.ok) {
-                      await supabase.auth.signOut()
-                      router.push('/login')
-                    } else {
-                      const err = await res.json()
-                      console.error('탈퇴 오류:', err)
-                      alert('탈퇴 처리 중 오류가 발생했어요. 다시 시도해주세요.')
+                    // Auth 계정 삭제 시도 (세션 있을 때만)
+                    const { data: { session } } = await supabase.auth.getSession()
+                    if (session?.access_token) {
+                      await fetch('/api/delete-account', {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${session.access_token}` }
+                      })
                     }
+
+                    await supabase.auth.signOut()
+                    router.push('/login')
                   } catch (e) {
-                    console.error('탈퇴 예외:', e)
-                    alert('탈퇴 처리 중 오류가 발생했어요. 다시 시도해주세요.')
+                    console.error('탈퇴 오류:', e)
+                    alert('탈퇴 처리 중 오류가 발생했어요.')
                   }
                 }}
                 style={{ width: '100%', height: '52px', background: '#E24B4A', color: '#fff', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}
