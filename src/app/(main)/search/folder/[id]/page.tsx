@@ -93,7 +93,16 @@ export default function PublicFolderPage() {
   useEffect(() => {
     const fetchAll = async () => {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      let { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) {
+          const { data } = await supabase.auth.refreshSession()
+          user = data.user
+        } else {
+          user = session.user
+        }
+      }
       if (user) {
         setMyUserId(user.id)
         setMyNickname(user.user_metadata?.nickname || user.user_metadata?.full_name || '익명')

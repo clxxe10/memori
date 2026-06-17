@@ -44,7 +44,7 @@
 
 'use client'
 
-import { Suspense, useCallback, useEffect, useState, type MouseEvent } from 'react'
+import { Suspense, useCallback, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Search, Star } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -79,7 +79,6 @@ function SearchPageContent() {
   const [loading, setLoading] = useState(true)
   const [importing, setImporting] = useState<string | null>(null)
   const [importedIds, setImportedIds] = useState<Set<string>>(new Set())
-  const [likedIds, setLikedIds] = useState<Set<string>>(new Set())
   const [myUserId, setMyUserId] = useState<string | null>(null)
   const pagePadding = usePagePadding()
   const bp = useBreakpoint()
@@ -87,14 +86,7 @@ function SearchPageContent() {
   const fetchPublicFolders = useCallback(async () => {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      setMyUserId(user.id)
-      const { data: myLikes } = await supabase
-        .from('folder_likes')
-        .select('folder_id')
-        .eq('user_id', user.id)
-      if (myLikes) setLikedIds(new Set(myLikes.map(l => l.folder_id)))
-    }
+    if (user) setMyUserId(user.id)
 
     const { data: folderData } = await supabase
       .from('folders')
@@ -151,23 +143,6 @@ function SearchPageContent() {
   })
 
   const isMyFolder = (folder: PublicFolder) => folder.user_id === myUserId
-
-  const handleLike = async (e: MouseEvent, folder: PublicFolder) => {
-    e.stopPropagation()
-    if (!myUserId) return
-    const supabase = createClient()
-    const isLiked = likedIds.has(folder.id)
-    if (isLiked) {
-      await supabase.from('folder_likes').delete()
-        .eq('folder_id', folder.id).eq('user_id', myUserId)
-      setLikedIds(prev => { const next = new Set(prev); next.delete(folder.id); return next })
-      setFolders(prev => prev.map(f => f.id === folder.id ? { ...f, like_count: (f.like_count || 0) - 1 } : f))
-    } else {
-      await supabase.from('folder_likes').insert({ folder_id: folder.id, user_id: myUserId })
-      setLikedIds(prev => new Set([...prev, folder.id]))
-      setFolders(prev => prev.map(f => f.id === folder.id ? { ...f, like_count: (f.like_count || 0) + 1 } : f))
-    }
-  }
 
   const handleImport = async (folder: PublicFolder) => {
     if (importing) return
@@ -385,39 +360,24 @@ function SearchPageContent() {
                           내 단어장
                         </span>
                       ) : (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-                          <button
-                            onClick={(e) => handleLike(e, folder)}
-                            style={{
-                              background: likedIds.has(folder.id) ? '#FFE5E5' : 'var(--color-surface-2)',
-                              border: 'none', borderRadius: '10px',
-                              padding: '6px 10px', cursor: 'pointer',
-                              display: 'flex', alignItems: 'center', gap: '4px',
-                              fontSize: '12px', fontWeight: 600,
-                              color: likedIds.has(folder.id) ? '#D92D20' : 'var(--color-text-secondary)',
-                            }}
-                          >
-                            ❤️ {folder.like_count || 0}
-                          </button>
-                          <button
-                            onClick={e => {
-                              e.stopPropagation()
-                              if (!isImported) handleImport(folder)
-                            }}
-                            disabled={isImported || importing === folder.id}
-                            style={{
-                              padding: '7px 14px', borderRadius: '20px', flexShrink: 0,
-                              background: isImported ? 'var(--color-surface-2)' : 'var(--color-my)',
-                              color: isImported ? 'var(--color-text-secondary)' : 'var(--color-my-contrast)',
-                              border: 'none',
-                              cursor: isImported ? 'default' : 'pointer',
-                              fontSize: '12px', fontWeight: 600,
-                              opacity: importing === folder.id ? 0.6 : 1,
-                            }}
-                          >
-                            {importing === folder.id ? '...' : isImported ? '완료 ✓' : '가져오기'}
-                          </button>
-                        </div>
+                        <button
+                          onClick={e => {
+                            e.stopPropagation()
+                            if (!isImported) handleImport(folder)
+                          }}
+                          disabled={isImported || importing === folder.id}
+                          style={{
+                            padding: '7px 14px', borderRadius: '20px', flexShrink: 0,
+                            background: isImported ? 'var(--color-surface-2)' : 'var(--color-my)',
+                            color: isImported ? 'var(--color-text-secondary)' : 'var(--color-my-contrast)',
+                            border: 'none',
+                            cursor: isImported ? 'default' : 'pointer',
+                            fontSize: '12px', fontWeight: 600,
+                            opacity: importing === folder.id ? 0.6 : 1,
+                          }}
+                        >
+                          {importing === folder.id ? '...' : isImported ? '완료 ✓' : '가져오기'}
+                        </button>
                       )}
                     </div>
                   </div>

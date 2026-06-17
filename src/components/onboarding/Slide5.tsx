@@ -70,7 +70,7 @@ export default function Slide5({ onFinish }: { onFinish: () => void }) {
           ))}
         </div>
       </div>
-      <div className="fade-up-3" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <div className="fade-up-3" style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '24px', paddingBottom: '8px' }}>
         <button onClick={onFinish} style={{ width: '100%', height: '52px', background: 'var(--color-text-primary)', color: 'var(--color-bg)', border: 'none', borderRadius: '14px', fontSize: '16px', fontWeight: 800, cursor: 'pointer' }}>
           첫 단어장 만들기 →
         </button>
