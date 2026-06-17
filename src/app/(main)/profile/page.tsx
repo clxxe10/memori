@@ -96,7 +96,7 @@ export default function ProfilePage() {
   const handleLogout = async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
-    router.push('/login')
+    router.push('/onboarding')
   }
 
   const groupTitleStyle = {

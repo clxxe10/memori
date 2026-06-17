@@ -121,7 +121,7 @@ export default function LoginPage() {
           disabled={loading}
           style={{
             width: '100%', height: '52px',
-            background: 'var(--color-my)', color: 'var(--color-my-contrast)',
+            background: 'var(--color-text-primary)', color: 'var(--color-bg)',
             border: 'none', borderRadius: '14px',
             fontSize: '15px', fontWeight: 700, cursor: 'pointer',
             opacity: loading ? 0.6 : 1, marginBottom: '14px',
