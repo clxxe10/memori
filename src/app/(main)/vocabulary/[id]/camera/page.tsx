@@ -235,6 +235,7 @@ export default function CameraPage() {
         />
 
         {!preview ? (
+          <>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <button
               onClick={() => {
@@ -309,6 +310,26 @@ export default function CameraPage() {
               <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>갤러리에서 선택</span>
             </button>
           </div>
+          <div style={{
+            marginTop: '16px',
+            padding: '14px 16px',
+            background: 'var(--vocab-card-bg)',
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+            borderRadius: '14px',
+            border: '0.5px solid var(--vocab-card-border)',
+          }}>
+            <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
+              💡 AI가 더 잘 인식하려면
+            </p>
+            <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '12px', color: 'var(--color-text-tertiary)', lineHeight: 1.6 }}>
+              <li>글자가 흐릿하지 않고 또렷하게 보이도록 촬영해주세요</li>
+              <li>빛 반사나 그림자가 적은 곳에서 촬영해주세요</li>
+              <li>화면을 너무 기울이지 말고 정면에서 촬영해주세요</li>
+              <li>한 번에 너무 많은 단어보단 한 페이지씩 나눠서 찍어주세요</li>
+            </ul>
+          </div>
+          </>
         ) : (
           <div>
             <div style={{ position: 'relative', marginBottom: '12px' }}>
