@@ -188,13 +188,13 @@ export default function PDFPage() {
       const { default: jsPDF } = await import('jspdf')
       const imgData = canvas.toDataURL('image/png')
       const pageWidth = 210
-      const pageHeight = logicalHeight * (210 / logicalWidth)
+      const pageHeight = Math.round(logicalHeight * (210 / logicalWidth) * 100) / 100
       const doc = new jsPDF({
-        orientation: 'portrait',
+        orientation: pageHeight >= pageWidth ? 'portrait' : 'landscape',
         unit: 'mm',
         format: [pageWidth, pageHeight],
       })
-      doc.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight)
+      doc.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'NONE')
 
       const url = doc.output('bloburl') as unknown as string
       setPdfUrl(url)
