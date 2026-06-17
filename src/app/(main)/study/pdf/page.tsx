@@ -22,7 +22,7 @@ type Word = {
   selected: boolean
 }
 
-type Step = 'folder' | 'words' | 'preview' | 'done'
+type Step = 'folder' | 'format' | 'words' | 'preview' | 'done'
 type ExamType = 'word-to-meaning' | 'meaning-to-word' | 'mixed'
 
 export default function PDFPage() {
@@ -61,7 +61,7 @@ export default function PDFPage() {
       .eq('folder_id', folder.id)
     setWords((data || []).map(w => ({ ...w, selected: true })))
     setLoading(false)
-    setStep('words')
+    setStep('format')
   }
 
   const toggleWord = (id: string) => {
@@ -220,7 +220,7 @@ export default function PDFPage() {
         {/* 헤더 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
           <button
-            onClick={() => step === 'folder' ? router.back() : setStep(step === 'words' ? 'folder' : step === 'preview' ? 'words' : 'preview')}
+            onClick={() => step === 'folder' ? router.back() : setStep(step === 'format' ? 'folder' : step === 'words' ? 'format' : step === 'preview' ? 'words' : 'preview')}
             style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer' }}
           >
             <ArrowLeft size={22} color="var(--color-text-primary)" />
@@ -235,11 +235,11 @@ export default function PDFPage() {
 
         {/* 스텝 인디케이터 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '24px' }}>
-          {['단어장', '단어', '미리보기', '완료'].map((s, i) => {
-            const steps = ['folder', 'words', 'preview', 'done']
+          {['단어장', '형식', '단어', '미리보기', '완료'].map((s, i) => {
+            const steps = ['folder', 'format', 'words', 'preview', 'done']
             const isActive = steps.indexOf(step) >= i
             return (
-              <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '4px', flex: i < 3 ? 1 : 0 }}>
+              <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '4px', flex: i < 4 ? 1 : 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <div style={{
                     width: '20px', height: '20px', borderRadius: '50%',
@@ -250,7 +250,7 @@ export default function PDFPage() {
                   </div>
                   <span style={{ fontSize: '10px', color: isActive ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)', fontWeight: isActive ? 600 : 400 }}>{s}</span>
                 </div>
-                {i < 3 && <div style={{ flex: 1, height: '1px', background: isActive ? 'var(--color-my)' : 'var(--color-track)' }} />}
+                {i < 4 && <div style={{ flex: 1, height: '1px', background: isActive ? 'var(--color-my)' : 'var(--color-track)' }} />}
               </div>
             )
           })}
@@ -258,25 +258,27 @@ export default function PDFPage() {
 
         {/* STEP 1: 단어장 선택 */}
         {step === 'folder' && (
-          <>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
-              {folders.map(folder => (
-                <div
-                  key={folder.id}
-                  onClick={() => handleFolderSelect(folder)}
-                  style={{
-                    background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px',
-                    border: '1px solid var(--color-border)',
-                    display: 'flex', alignItems: 'center', gap: '12px',
-                    cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                  }}
-                >
-                  <span style={{ flex: 1, fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{folder.name}</span>
-                  <ChevronRight size={16} color="var(--color-text-tertiary)" />
-                </div>
-              ))}
-            </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+            {folders.map(folder => (
+              <div
+                key={folder.id}
+                onClick={() => handleFolderSelect(folder)}
+                style={{
+                  background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px',
+                  border: '1px solid var(--color-border)',
+                  display: 'flex', alignItems: 'center', gap: '12px',
+                  cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                }}
+              >
+                <span style={{ flex: 1, fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{folder.name}</span>
+                <ChevronRight size={16} color="var(--color-text-tertiary)" />
+              </div>
+            ))}
+          </div>
+        )}
 
+        {step === 'format' && (
+          <>
             <div style={{ marginBottom: '16px' }}>
               <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '10px' }}>시험 형식</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -304,6 +306,17 @@ export default function PDFPage() {
                 ))}
               </div>
             </div>
+            <button
+              onClick={() => setStep('words')}
+              style={{
+                width: '100%', height: '52px',
+                background: 'var(--color-my)', color: 'var(--color-my-contrast)',
+                border: 'none', borderRadius: '14px',
+                fontSize: '15px', fontWeight: 700, cursor: 'pointer',
+              }}
+            >
+              다음
+            </button>
           </>
         )}
 
