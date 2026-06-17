@@ -118,7 +118,8 @@ export default function PDFPage() {
       const canvas = document.createElement('canvas')
       const scale = 2
       const logicalWidth = 794
-      const logicalHeight = Math.max(1123, 40 + 30 + leftWords.length * 26 + 100)
+      const contentHeight = 40 + 30 + leftWords.length * 26 + 60
+      const logicalHeight = Math.min(Math.max(contentHeight, 300), 1600)
       canvas.width = logicalWidth * scale
       canvas.height = logicalHeight * scale
       const ctx = canvas.getContext('2d')!
@@ -186,9 +187,13 @@ export default function PDFPage() {
 
       const { default: jsPDF } = await import('jspdf')
       const imgData = canvas.toDataURL('image/png')
-      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
       const pageWidth = 210
       const pageHeight = logicalHeight * (210 / logicalWidth)
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: [pageWidth, pageHeight],
+      })
       doc.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight)
 
       const url = doc.output('bloburl') as unknown as string
