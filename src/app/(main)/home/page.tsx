@@ -264,7 +264,7 @@ export default function HomePage() {
           background: 'rgba(255,255,255,0.5)',
           backdropFilter: 'blur(20px) saturate(180%)',
           WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-          borderRadius: '28px', padding: '26px', marginBottom: '12px',
+          borderRadius: '28px', padding: '36px 28px', marginBottom: '12px',
           border: '0.5px solid rgba(255,255,255,0.4)',
           borderTop: '1px solid rgba(255,255,255,0.6)',
           boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
@@ -273,7 +273,7 @@ export default function HomePage() {
             <div>
               <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '4px', margin: 0 }}>오늘 복습할 단어</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginTop: '4px' }}>
-                <span style={{ fontSize: '52px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-1px', lineHeight: 1 }}>{animatedReviewCount}</span>
+                <span style={{ fontSize: '58px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-1px', lineHeight: 1 }}>{animatedReviewCount}</span>
                 <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>개</span>
               </div>
             </div>
