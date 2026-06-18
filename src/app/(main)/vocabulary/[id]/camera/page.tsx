@@ -371,7 +371,7 @@ export default function CameraPage() {
             </div>
             )}
 
-            {words.length === 0 && (
+            {preview && (
               <button
                 onClick={handleAnalyzeClick}
                 disabled={isAnalyzing}
