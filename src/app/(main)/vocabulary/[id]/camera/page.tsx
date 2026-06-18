@@ -107,7 +107,6 @@ export default function CameraPage() {
     if (!file) return
     setImageFile(file)
     setPreview(URL.createObjectURL(file))
-    setWords([])
     setError('')
   }
 
@@ -142,13 +141,15 @@ export default function CameraPage() {
         return
       }
 
-      setWords(data.words.map((w: { word: string; meaning: string; part_of_speech?: string; pronunciation?: string; example?: string }) => ({ ...w, selected: true })))
+      setWords(prev => [...prev, ...data.words.map((w: { word: string; meaning: string; part_of_speech?: string; pronunciation?: string; example?: string }) => ({ ...w, selected: true }))])
       showToast('단어를 찾았어요!')
     } catch {
       showToast('단어를 찾지 못했어요', 'error')
     } finally {
       stopTimer()
       setIsAnalyzing(false)
+      setPreview(null)
+      setImageFile(null)
     }
   }
 
@@ -230,17 +231,19 @@ export default function CameraPage() {
           type="file"
           accept="image/*"
           capture="environment"
+          multiple
           style={{ display: 'none' }}
           onChange={handleFileChange}
         />
 
-        {!preview ? (
+        {!preview && words.length === 0 ? (
           <>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <button
               onClick={() => {
                 if (fileRef.current) {
                   fileRef.current.capture = 'environment'
+                  fileRef.current.multiple = false
                   fileRef.current.click()
                 }
               }}
@@ -277,6 +280,7 @@ export default function CameraPage() {
               onClick={() => {
                 if (fileRef.current) {
                   fileRef.current.removeAttribute('capture')
+                  fileRef.current.multiple = true
                   fileRef.current.click()
                 }
               }}
@@ -332,6 +336,7 @@ export default function CameraPage() {
           </>
         ) : (
           <div>
+            {preview && (
             <div style={{ position: 'relative', marginBottom: '12px' }}>
               <img
                 src={preview}
@@ -364,6 +369,7 @@ export default function CameraPage() {
                 ✕
               </button>
             </div>
+            )}
 
             {words.length === 0 && (
               <button
@@ -404,6 +410,26 @@ export default function CameraPage() {
                 <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '10px' }}>
                   추출된 단어 {words.length}개 — 저장할 단어를 선택하세요
                 </p>
+                <button
+                  onClick={() => {
+                    if (fileRef.current) {
+                      fileRef.current.removeAttribute('capture')
+                      fileRef.current.click()
+                    }
+                  }}
+                  style={{
+                    width: '100%', height: '44px',
+                    background: 'var(--color-surface-2)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: '12px',
+                    fontSize: '13px', fontWeight: 600,
+                    color: 'var(--color-text-primary)',
+                    cursor: 'pointer', marginBottom: '12px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                  }}
+                >
+                  📷 사진 더 추가하기
+                </button>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
                   {words.map((w, i) => {
                     const posStyle = getPosStyle(w.part_of_speech || null)
