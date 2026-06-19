@@ -118,7 +118,7 @@ export default function VocabularyDetailPage() {
       .from('words')
       .select('*')
       .eq('folder_id', folderId)
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: true })
     setWords(wordData || [])
     setLoading(false)
   }
