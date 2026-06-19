@@ -428,7 +428,7 @@ export default function HomePage() {
           ]
 
           return (
-            <div style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px', border: '1px solid var(--color-border)', marginBottom: '12px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+            <div style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px', border: '1px solid var(--color-border)', marginBottom: '12px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', maxWidth: '420px', margin: '0 auto 12px' }}>
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                 <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>학습 캘린더</p>
