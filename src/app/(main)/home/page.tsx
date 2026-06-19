@@ -448,13 +448,13 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '3px', marginBottom: '4px', maxWidth: '380px', margin: '0 auto 4px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '3px', marginBottom: '4px', maxWidth: '600px', margin: '0 auto 4px' }}>
                 {['월', '화', '수', '목', '금', '토', '일'].map(d => (
                   <div key={d} style={{ textAlign: 'center', fontSize: '10px', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>{d}</div>
                 ))}
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '3px', marginBottom: '10px', maxWidth: '380px', margin: '0 auto 10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '3px', marginBottom: '10px', maxWidth: '600px', margin: '0 auto 10px' }}>
                 {Array.from({ length: startOffset }).map((_, i) => (
                   <div key={`empty-${i}`} />
                 ))}
