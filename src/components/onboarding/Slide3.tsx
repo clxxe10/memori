@@ -59,7 +59,14 @@ export default function Slide3({ onNext, onBack, onGoogleLogin, email, setEmail,
           email, password,
           options: { data: { full_name: name } }
         })
-        if (signUpError) { setError(signUpError.message); return }
+        if (signUpError) {
+          if (signUpError.message.includes('already registered') || signUpError.message.includes('already exists')) {
+            setError('이미 가입된 이메일이에요. 로그인해주세요.')
+          } else {
+            setError(signUpError.message)
+          }
+          return
+        }
 
         // 이미 가입된 이메일인 경우 identities가 빈 배열로 옴
         if (signUpData.user && signUpData.user.identities && signUpData.user.identities.length === 0) {
