@@ -80,17 +80,17 @@ export default function TabBar() {
     <nav id="tab-bar" className="tab-bar-container" style={{
       position: 'fixed', bottom: 28, left: '50%',
       transform: 'translateX(-50%)',
-      background: 'rgba(255,255,255,0.15)',
-      backdropFilter: 'blur(40px) saturate(180%)',
-      WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-      border: '0.5px solid rgba(255,255,255,0.3)',
-      boxShadow: '0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.4)',
-      borderRadius: '40px', padding: '13px 8px',
+      background: 'rgba(255,255,255,0.08)',
+      backdropFilter: 'blur(25px) saturate(150%)',
+      WebkitBackdropFilter: 'blur(25px) saturate(150%)',
+      border: '0.5px solid rgba(255,255,255,0.25)',
+      boxShadow: '0 4px 24px rgba(0,0,0,0.06), inset 0 1px 1px rgba(255,255,255,0.3)',
+      borderRadius: '40px', padding: '10px 6px',
       display: 'flex', flexDirection: 'row', flexWrap: 'nowrap',
       justifyContent: 'space-around',
       alignItems: 'center', gap: '4px',
       zIndex: 100,
-      width: 'min(calc(100vw - 48px), 500px)',
+      width: 'min(calc(100vw - 48px), 387px)',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
       {TABS.map(tab => {
@@ -101,23 +101,20 @@ export default function TabBar() {
             onClick={() => router.push(tab.path)}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              padding: active ? '8px 16px' : '8px',
-              borderRadius: '30px', border: 'none',
-              background: active ? 'var(--color-tab-active)' : 'transparent',
-              boxShadow: active ? 'inset 0 1px 3px rgba(0,0,0,0.12)' : 'none',
-              backdropFilter: active ? 'blur(10px)' : 'none',
-              WebkitBackdropFilter: active ? 'blur(10px)' : 'none',
+              width: active ? '57px' : '43px',
+              height: active ? '48px' : '43px',
+              padding: '0',
+              borderRadius: active ? '25px' : '16px', border: 'none',
+              background: active ? 'rgba(120,120,128,0.16)' : 'transparent',
+              boxShadow: 'none',
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
               color: active ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
               cursor: 'pointer', gap: '6px',
               transition: 'all 0.2s',
             }}
           >
-            <tab.icon size={18} />
-            {active && (
-              <span style={{ fontSize: '12px', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                {tab.label}
-              </span>
-            )}
+            <tab.icon size={23} />
           </button>
         )
       })}
