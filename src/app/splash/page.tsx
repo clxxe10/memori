@@ -35,6 +35,31 @@ export default function SplashPage() {
     `
     document.head.appendChild(style)
 
+    const theme = localStorage.getItem('app_theme') || '시스템'
+    const isDark = theme === '다크' ||
+      (theme === '시스템' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+
+    if (isDark) {
+      document.querySelector('.splash-bg')?.setAttribute('style',
+        'position:fixed;inset:0;background:linear-gradient(165deg,#000000 0%,#0A0A0C 45%,#111114 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);'
+      )
+      document.querySelector('.splash-wordmark-text')?.setAttribute('style',
+        'font-size:40px;font-weight:800;letter-spacing:-0.9px;margin:0;color:#FFFFFF;'
+      )
+      document.querySelector('.splash-tagline-text')?.setAttribute('style',
+        'font-size:15px;font-weight:500;letter-spacing:-0.2px;margin:0;color:rgba(235,235,245,0.6);text-align:center;'
+      )
+      document.querySelector('.splash-track-bg')?.setAttribute('style',
+        'position:absolute;bottom:max(78px,calc(env(safe-area-inset-bottom) + 40px));left:50%;transform:translateX(-50%);width:120px;height:3px;border-radius:9999px;overflow:hidden;background:rgba(235,235,245,0.18);'
+      )
+      document.querySelector('.splash-fill-bar')?.setAttribute('style',
+        'height:100%;border-radius:9999px;background:#0A84FF;width:6%;'
+      )
+      document.querySelector('.splash-icon-img')?.setAttribute('style',
+        'width:84px;height:84px;border-radius:22.37%;box-shadow:0 10px 28px rgba(0,0,0,0.50);'
+      )
+    }
+
     const timer = setTimeout(async () => {
       try {
         const supabase = createClient()
