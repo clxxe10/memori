@@ -222,9 +222,21 @@ function FlashcardContent() {
     </main>
   )
 
+  const finishStyle = `
+  @keyframes emojiBounce {
+    0%   { opacity: 0; transform: scale(0) rotate(-20deg); }
+    50%  { opacity: 1; transform: scale(1.3) rotate(10deg); }
+    70%  { transform: scale(0.9) rotate(-5deg); }
+    85%  { transform: scale(1.1) rotate(3deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+  .emoji-bounce { animation: emojiBounce 800ms cubic-bezier(0.32,0.72,0,1) both; }
+`
+
   if (finished) return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', padding: '0 24px' }}>
-      <div style={{ fontSize: '56px', marginBottom: '16px' }}>🎉</div>
+      <style>{finishStyle}</style>
+      <div className="emoji-bounce" style={{ fontSize: '56px', marginBottom: '16px' }}>🎉</div>
       <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px', letterSpacing: '-0.5px' }}>완료!</h1>
       <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '32px' }}>총 {words.length}개 학습했어요</p>
       <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', width: '100%', maxWidth: '320px' }}>
