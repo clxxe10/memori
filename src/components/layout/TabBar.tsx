@@ -30,6 +30,19 @@ export default function TabBar() {
 
   const isActive = (path: string) => pathname.startsWith(path)
 
+  const isStudyMode = [
+    '/study/flashcard',
+    '/study/quiz',
+    '/study/typing',
+    '/study/listening',
+    '/study/review',
+    '/study/blink',
+    '/study/speed',
+    '/study/pdf',
+  ].some(path => pathname.startsWith(path))
+
+  if (isStudyMode) return null
+
   if (isDesktop) {
     return (
       <aside id="tab-bar" style={{
