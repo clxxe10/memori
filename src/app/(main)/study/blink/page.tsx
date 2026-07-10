@@ -1,6 +1,7 @@
 'use client'
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { Pause, Play } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 function BlinkContent() {
@@ -77,7 +78,7 @@ function BlinkContent() {
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '16px 20px',
-        paddingTop: 'max(16px, env(safe-area-inset-top))',
+        paddingTop: 'max(56px, calc(env(safe-area-inset-top) + 16px))',
       }}>
         <button onClick={() => router.back()} style={{
           background: 'none', border: 'none', cursor: 'pointer',
@@ -197,7 +198,7 @@ function BlinkContent() {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
         }}>
-          {isPlaying ? '⏸' : '▶'}
+          {isPlaying ? <Pause size={22} fill="currentColor" /> : <Play size={22} fill="currentColor" />}
         </button>
 
         <button onClick={() => {

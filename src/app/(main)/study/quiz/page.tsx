@@ -165,7 +165,7 @@ function QuizContent() {
           <div style={{ height: '4px', background: 'var(--color-my)', borderRadius: '4px', width: `${progress}%`, transition: 'width 0.3s ease' }} />
         </div>
 
-        <div style={{ background: 'var(--color-surface)', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.09)', padding: '24px 20px', textAlign: 'center', marginBottom: '16px', flexShrink: 0 }}>
+        <div style={{ background: 'var(--color-surface)', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.09)', padding: '24px 20px', textAlign: 'center', marginBottom: '0', flexShrink: 0, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <button onClick={() => handleSpeak(word.word)} style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--color-surface-2)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
             <Volume2 size={15} color="var(--color-text-secondary)" />
           </button>
@@ -173,7 +173,10 @@ function QuizContent() {
           {word.pronunciation && <div style={{ fontSize: '13px', color: 'var(--color-text-tertiary)' }}>{word.pronunciation}</div>}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+        <div style={{
+          display: 'flex', flexDirection: 'column', gap: '8px',
+          paddingBottom: 'max(24px, calc(env(safe-area-inset-bottom) + 16px))',
+        }}>
           {options.map((opt, i) => {
             const isSelected = selectedOption === i
             const isCorrect = opt === word.meaning
