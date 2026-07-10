@@ -4,9 +4,11 @@ import { useEffect } from 'react'
 interface Props {
   onNext: () => void
   onBack: () => void
+  name: string
+  setName: (v: string) => void
 }
 
-export default function Slide2({ onNext, onBack }: Props) {
+export default function Slide2({ onNext, onBack, name, setName }: Props) {
   useEffect(() => {
     const style = document.createElement('style')
     style.textContent = `
@@ -112,6 +114,8 @@ export default function Slide2({ onNext, onBack }: Props) {
         <input
           className="s2-input"
           placeholder="닉네임"
+          value={name}
+          onChange={e => setName(e.target.value)}
           style={{
             width: '100%', height: '50px',
             borderRadius: '16px', padding: '0 16px',
