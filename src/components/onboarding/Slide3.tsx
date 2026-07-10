@@ -212,13 +212,13 @@ export default function Slide3({ onNext, onBack, onGoogleLogin, email, setEmail,
               background: 'rgba(255,255,255,0.8)', border: '1px solid rgba(60,60,67,0.08)',
               cursor: 'pointer', fontSize: '14px', fontWeight: 500, color: '#0B0B0C',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-            }}>🌐 Google로 계속하기</button>
+            }}>Google로 계속하기</button>
             <button onClick={handleKakao} style={{
               width: '100%', height: '44px', borderRadius: '9999px',
               background: '#FEE500', border: 'none',
               cursor: 'pointer', fontSize: '14px', fontWeight: 500, color: '#3C1E1E',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-            }}>💬 카카오로 계속하기</button>
+            }}>카카오로 계속하기</button>
           </>
         )}
       </div>
