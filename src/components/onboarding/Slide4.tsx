@@ -1,19 +1,24 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { applyMyColor } from '@/lib/colorUtils'
 
-const GOALS = ['5개', '10개', '15개', '20개', '30개', '50개']
-const TIMES = ['오전 7:00', '오전 8:00', '오전 9:00', '오후 6:00', '오후 8:00', '오후 10:00']
-
 export default function Slide4({ onNext, onBack, email, name }: { onNext: () => void; onBack: () => void; email: string; name: string }) {
-  const [goal, setGoal] = useState('10개')
-  const [notifOn, setNotifOn] = useState(true)
-  const [time, setTime] = useState('오전 8:00')
-  const [myColor, setMyColor] = useState('#1C1C1E')
-  const [showGoalDrop, setShowGoalDrop] = useState(false)
-  const [showTimeDrop, setShowTimeDrop] = useState(false)
+  const [myColor, setMyColor] = useState('#007AFF')
   const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    const style = document.createElement('style')
+    style.textContent = `
+      @keyframes slide4FadeUp {
+        from { opacity: 0; transform: translateY(14px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .s4-card { animation: slide4FadeUp 700ms cubic-bezier(0.32,0.72,0,1) both; }
+    `
+    document.head.appendChild(style)
+    return () => { document.head.removeChild(style) }
+  }, [])
 
   const handleNext = async () => {
     setSaving(true)
@@ -23,9 +28,9 @@ export default function Slide4({ onNext, onBack, email, name }: { onNext: () => 
       if (user) {
         await supabase.from('user_learning_stats').upsert({
           user_id: user.id,
-          daily_goal: parseInt(goal.replace('개', '')),
-          notification_enabled: notifOn,
-          notification_time: time,
+          daily_goal: 10,
+          notification_enabled: false,
+          notification_time: '오전 8:00',
         }, { onConflict: 'user_id' })
       }
       localStorage.setItem('app_my_color', myColor)
@@ -40,135 +45,137 @@ export default function Slide4({ onNext, onBack, email, name }: { onNext: () => 
 
   return (
     <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '100dvh',
-      background: 'var(--color-bg)',
+      position: 'fixed', inset: 0,
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif',
+      paddingTop: 'env(safe-area-inset-top)',
+      paddingBottom: 'env(safe-area-inset-bottom)',
     }}>
+      <style>{`
+        @media (prefers-color-scheme: dark) {
+          .s4-bg { background: linear-gradient(165deg, #000000 0%, #0A0A0C 45%, #111114 100%) !important; }
+          .s4-card-inner { background: linear-gradient(rgba(0,0,0,.6), rgba(0,0,0,.6)) !important; border-color: rgba(255,255,255,0.12) !important; }
+          .s4-title { color: #FFFFFF !important; }
+          .s4-sub { color: rgba(235,235,245,0.6) !important; }
+          .s4-back { background: rgba(120,120,128,0.24) !important; color: rgba(255,255,255,0.7) !important; }
+          .s4-dot { background: rgba(235,235,245,0.22) !important; }
+          .s4-hex { color: rgba(235,235,245,0.6) !important; }
+        }
+      `}</style>
+
+      <div className="s4-bg" style={{
+        position: 'fixed', inset: 0,
+        background: 'linear-gradient(165deg, #FFFFFF 0%, #F7F9FC 45%, #F2F4F9 100%)',
+      }} />
+
+      {/* 상단 바 */}
       <div style={{
-        width: '100%',
-        maxWidth: '480px',
-        minHeight: '100dvh',
-        height: '100dvh',
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '52px 24px 40px',
+        position: 'fixed', top: '66px', left: '20px', right: '20px',
+        height: '32px', display: 'flex', alignItems: 'center',
+        justifyContent: 'space-between', zIndex: 10,
       }}>
-      <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', marginBottom: '24px' }}>
-        {[1,2,3,4,5].map(i => (
-          <div key={i} style={{ height: '5px', borderRadius: '3px', background: i === 4 ? 'var(--color-text-primary)' : 'var(--color-border)', width: i === 4 ? '18px' : '5px' }} />
-        ))}
+        <button className="s4-back" onClick={onBack} style={{
+          width: '32px', height: '32px', borderRadius: '9999px',
+          background: 'rgba(120,120,128,0.10)', border: 'none',
+          cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '16px', color: 'rgba(60,60,67,0.65)',
+        }}>←</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          {[1,2,3,4,5].map(i => (
+            <div key={i} className={i !== 4 ? 's4-dot' : ''} style={{
+              width: i === 4 ? '18px' : '6px', height: '6px',
+              borderRadius: '9999px',
+              background: i === 4 ? myColor : 'rgba(60,60,67,0.18)',
+              transition: 'width 300ms cubic-bezier(0.32,0.72,0,1), background 200ms ease',
+            }} />
+          ))}
+        </div>
+        <div style={{ width: '32px' }} />
       </div>
 
-      <h1 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--color-text-primary)', letterSpacing: '-0.8px', lineHeight: 1.2, marginBottom: '6px' }}>
-        나만의 루틴을<br/>설정해봐요
-      </h1>
-      <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '20px' }}>나중에 언제든지 바꿀 수 있어요</p>
+      {/* 글래스 카드 */}
+      <div className="s4-card s4-card-inner" style={{
+        width: 'calc(100% - 48px)', maxWidth: '360px',
+        background: 'linear-gradient(rgba(255,255,255,.6), rgba(255,255,255,.6))',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        borderRadius: '28px',
+        border: '1px solid rgba(255,255,255,0.6)',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.08)',
+        padding: '32px 26px',
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', gap: '20px',
+        position: 'relative', zIndex: 1,
+      }}>
+        {/* 아이콘 배지 */}
+        <div style={{
+          width: '60px', height: '60px', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(255,255,255,.9), rgba(255,255,255,.5))',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '28px', boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+        }}>🎨</div>
 
-      {/* 하루 목표 */}
-      <div style={{ position: 'relative', marginBottom: '10px' }}>
-        <div onClick={() => { setShowGoalDrop(p => !p); setShowTimeDrop(false) }}
-          style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '14px', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-          <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>하루 목표</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(28,28,30,0.07)', borderRadius: '8px', padding: '5px 10px' }}>
-            <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{goal}</span>
-            <span style={{ fontSize: '10px' }}>{showGoalDrop ? '▲' : '▼'}</span>
-          </div>
+        <div style={{ textAlign: 'center' }}>
+          <h2 className="s4-title" style={{
+            fontSize: '21px', fontWeight: 700, letterSpacing: '-0.4px',
+            margin: '0 0 6px', color: '#0B0B0C',
+          }}>나만의 컬러를 골라보세요</h2>
+          <p className="s4-sub" style={{
+            fontSize: '14px', color: 'rgba(60,60,67,0.55)', margin: 0,
+          }}>앱 전체에 적용되는 포인트 색상이에요</p>
         </div>
-        {showGoalDrop && (
-          <div style={{ position: 'absolute', top: '58px', left: 0, right: 0, background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 50 }}>
-            {GOALS.map((g, i) => (
-              <button key={g} onClick={() => { setGoal(g); setShowGoalDrop(false) }}
-                style={{ width: '100%', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: goal === g ? 'var(--color-surface-2)' : 'transparent', border: 'none', borderBottom: i < GOALS.length - 1 ? '1px solid var(--color-border)' : 'none', cursor: 'pointer', fontSize: '14px', color: 'var(--color-text-primary)', fontWeight: goal === g ? 700 : 400 }}>
-                {g}{goal === g && <span style={{ color: 'var(--color-my)' }}>✓</span>}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
 
-      {/* 알림 */}
-      <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '14px', padding: '14px 16px', marginBottom: '10px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: notifOn ? '12px' : 0 }}>
-          <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>학습 알림</span>
-          <div onClick={() => setNotifOn(p => !p)} style={{ width: '44px', height: '24px', borderRadius: '20px', background: notifOn ? 'var(--color-text-primary)' : 'var(--color-border)', position: 'relative', cursor: 'pointer', transition: 'background 0.2s' }}>
-            <div style={{ position: 'absolute', top: '3px', left: notifOn ? '23px' : '3px', width: '18px', height: '18px', borderRadius: '50%', background: notifOn ? 'var(--color-bg)' : 'var(--color-surface)', boxShadow: '0 1px 3px rgba(0,0,0,0.2)', transition: 'left 0.2s' }} />
-          </div>
-        </div>
-        {notifOn && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '12px', borderTop: '1px solid var(--color-border)', position: 'relative' }}>
-            <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>알림 시간</span>
-            <div onClick={() => { setShowTimeDrop(p => !p); setShowGoalDrop(false) }} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(28,28,30,0.07)', borderRadius: '8px', padding: '5px 10px', cursor: 'pointer' }}>
-              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{time}</span>
-              <span style={{ fontSize: '10px' }}>{showTimeDrop ? '▲' : '▼'}</span>
-            </div>
-            {showTimeDrop && (
-              <div style={{ position: 'absolute', top: '44px', right: 0, background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', zIndex: 50, minWidth: '140px' }}>
-                {TIMES.map((t, i) => (
-                  <button key={t} onClick={() => { setTime(t); setShowTimeDrop(false) }}
-                    style={{ width: '100%', padding: '11px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: time === t ? 'var(--color-surface-2)' : 'transparent', border: 'none', borderBottom: i < TIMES.length - 1 ? '1px solid var(--color-border)' : 'none', cursor: 'pointer', fontSize: '13px', color: 'var(--color-text-primary)', fontWeight: time === t ? 700 : 400 }}>
-                    {t}{time === t && <span style={{ color: 'var(--color-my)' }}>✓</span>}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* 마이컬러 */}
-      <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '14px', padding: '14px 16px', marginBottom: '20px' }}>
-        <div style={{ marginBottom: '12px' }}>
-          <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>마이컬러</p>
-          <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: 0 }}>앱 포인트 색상을 설정해요</p>
-        </div>
-        <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'center' }}>
-          <div style={{ position: 'relative', width: '72px', height: '72px' }}>
-            <input
-              type="color"
-              value={myColor}
-              onChange={e => setMyColor(e.target.value)}
-              style={{
-                width: '72px', height: '72px', borderRadius: '50%',
-                border: 'none', cursor: 'pointer', padding: 0,
-                position: 'absolute', inset: 0, opacity: 0, zIndex: 1,
-              }}
-            />
+        {/* 컬러 휠 */}
+        <div style={{ position: 'relative', width: '150px', height: '150px' }}>
+          <input
+            type="color"
+            value={myColor}
+            onChange={e => setMyColor(e.target.value)}
+            style={{
+              width: '150px', height: '150px', borderRadius: '50%',
+              border: 'none', cursor: 'pointer', padding: 0,
+              position: 'absolute', inset: 0, opacity: 0, zIndex: 1,
+            }}
+          />
+          <div style={{
+            width: '150px', height: '150px', borderRadius: '50%',
+            background: 'conic-gradient(#ffb3c6, #ffd6a5, #fdffb6, #caffbf, #a0c4ff, #bdb2ff, #ffb3c6)',
+            border: '2px solid rgba(60,60,67,0.12)', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
             <div style={{
-              width: '72px', height: '72px', borderRadius: '50%',
-              background: 'conic-gradient(#ffb3c6, #ffd6a5, #fdffb6, #caffbf, #a0c4ff, #bdb2ff, #ffb3c6)',
-              border: '2px solid var(--color-border)', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: myColor, border: '2px solid var(--color-surface)' }} />
-            </div>
+              width: '56px', height: '56px', borderRadius: '50%',
+              background: myColor, border: '3px solid #fff',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+              transition: 'background 200ms ease',
+            }} />
           </div>
         </div>
+
+        {/* HEX 프리뷰 */}
+        <p className="s4-hex" style={{
+          fontSize: '13px', color: 'rgba(60,60,67,0.55)',
+          margin: 0, letterSpacing: '0.5px',
+        }}>{myColor.toUpperCase()}</p>
       </div>
 
+      {/* 하단 버튼 */}
       <button onClick={handleNext} disabled={saving} style={{
         position: 'fixed',
-        bottom: '40px',
-        right: '28px',
-        width: '52px',
-        height: '52px',
-        borderRadius: '50%',
-        background: 'var(--color-text-primary)',
-        color: 'var(--color-bg)',
-        border: 'none',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '22px',
-        boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
-        zIndex: 100,
+        bottom: 'max(52px, calc(env(safe-area-inset-bottom) + 32px))',
+        left: '28px', right: '28px',
+        height: '52px', borderRadius: '9999px',
+        background: myColor,
+        color: '#FFFFFF',
+        border: 'none', cursor: 'pointer',
+        fontSize: '16px', fontWeight: 600,
+        letterSpacing: '-0.2px', zIndex: 10,
         opacity: saving ? 0.7 : 1,
+        transition: 'background 200ms ease',
       }}>
-        →
+        {saving ? '저장 중...' : '다음'}
       </button>
-      </div>
     </div>
   )
 }
