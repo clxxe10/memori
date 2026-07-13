@@ -34,6 +34,7 @@ function QuizContent() {
   const [options, setOptions] = useState<string[]>([])
   const [selectedOption, setSelectedOption] = useState<number | null>(null)
   const [stats, setStats] = useState({ correct: 0, wrong: 0 })
+  const [wrongWords, setWrongWords] = useState<typeof words>([])
   const [folderName, setFolderName] = useState('')
   useEffect(() => {
     const fetchWords = async () => {
@@ -78,6 +79,7 @@ function QuizContent() {
     setSelectedOption(idx)
     const word = words[current]
     const isCorrect = opt === word.meaning
+    if (!isCorrect) setWrongWords(prev => [...prev, words[current]])
     const supabase = createClient()
 
     const { nextInterval, nextEaseFactor, nextReviewDate } = calculateNextReview(
@@ -109,6 +111,15 @@ function QuizContent() {
     }, 900)
   }
 
+  const handleRetryWrong = () => {
+    setWords(wrongWords)
+    setWrongWords([])
+    setCurrent(0)
+    setSelectedOption(null)
+    setFinished(false)
+    setStats({ correct: 0, wrong: 0 })
+  }
+
   if (loading) return <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif' }}><p style={{ color: 'var(--color-text-secondary)' }}>불러오는 중...</p></main>
 
   if (finished) return (
@@ -131,6 +142,19 @@ function QuizContent() {
           style={{ width: '100%', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
           <RotateCcw size={18} /> 다시 풀기
         </button>
+        {wrongWords.length > 0 && (
+          <button onClick={handleRetryWrong} style={{
+            width: '100%', height: '52px',
+            background: 'var(--color-incorrect-bg)',
+            color: 'var(--color-incorrect)',
+            border: '1.5px solid var(--color-incorrect)',
+            borderRadius: '14px', fontSize: '15px', fontWeight: 700,
+            cursor: 'pointer', display: 'flex', alignItems: 'center',
+            justifyContent: 'center', gap: '8px',
+          }}>
+            <RotateCcw size={18} /> 틀린 단어 {wrongWords.length}개 다시 풀기
+          </button>
+        )}
         <button onClick={() => router.push('/home')} style={{ width: '100%', height: '52px', background: 'var(--color-surface-2)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
       </div>
     </main>
