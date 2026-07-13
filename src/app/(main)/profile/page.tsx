@@ -333,7 +333,7 @@ export default function ProfilePage() {
             <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 20px' }} />
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>테마</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {['시스템', '라이트', '다크'].map(t => (
+              {['기본', '시스템', '라이트', '다크'].map(t => (
                 <div key={t} onClick={() => handleThemeChange(t)}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
