@@ -1,5 +1,5 @@
 'use client'
-import { Suspense, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Slide1 from '@/components/onboarding/Slide1'
 import Slide2 from '@/components/onboarding/Slide2'
@@ -14,6 +14,12 @@ function OnboardingContent() {
   const [step, setStep] = useState(initialStep)
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
+
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains('dark')
+    document.documentElement.style.setProperty('--color-my', isDark ? '#FFFFFF' : '#1C1C1E')
+    document.documentElement.style.setProperty('--color-my-contrast', isDark ? '#000000' : '#FFFFFF')
+  }, [])
 
   const handleFinish = () => {
     router.replace('/home')

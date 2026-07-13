@@ -21,9 +21,14 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 
     const savedTheme = localStorage.getItem('app_theme') || '시스템'
     const savedColor = localStorage.getItem('app_my_color') || '#1C1C1E'
-
     applyTheme(savedTheme)
-    applyMyColor(savedColor)
+
+    if (savedTheme === '기본') {
+      const isDark = document.documentElement.classList.contains('dark')
+      applyMyColor(isDark ? '#FFFFFF' : '#1C1C1E')
+    } else {
+      applyMyColor(savedColor)
+    }
 
     // 시스템 테마 변경 감지
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
@@ -31,6 +36,11 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
       if (localStorage.getItem('app_theme') === '시스템') {
         applyTheme('시스템')
         applyMyColor(localStorage.getItem('app_my_color') || '#1C1C1E')
+      }
+      if (localStorage.getItem('app_theme') === '기본') {
+        applyTheme('기본')
+        const isDark = document.documentElement.classList.contains('dark')
+        applyMyColor(isDark ? '#FFFFFF' : '#1C1C1E')
       }
     }
     mediaQuery.addEventListener('change', handleChange)

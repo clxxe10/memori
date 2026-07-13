@@ -19,6 +19,13 @@ export default function LoginPage() {
     return () => window.removeEventListener('resize', check)
   }, [])
 
+  useEffect(() => {
+    // 로그인 페이지에서는 마이컬러를 기본값으로 리셋
+    const isDark = document.documentElement.classList.contains('dark')
+    document.documentElement.style.setProperty('--color-my', isDark ? '#FFFFFF' : '#1C1C1E')
+    document.documentElement.style.setProperty('--color-my-contrast', isDark ? '#000000' : '#FFFFFF')
+  }, [])
+
   const handleLogin = async () => {
     if (!email || !password) { setError('이메일과 비밀번호를 입력해주세요'); return }
     setLoading(true); setError('')
