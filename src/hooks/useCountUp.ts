@@ -4,8 +4,17 @@ import { useEffect, useState, useRef } from 'react'
 export function useCountUp(target: number, duration = 800) {
   const [value, setValue] = useState(0)
   const prevTarget = useRef(0)
+  const hasAnimated = useRef(false)
 
   useEffect(() => {
+    const isFirstVisit = !sessionStorage.getItem('home_animated')
+
+    if (!isFirstVisit) {
+      setValue(target)
+      prevTarget.current = target
+      return
+    }
+
     const start = prevTarget.current
     const diff = target - start
     if (diff === 0) return
@@ -22,6 +31,7 @@ export function useCountUp(target: number, duration = 800) {
         requestAnimationFrame(tick)
       } else {
         prevTarget.current = target
+        hasAnimated.current = true
       }
     }
     requestAnimationFrame(tick)

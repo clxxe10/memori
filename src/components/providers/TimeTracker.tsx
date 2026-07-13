@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 function getLocalToday(): string {
@@ -21,9 +22,18 @@ function getLocalYesterday(): string {
 }
 
 export default function TimeTracker() {
+  const pathname = usePathname()
+  const isStudyMode = [
+    '/study/flashcard', '/study/quiz', '/study/typing',
+    '/study/listening', '/study/blink', '/study/review',
+    '/study/speed',
+  ].some(path => pathname.startsWith(path))
+
   const startTimeRef = useRef<number>(Date.now())
   const accumulatedRef = useRef<number>(0)
   const isVisibleRef = useRef<boolean>(true)
+  const isStudyModeRef = useRef(isStudyMode)
+  isStudyModeRef.current = isStudyMode
 
   const saveTime = async (seconds: number) => {
     if (typeof navigator !== 'undefined' && !navigator.onLine) return
@@ -114,9 +124,15 @@ export default function TimeTracker() {
   }
 
   useEffect(() => {
+    if (!isStudyMode) {
+      accumulatedRef.current = 0
+      return
+    }
+
     startTimeRef.current = Date.now()
 
     const handleVisibilityChange = () => {
+      if (!isStudyModeRef.current) return
       if (document.hidden) {
         const elapsed = Math.round((Date.now() - startTimeRef.current) / 1000)
         accumulatedRef.current += elapsed
@@ -130,6 +146,7 @@ export default function TimeTracker() {
     }
 
     const handleBeforeUnload = () => {
+      if (!isStudyModeRef.current) return
       if (isVisibleRef.current) {
         const elapsed = Math.round((Date.now() - startTimeRef.current) / 1000)
         accumulatedRef.current += elapsed
@@ -137,6 +154,7 @@ export default function TimeTracker() {
     }
 
     const interval = setInterval(async () => {
+      if (!isStudyModeRef.current) return
       if (isVisibleRef.current) {
         const elapsed = Math.round((Date.now() - startTimeRef.current) / 1000)
         const total = accumulatedRef.current + elapsed
@@ -158,8 +176,9 @@ export default function TimeTracker() {
         accumulatedRef.current += elapsed
       }
       saveTime(accumulatedRef.current)
+      accumulatedRef.current = 0
     }
-  }, [])
+  }, [isStudyMode])
 
   return null
 }

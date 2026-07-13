@@ -7,7 +7,9 @@ import { createClient } from '@/lib/supabase/client'
 function BlinkContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const folderId = searchParams.get('folderId')
+  const isMemorySet = searchParams.get('memoryset') === 'true'
+  const memorySetFolder = searchParams.get('folder')
+  const folderId = searchParams.get('folderId') || memorySetFolder
 
   const [words, setWords] = useState<any[]>([])
   const [index, setIndex] = useState(0)
@@ -211,6 +213,12 @@ function BlinkContent() {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>→</button>
       </div>
+      {isMemorySet && (
+        <button onClick={() => router.push(`/study/quiz?folder=${memorySetFolder}&memoryset=true`)}
+          style={{ position: 'fixed', bottom: 'max(40px, calc(env(safe-area-inset-bottom) + 20px))', left: '24px', right: '24px', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', zIndex: 100 }}>
+          다음 단계: 퀴즈 →
+        </button>
+      )}
     </div>
   )
 }

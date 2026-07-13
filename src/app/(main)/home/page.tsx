@@ -176,6 +176,12 @@ export default function HomePage() {
   }, [])
 
   useEffect(() => {
+    if (!loading) {
+      sessionStorage.setItem('home_animated', 'true')
+    }
+  }, [loading])
+
+  useEffect(() => {
     const handleFocus = () => fetchData()
     window.addEventListener('focus', handleFocus)
     return () => window.removeEventListener('focus', handleFocus)

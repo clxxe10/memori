@@ -23,7 +23,8 @@ type Word = {
 function TypingContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const folderId = searchParams.get('folderId')
+  const isMemorySet = searchParams.get('memoryset') === 'true'
+  const folderId = searchParams.get('folderId') || searchParams.get('folder')
   const padding = usePagePadding('100px')
 
   const [words, setWords] = useState<Word[]>([])
@@ -146,7 +147,17 @@ function TypingContent() {
             <RotateCcw size={18} /> 틀린 단어 {wrongWords.length}개 다시 풀기
           </button>
         )}
-        <button onClick={() => router.push('/home')} style={{ width: '100%', height: '52px', background: 'var(--color-surface-2)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
+        {isMemorySet ? (
+          <button onClick={() => router.push('/study/memoryset/complete')}
+            style={{ width: '100%', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
+            🎉 암기세트 완료!
+          </button>
+        ) : (
+          <button onClick={() => router.back()}
+            style={{ width: '100%', height: '52px', background: 'var(--color-bg)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>
+            돌아가기
+          </button>
+        )}
       </div>
     </main>
   )
