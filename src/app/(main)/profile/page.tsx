@@ -449,7 +449,7 @@ export default function ProfilePage() {
             <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 20px' }} />
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>언어 설정</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
-              {['한국어', 'English', '日本語', '中文'].map(lang => (
+              {['한국어', 'English'].map(lang => (
                 <div key={lang}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
