@@ -130,12 +130,14 @@ function QuizContent() {
   }
 
   const handleRetryWrong = () => {
-    setWords(wrongWords)
+    const retryWords = [...wrongWords]
+    setWords(retryWords)
     setWrongWords([])
     setCurrent(0)
     setSelectedOption(null)
     setFinished(false)
     setStats({ correct: 0, wrong: 0 })
+    generateOptions(retryWords[0], allWords)
   }
 
   if (loading) return <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif' }}><p style={{ color: 'var(--color-text-secondary)' }}>불러오는 중...</p></main>
