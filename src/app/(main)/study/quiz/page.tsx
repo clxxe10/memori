@@ -61,7 +61,25 @@ function QuizContent() {
   }, [folderId])
 
   const generateOptions = (word: Word, pool: Word[]) => {
-    const wrong = pool.filter(w => w.id !== word.id).sort(() => Math.random() - 0.5).slice(0, 3).map(w => w.meaning)
+    const filtered = pool.filter(w => w.id !== word.id && w.meaning !== word.meaning)
+    const wrong = filtered.sort(() => Math.random() - 0.5).slice(0, 3).map(w => w.meaning)
+
+    // 오답이 3개 미만이면 allWords에서 추가로 보충
+    if (wrong.length < 3) {
+      const extra = allWords
+        .filter(w => w.id !== word.id && w.meaning !== word.meaning && !wrong.includes(w.meaning))
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3 - wrong.length)
+        .map(w => w.meaning)
+      wrong.push(...extra)
+    }
+
+    // 그래도 부족하면 더미 추가
+    const dummies = ['없음', '해당 없음', '모르는 단어']
+    while (wrong.length < 3) {
+      wrong.push(dummies[wrong.length])
+    }
+
     const opts = [...wrong, word.meaning].sort(() => Math.random() - 0.5)
     setOptions(opts)
   }
