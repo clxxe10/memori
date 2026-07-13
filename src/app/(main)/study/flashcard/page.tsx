@@ -35,6 +35,7 @@ function FlashcardContent() {
   const [loading, setLoading] = useState(true)
   const [finished, setFinished] = useState(false)
   const [stats, setStats] = useState({ know: 0, dontKnow: 0 })
+  const [wrongWords, setWrongWords] = useState<typeof words>([])
   const [folderName, setFolderName] = useState('')
   const [cardAnim, setCardAnim] = useState('')
   const [exitDirection, setExitDirection] = useState<'left' | 'right' | null>(null)
@@ -154,6 +155,8 @@ function FlashcardContent() {
       ease_factor: nextEaseFactor,
     }).eq('id', word.id)
 
+    if (!know) setWrongWords(prev => [...prev, word])
+
     setStats(prev => ({
       know: know ? prev.know + 1 : prev.know,
       dontKnow: !know ? prev.dontKnow + 1 : prev.dontKnow,
@@ -173,6 +176,15 @@ function FlashcardContent() {
     setCurrent(0); setFlipped(false); setFinished(false)
     setStats({ know: 0, dontKnow: 0 })
     setCardAnim('')
+  }
+
+  const handleRetryWrong = () => {
+    setWords(wrongWords)
+    setWrongWords([])
+    setCurrent(0)
+    setFlipped(false)
+    setFinished(false)
+    setStats({ know: 0, dontKnow: 0 })
   }
 
   const swipeHandlers = useSwipe({
@@ -253,6 +265,19 @@ function FlashcardContent() {
         <button onClick={handleRestart} style={{ width: '100%', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
           <RotateCcw size={18} /> 다시 학습하기
         </button>
+        {wrongWords.length > 0 && (
+          <button onClick={handleRetryWrong} style={{
+            width: '100%', height: '52px',
+            background: 'var(--color-incorrect-bg)',
+            color: 'var(--color-incorrect)',
+            border: '1.5px solid var(--color-incorrect)',
+            borderRadius: '14px', fontSize: '15px', fontWeight: 700,
+            cursor: 'pointer', display: 'flex', alignItems: 'center',
+            justifyContent: 'center', gap: '8px',
+          }}>
+            <RotateCcw size={18} /> 틀린 단어 {wrongWords.length}개 다시 학습
+          </button>
+        )}
         <button onClick={() => router.push('/home')} style={{ width: '100%', height: '52px', background: 'var(--color-bg)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
       </div>
     </main>
