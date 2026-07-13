@@ -224,11 +224,15 @@ export default function StudyPage() {
           role="button"
           style={{
             width: '100%', maxWidth: '640px', margin: '0 auto 8px',
-            background: 'var(--color-my)',
+            background: 'var(--vocab-card-bg)',
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
             borderRadius: '18px',
             padding: '18px 18px',
-            border: 'none',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+            border: '0.5px solid var(--vocab-card-border)',
+            borderTop: '1px solid var(--vocab-card-border-top)',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+            borderLeft: '4px solid var(--color-my)',
             display: 'flex', alignItems: 'center', gap: '12px',
             cursor: 'pointer',
           }}
