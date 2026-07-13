@@ -230,7 +230,7 @@ export default function StudyPage() {
             onClick={() => router.push('/study/memoryset')}
             role="button"
             style={{
-              width: '100%', margin: '0 0 8px',
+              width: '100%',
               background: 'var(--vocab-card-bg)',
               backdropFilter: 'blur(20px) saturate(180%)',
               WebkitBackdropFilter: 'blur(20px) saturate(180%)',
