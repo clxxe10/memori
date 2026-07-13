@@ -17,6 +17,11 @@ export default function ProfilePage() {
   const [stats, setStats] = useState({ mastered: 0, streak: 0, total: 0 })
   const [theme, setTheme] = useState('시스템')
   const [myColor, setMyColor] = useState('#1C1C1E')
+  const [useDefaultColor, setUseDefaultColor] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return localStorage.getItem('app_my_color') === null ||
+      !localStorage.getItem('app_my_color')
+  })
   const [showThemeSheet, setShowThemeSheet] = useState(false)
   const [showColorSheet, setShowColorSheet] = useState(false)
   const [showLangSheet, setShowLangSheet] = useState(false)
@@ -91,6 +96,20 @@ export default function ProfilePage() {
     setMyColor(color)
     localStorage.setItem('app_my_color', color)
     applyMyColor(color)
+  }
+
+  const handleDefaultToggle = () => {
+    const next = !useDefaultColor
+    setUseDefaultColor(next)
+    if (next) {
+      const isDark = document.documentElement.classList.contains('dark')
+      const defaultColor = isDark ? '#FFFFFF' : '#1C1C1E'
+      handleColorChange(defaultColor)
+      localStorage.setItem('app_theme', '기본')
+    } else {
+      localStorage.setItem('app_theme', theme)
+      handleColorChange(myColor)
+    }
   }
 
   const handleLogout = async () => {
@@ -333,7 +352,7 @@ export default function ProfilePage() {
             <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 20px' }} />
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>테마</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {['기본', '시스템', '라이트', '다크'].map(t => (
+              {['시스템', '라이트', '다크'].map(t => (
                 <div key={t} onClick={() => handleThemeChange(t)}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -363,6 +382,26 @@ export default function ProfilePage() {
           }}>
             <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 20px' }} />
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>마이컬러</h3>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', padding: '14px 16px', background: 'var(--color-surface-2)', borderRadius: '14px' }}>
+              <div>
+                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>기본 모드</div>
+                <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>라이트=검정, 다크=흰색 자동 적용</div>
+              </div>
+              <div onClick={handleDefaultToggle} style={{
+                width: '44px', height: '24px', borderRadius: '20px',
+                background: useDefaultColor ? 'var(--color-text-primary)' : 'var(--color-border)',
+                position: 'relative', cursor: 'pointer', transition: 'background 0.2s', flexShrink: 0,
+              }}>
+                <div style={{
+                  position: 'absolute', top: '3px',
+                  left: useDefaultColor ? '23px' : '3px',
+                  width: '18px', height: '18px', borderRadius: '50%',
+                  background: useDefaultColor ? 'var(--color-bg)' : 'var(--color-surface)',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.2)', transition: 'left 0.2s',
+                }} />
+              </div>
+            </div>
+            {!useDefaultColor && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
               <div style={{ position: 'relative', width: '52px', height: '52px' }}>
                 <input
@@ -389,6 +428,7 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
+            )}
             <p style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>
               밝은 색상 선택 시 텍스트가 자동으로 검정색으로 바뀌어요
             </p>
