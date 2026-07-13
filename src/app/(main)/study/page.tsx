@@ -219,6 +219,38 @@ export default function StudyPage() {
         </div>
 
         {/* 모드 리스트 */}
+        <div
+          onClick={() => router.push('/study/memoryset')}
+          role="button"
+          style={{
+            width: '100%', maxWidth: '640px', margin: '0 auto 8px',
+            background: 'var(--color-my)',
+            borderRadius: '18px',
+            padding: '18px 18px',
+            border: 'none',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+            display: 'flex', alignItems: 'center', gap: '12px',
+            cursor: 'pointer',
+          }}
+        >
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
+              <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-my-contrast)' }}>
+                암기세트
+              </span>
+              <span style={{
+                fontSize: '11px', fontWeight: 700,
+                background: 'rgba(255,255,255,0.25)',
+                color: 'var(--color-my-contrast)',
+                borderRadius: '6px', padding: '2px 7px',
+              }}>NEW</span>
+            </div>
+            <p style={{ fontSize: '13px', color: 'var(--color-my-contrast)', opacity: 0.8, margin: 0 }}>
+              플래시카드 → 깜빡이 → 퀴즈 → 타이핑 순서로 완벽하게 암기해요
+            </p>
+          </div>
+          <ChevronRight size={18} color="var(--color-my-contrast)" style={{ flexShrink: 0, opacity: 0.8 }} />
+        </div>
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr',
