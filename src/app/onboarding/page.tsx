@@ -34,8 +34,18 @@ function OnboardingContent() {
       overflow: 'hidden',
     }}>
       {step === 1 && <Slide1 onNext={() => setStep(2)} />}
-      {step === 2 && <Slide2 onNext={() => setStep(3)} onBack={() => setStep(1)} name={name} setName={setName} />}
-      {step === 3 && <Slide3 onNext={() => setStep(4)} onBack={() => setStep(2)} onGoogleLogin={handleFinish} email={email} setEmail={setEmail} name={name} setName={setName} />}
+      {step === 2 && (
+        <Slide2
+          onNext={() => setStep(3)}
+          onBack={() => setStep(1)}
+          onLogin={handleFinish}
+          email={email}
+          setEmail={setEmail}
+          name={name}
+          setName={setName}
+        />
+      )}
+      {step === 3 && <Slide3 onNext={() => setStep(4)} onBack={() => setStep(2)} />}
       {step === 4 && <Slide4 onNext={() => setStep(5)} onBack={() => setStep(3)} email={email} name={name} />}
       {step === 5 && <Slide5 onFinish={handleFinish} />}
     </main>
