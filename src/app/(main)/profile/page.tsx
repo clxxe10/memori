@@ -119,27 +119,23 @@ export default function ProfilePage() {
   }
 
   const groupTitleStyle = {
-    fontSize: '12px', fontWeight: 700,
+    fontSize: '13px', fontWeight: 600,
     color: 'var(--color-text-secondary)',
-    marginBottom: '8px', letterSpacing: '0.3px',
+    marginBottom: '8px', letterSpacing: '0.5px',
+    textTransform: 'uppercase' as const,
   }
 
   const groupCardStyle = {
-    background: 'var(--vocab-card-bg)',
-    backdropFilter: 'blur(20px) saturate(180%)',
-    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-    borderRadius: '18px',
-    border: '0.5px solid var(--vocab-card-border)',
-    borderTop: '1px solid var(--vocab-card-border-top)',
-    boxShadow: '0 2px 12px rgba(0,0,0,0.09)',
+    background: 'var(--color-surface)',
+    borderRadius: '22px',
     overflow: 'hidden' as const,
-    marginBottom: '16px',
+    marginBottom: '8px',
   }
 
   const menuRowStyle = (isLast = false) => ({
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    padding: '14px 16px',
-    borderBottom: isLast ? 'none' : '1px solid var(--color-border)',
+    padding: '15px 16px',
+    borderBottom: isLast ? 'none' : '0.5px solid var(--color-border)',
     cursor: 'pointer',
   })
 
@@ -156,50 +152,98 @@ export default function ProfilePage() {
           프로필
         </h1>
 
-        {/* 프로필 카드 */}
+        {/* 프로필 히어로 카드 */}
         <div style={{
-          background: 'var(--vocab-card-bg)',
-          backdropFilter: 'blur(20px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-          borderRadius: '22px', padding: '24px 20px',
-          border: '0.5px solid var(--vocab-card-border)',
-          borderTop: '1px solid var(--vocab-card-border-top)',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.09)',
-          textAlign: 'center', marginBottom: '20px',
+          background: `linear-gradient(160deg, var(--color-my) 0%, color-mix(in srgb, var(--color-my) 70%, #000) 100%)`,
+          borderRadius: '28px',
+          padding: '24px 20px 20px',
+          marginBottom: '20px',
+          boxShadow: '0 12px 28px rgba(0,0,0,0.18)',
+          position: 'relative',
+          overflow: 'hidden',
         }}>
-          <div style={{
-            width: '72px', height: '72px', borderRadius: '50%',
-            background: 'var(--color-surface-2)', margin: '0 auto 12px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            overflow: 'hidden',
-          }}>
-            {user?.user_metadata?.avatar_url ? (
-              <img src={user.user_metadata.avatar_url} alt="avatar"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <User size={32} color="var(--color-text-secondary)" />
-            )}
+          {/* 상단: 아바타 + 이름/이메일 + 화살표 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '20px' }}
+            onClick={() => router.push('/profile/edit')}
+          >
+            <div style={{
+              width: '64px', height: '64px', borderRadius: '50%',
+              background: 'rgba(255,255,255,0.2)',
+              border: '1.5px solid rgba(255,255,255,0.8)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '24px', fontWeight: 800, color: '#FFFFFF',
+              flexShrink: 0,
+            }}>
+              {nickname.charAt(0).toUpperCase()}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: '22px', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.3px' }}>
+                {nickname}
+              </div>
+              <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.75)', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {user?.email}
+              </div>
+            </div>
+            <ChevronRight size={18} color="rgba(255,255,255,0.7)" />
           </div>
-          <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '4px' }}>{nickname}</div>
-          <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>{user?.email}</div>
 
-          {/* 통계 */}
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+          {/* 하단: 통계 3개 */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
             {[
-              { label: '마스터', value: stats.mastered },
-              { label: '연속 학습', value: `${stats.streak}일` },
+              { label: '마스터 단어', value: stats.mastered },
+              { label: '연속 학습일', value: `${stats.streak}일` },
               { label: '전체 단어', value: stats.total },
-            ].map(s => (
-              <div key={s.label} style={{ flex: 1, background: 'var(--color-surface-2)', borderRadius: '12px', padding: '10px 6px' }}>
-                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)' }}>{s.value}</div>
-                <div style={{ fontSize: '10px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>{s.label}</div>
+            ].map(item => (
+              <div key={item.label} style={{
+                background: 'rgba(255,255,255,0.14)',
+                borderRadius: '14px', padding: '12px 10px',
+                textAlign: 'center',
+              }}>
+                <div style={{ fontSize: '22px', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.5px' }}>
+                  {item.value}
+                </div>
+                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', marginTop: '2px' }}>
+                  {item.label}
+                </div>
               </div>
             ))}
           </div>
-
         </div>
 
-        {/* 그룹 1 — 내 계정 */}
+        {/* Memori+ 배너 */}
+        <div onClick={() => router.push('/profile/premium')} style={{
+          background: 'var(--color-surface)',
+          borderRadius: '22px', padding: '16px',
+          marginBottom: '24px', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', gap: '14px',
+          border: '0.5px solid var(--color-border)',
+          position: 'relative', overflow: 'hidden',
+        }}>
+          <div style={{
+            width: '42px', height: '42px', borderRadius: '12px',
+            background: 'linear-gradient(135deg, #1C1C1E 0%, #3A3A3C 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}>
+            <span style={{ fontSize: '20px' }}>✦</span>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '2px' }}>
+              Memori+
+            </div>
+            <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+              광고 없이, 무제한으로 사용해요
+            </div>
+          </div>
+          <button style={{
+            background: 'var(--color-text-primary)', color: 'var(--color-bg)',
+            border: 'none', borderRadius: '9999px',
+            padding: '8px 16px', fontSize: '13px', fontWeight: 600,
+            cursor: 'pointer', flexShrink: 0,
+          }}>업그레이드</button>
+        </div>
+
+        {/* 내 계정 */}
         <p style={groupTitleStyle}>내 계정</p>
         <div style={groupCardStyle}>
           <div style={menuRowStyle()} onClick={() => router.push('/profile/edit')}>
@@ -212,38 +256,17 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* 그룹 2 — Memori+ */}
-        <p style={groupTitleStyle}>Memori+</p>
-        <div style={groupCardStyle}>
-          <div style={menuRowStyle(true)} onClick={() => router.push('/profile/premium')}>
-            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>Memori+ 구독</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              {isPremiumUser ? (
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#065F46', background: '#D1FAE5', borderRadius: '6px', padding: '2px 8px' }}>구독 중</span>
-              ) : (
-                <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-my-contrast)', background: 'var(--color-my)', borderRadius: '6px', padding: '2px 8px' }}>업그레이드</span>
-              )}
-              <ChevronRight size={16} color="var(--color-text-tertiary)" />
-            </div>
-          </div>
-        </div>
-
-        {/* 그룹 3 — 학습 설정 */}
-        <p style={groupTitleStyle}>학습 설정</p>
+        {/* 학습 및 화면 */}
+        <p style={groupTitleStyle}>학습 및 화면</p>
         <div style={groupCardStyle}>
           <div style={menuRowStyle()} onClick={() => setShowGoalSheet(true)}>
             <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>하루 학습 목표</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
-          <div style={menuRowStyle(true)} onClick={() => setShowNotifSheet(true)}>
+          <div style={menuRowStyle()} onClick={() => setShowNotifSheet(true)}>
             <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>학습 알림</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
-        </div>
-
-        {/* 그룹 4 — 화면 */}
-        <p style={groupTitleStyle}>화면</p>
-        <div style={groupCardStyle}>
           <div style={menuRowStyle()} onClick={() => setShowThemeSheet(true)}>
             <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>테마</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
@@ -258,7 +281,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* 그룹 5 — 지원 */}
+        {/* 지원 */}
         <p style={groupTitleStyle}>지원</p>
         <div style={groupCardStyle}>
           <div style={menuRowStyle()} onClick={() => router.push('/profile/support')}>
@@ -275,17 +298,21 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* 계정 */}
-        <p style={groupTitleStyle}>계정</p>
-        <div style={groupCardStyle}>
-          <div style={menuRowStyle()} onClick={() => setShowDeleteSheet(true)}>
-            <span style={{ fontSize: '15px', fontWeight: 500, color: '#E24B4A' }}>계정 탈퇴</span>
-            <ChevronRight size={16} color="#E24B4A" />
-          </div>
-          <div style={menuRowStyle(true)} onClick={() => setShowLogoutSheet(true)}>
+        {/* 로그아웃 - 별도 카드 */}
+        <div style={{ ...groupCardStyle, marginTop: '8px' }}>
+          <div style={{ ...menuRowStyle(true), justifyContent: 'center' }}
+            onClick={() => setShowLogoutSheet(true)}>
             <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>로그아웃</span>
-            <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
+        </div>
+
+        {/* 계정 탈퇴 - 맨 아래 텍스트 링크 */}
+        <div style={{ textAlign: 'center', marginTop: '16px', marginBottom: '20px' }}>
+          <button onClick={() => setShowDeleteSheet(true)} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            fontSize: '14px', color: 'var(--color-text-secondary)',
+            textDecoration: 'underline',
+          }}>계정 탈퇴</button>
         </div>
 
       </div>

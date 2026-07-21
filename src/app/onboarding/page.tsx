@@ -13,7 +13,6 @@ function OnboardingContent() {
   const initialStep = Number(searchParams.get('step')) || 1
   const [step, setStep] = useState(initialStep)
   const [email, setEmail] = useState('')
-  const [name, setName] = useState('')
 
   useEffect(() => {
     const isDark = document.documentElement.classList.contains('dark')
@@ -41,12 +40,12 @@ function OnboardingContent() {
           onLogin={handleFinish}
           email={email}
           setEmail={setEmail}
-          name={name}
-          setName={setName}
+          name=""
+          setName={() => {}}
         />
       )}
       {step === 3 && <Slide3 onNext={() => setStep(4)} onBack={() => setStep(2)} />}
-      {step === 4 && <Slide4 onNext={() => setStep(5)} onBack={() => setStep(3)} email={email} name={name} />}
+      {step === 4 && <Slide4 onNext={() => setStep(5)} onBack={() => setStep(3)} />}
       {step === 5 && <Slide5 onFinish={handleFinish} />}
     </main>
   )

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { applyMyColor } from '@/lib/colorUtils'
 
-export default function Slide4({ onNext, onBack, email, name }: { onNext: () => void; onBack: () => void; email: string; name: string }) {
+export default function Slide4({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
   const [myColor, setMyColor] = useState('#007AFF')
   const [saving, setSaving] = useState(false)
 

@@ -113,7 +113,7 @@ export default function Slide5({ onFinish }: { onFinish: () => void }) {
         fontSize: '16px', fontWeight: 600,
         letterSpacing: '-0.2px', zIndex: 10,
       }}>
-        첫 단어장 만들기
+        시작하기
       </button>
 
       <button className="s5-btn2 s5-skip" onClick={onFinish} style={{
