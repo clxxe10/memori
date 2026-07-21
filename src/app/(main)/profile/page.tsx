@@ -47,7 +47,12 @@ export default function ProfilePage() {
         user = retryUser
       }
       setUser(user)
-      const name = user.user_metadata?.nickname || user.user_metadata?.full_name || '사용자'
+      const name = user.user_metadata?.nickname
+        || user.user_metadata?.full_name
+        || user.user_metadata?.name
+        || user.user_metadata?.preferred_username
+        || user.email?.split('@')[0]
+        || '사용자'
       setNickname(name)
 
       const { data: words } = await supabase
@@ -636,7 +641,11 @@ export default function ProfilePage() {
                     await supabase.from('user_daily_study').delete().eq('user_id', user.id)
 
                     // Auth 계정 삭제 시도 (세션 있을 때만)
-                    const { data: { session } } = await supabase.auth.getSession()
+                    let session = (await supabase.auth.getSession()).data.session
+                    if (!session) {
+                      const { data } = await supabase.auth.refreshSession()
+                      session = data.session
+                    }
                     if (session?.access_token) {
                       await fetch('/api/delete-account', {
                         method: 'DELETE',
