@@ -39,6 +39,9 @@ export default function ProfilePage() {
     const fetchData = async () => {
       const supabase = createClient()
       let { data: { user } } = await supabase.auth.getUser()
+      console.log('user metadata:', JSON.stringify(user?.user_metadata))
+      console.log('user id:', user?.id)
+      console.log('user email:', user?.email)
       if (!user) {
         // 세션 복구 시도
         await new Promise(resolve => setTimeout(resolve, 500))
