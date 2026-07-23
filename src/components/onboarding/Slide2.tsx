@@ -83,11 +83,17 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name,
   }
 
   const handleGoogle = async () => {
-    const supabase = createClient()
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` }
-    })
+    try {
+      const supabase = createClient()
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: `${window.location.origin}/auth/callback` }
+      })
+      if (error) alert('구글 로그인 오류: ' + error.message)
+      if (data?.url) window.location.href = data.url
+    } catch (e: any) {
+      alert('구글 로그인 예외: ' + e.message)
+    }
   }
 
   const handleKakao = async () => {
