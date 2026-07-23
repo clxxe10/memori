@@ -21,7 +21,13 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name,
   const [isDark, setIsDark] = useState(false)
 
   useEffect(() => {
-    setIsDark(document.documentElement.classList.contains('dark'))
+    const checkDark = () => {
+      const savedTheme = localStorage.getItem('app_theme') || '시스템'
+      if (savedTheme === '다크') setIsDark(true)
+      else if (savedTheme === '라이트') setIsDark(false)
+      else setIsDark(window.matchMedia('(prefers-color-scheme: dark)').matches)
+    }
+    checkDark()
     const style = document.createElement('style')
     style.textContent = `
       @keyframes s2FadeUp {
@@ -114,6 +120,7 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name,
     <div style={{
       position: 'fixed', inset: 0,
       display: 'flex', flexDirection: 'column',
+      overflow: 'hidden',
       fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif',
     }}>
       {/* 상단 히어로 */}
@@ -124,7 +131,7 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name,
         justifyContent: 'flex-end',
         padding: '0 28px 32px',
         position: 'relative', overflow: 'hidden',
-        paddingTop: 'max(56px, calc(env(safe-area-inset-top) + 12px))',
+        paddingTop: 'max(60px, calc(env(safe-area-inset-top) + 16px))',
       }}>
         {/* 장식 원 */}
         <div style={{ position: 'absolute', top: '-40px', right: '-30px', width: '160px', height: '160px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
@@ -133,7 +140,7 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name,
         {/* 상단 바 */}
         <div style={{
           position: 'absolute',
-          top: 'max(56px, calc(env(safe-area-inset-top) + 12px))',
+          top: 'max(60px, calc(env(safe-area-inset-top) + 16px))',
           left: '20px', right: '20px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
@@ -179,7 +186,8 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name,
         paddingBottom: 'max(24px, calc(env(safe-area-inset-bottom) + 16px))',
         display: 'flex', flexDirection: 'column',
         position: 'relative', zIndex: 1,
-        overflow: 'auto',
+        overflowY: 'auto',
+        WebkitOverflowScrolling: 'touch',
       }}>
         <div style={{ marginBottom: '20px' }}>
           <h2 style={{ fontSize: '26px', fontWeight: 700, color: formText, margin: '0 0 6px', letterSpacing: '-0.5px' }}>
