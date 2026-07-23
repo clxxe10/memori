@@ -126,7 +126,8 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name,
       {/* 상단 히어로 */}
       <div className="s2-hero" style={{
         background: 'linear-gradient(165deg, #3A3A3C 0%, #1C1C1E 50%, #0A0A0B 100%)',
-        flex: '0 0 42%',
+        flex: '0 0 38%',
+        minHeight: '0',
         display: 'flex', flexDirection: 'column',
         justifyContent: 'flex-end',
         padding: '0 28px 32px',
@@ -180,12 +181,12 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name,
       {/* 하단 폼 */}
       <div className="s2-form" style={{
         flex: 1, background: formBg,
-        borderRadius: '28px 28px 0 0',
-        marginTop: '-24px',
+        borderRadius: '0',
+        marginTop: '0',
         padding: '28px 24px',
         paddingBottom: 'max(24px, calc(env(safe-area-inset-bottom) + 16px))',
         display: 'flex', flexDirection: 'column',
-        position: 'relative', zIndex: 1,
+        position: 'relative', zIndex: 10,
         overflowY: 'auto',
         WebkitOverflowScrolling: 'touch',
       }}>
