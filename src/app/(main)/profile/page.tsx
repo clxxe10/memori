@@ -38,19 +38,29 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchData = async () => {
       const supabase = createClient()
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
+      let user = null
+
+      // 1차 시도
+      const { data: { user: user1 } } = await supabase.auth.getUser()
+      if (user1) {
+        user = user1
+      } else {
+        // 2차: refreshSession 후 재시도
         await supabase.auth.refreshSession()
+        await new Promise(resolve => setTimeout(resolve, 300))
+        const { data: { user: user2 } } = await supabase.auth.getUser()
+        if (user2) {
+          user = user2
+        } else {
+          // 3차: getSession에서 직접 추출
+          const { data: { session } } = await supabase.auth.getSession()
+          if (session?.user) {
+            user = session.user
+          }
+        }
       }
-      let { data: { user } } = await supabase.auth.getUser()
-      alert('metadata: ' + JSON.stringify(user?.user_metadata) + '\nemail: ' + user?.email)
-      if (!user) {
-        // 세션 복구 시도
-        await new Promise(resolve => setTimeout(resolve, 500))
-        const { data: { user: retryUser } } = await supabase.auth.getUser()
-        if (!retryUser) return
-        user = retryUser
-      }
+
+      if (!user) { router.push('/login'); return }
       setUser(user)
       const name = user.user_metadata?.nickname
         || user.user_metadata?.full_name
