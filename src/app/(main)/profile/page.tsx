@@ -38,6 +38,10 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchData = async () => {
       const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        await supabase.auth.refreshSession()
+      }
       let { data: { user } } = await supabase.auth.getUser()
       alert('metadata: ' + JSON.stringify(user?.user_metadata) + '\nemail: ' + user?.email)
       if (!user) {
