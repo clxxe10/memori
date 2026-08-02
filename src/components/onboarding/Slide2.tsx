@@ -274,6 +274,19 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name,
             </>
           ) : (
             <>
+              {mode === 'signup' && emailStep === 'email' && (
+                <input type="text" placeholder="이름" value={name}
+                  onChange={e => setName(e.target.value)}
+                  style={{
+                    width: '100%', padding: '17px 20px',
+                    borderRadius: '9999px', fontSize: '16px',
+                    border: inputBorder, background: inputBg,
+                    color: titleColor, outline: 'none',
+                    boxShadow: inputShadow,
+                    boxSizing: 'border-box' as const,
+                  }} />
+              )}
+
               {emailStep === 'email' ? (
                 <input type="email" placeholder="이메일 주소" value={email}
                   onChange={e => setEmail(e.target.value)}
