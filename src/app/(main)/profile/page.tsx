@@ -669,7 +669,7 @@ export default function ProfilePage() {
                     }
 
                     await supabase.auth.signOut()
-                    router.push('/login')
+                    router.push('/onboarding')
                   } catch (e) {
                     console.error('탈퇴 오류:', e)
                     alert('탈퇴 처리 중 오류가 발생했어요.')
