@@ -589,18 +589,31 @@ export default function HomePage() {
       </PullToRefresh>
       {showSpeedSheet && (
         <>
-          <div onClick={() => setShowSpeedSheet(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 200 }} />
+          <div onClick={() => setShowSpeedSheet(false)} style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            background: document.documentElement.classList.contains('dark') ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.16)',
+          }} />
           <div style={{
-            position: 'fixed', bottom: 0, left: 0, right: 0,
-            background: 'var(--color-surface)', borderRadius: '24px 24px 0 0',
-            padding: '12px 20px 100px', zIndex: 201, maxHeight: '75vh',
-            display: 'flex', flexDirection: 'column',
+            position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+            width: '320px', zIndex: 201,
+            background: document.documentElement.classList.contains('dark')
+              ? 'linear-gradient(165deg, rgba(70,68,80,0.5), rgba(20,18,26,0.55))'
+              : '#FEFEFF',
+            backdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
+            WebkitBackdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
+            boxShadow: document.documentElement.classList.contains('dark')
+              ? 'inset 0 1.5px 0 rgba(255,255,255,0.16), 0 24px 48px rgba(0,0,0,0.6)'
+              : '0 24px 48px rgba(31,38,60,0.18), 0 2px 8px rgba(31,38,60,0.06)',
+            border: document.documentElement.classList.contains('dark')
+              ? '1px solid rgba(255,255,255,0.12)'
+              : '1px solid rgba(0,0,0,0.04)',
+            borderRadius: '26px',
+            padding: '24px 20px 20px',
+            maxHeight: '70vh', overflowY: 'auto' as const,
           }}>
-            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 16px' }} />
-            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '6px' }}>단어장 선택</h3>
-            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>스피드 모드로 학습할 단어장을 선택하세요</p>
-            <div style={{ overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '6px', textAlign: 'center' }}>단어장 선택</h3>
+            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px', textAlign: 'center' }}>스피드 모드로 학습할 단어장을 선택하세요</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
               <button onClick={() => { setShowSpeedSheet(false); router.push('/study/speed') }}
                 style={{ width: '100%', background: 'rgba(28,28,30,0.06)', borderRadius: '16px', padding: '14px 16px', border: '1.5px solid rgba(28,28,30,0.12)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textAlign: 'left' as const }}>
                 <div style={{ width: '42px', height: '42px', borderRadius: '13px', background: 'rgba(28,28,30,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>📚</div>
@@ -626,6 +639,13 @@ export default function HomePage() {
                 </button>
               ))}
             </div>
+            <button onClick={() => setShowSpeedSheet(false)} style={{
+              width: '100%', padding: '14px',
+              borderRadius: '9999px', border: 'none',
+              background: document.documentElement.classList.contains('dark') ? 'rgba(255,255,255,0.1)' : 'rgba(120,120,128,0.14)',
+              color: 'var(--color-text-primary)',
+              fontSize: '16px', fontWeight: 600, cursor: 'pointer',
+            }}>취소</button>
           </div>
         </>
       )}
