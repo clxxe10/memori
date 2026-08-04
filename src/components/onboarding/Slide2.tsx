@@ -276,6 +276,9 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name,
             <>
               {mode === 'signup' && emailStep === 'email' && (
                 <input type="text" placeholder="이름" value={name}
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck={false}
                   onChange={e => setName(e.target.value)}
                   style={{
                     width: '100%', padding: '17px 20px',
