@@ -3,6 +3,7 @@ import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Slide1 from '@/components/onboarding/Slide1'
 import Slide2 from '@/components/onboarding/Slide2'
+import Slide2Name from '@/components/onboarding/Slide2Name'
 import Slide3 from '@/components/onboarding/Slide3'
 import Slide4 from '@/components/onboarding/Slide4'
 import Slide5 from '@/components/onboarding/Slide5'
@@ -13,6 +14,7 @@ function OnboardingContent() {
   const initialStep = Number(searchParams.get('step')) || 1
   const [step, setStep] = useState(initialStep)
   const [email, setEmail] = useState('')
+  const [name, setName] = useState('')
 
   useEffect(() => {
     const isDark = document.documentElement.classList.contains('dark')
@@ -40,13 +42,14 @@ function OnboardingContent() {
           onLogin={handleFinish}
           email={email}
           setEmail={setEmail}
-          name=""
-          setName={() => {}}
+          name={name}
+          setName={setName}
         />
       )}
-      {step === 3 && <Slide3 onNext={() => setStep(4)} onBack={() => setStep(2)} />}
-      {step === 4 && <Slide4 onNext={() => setStep(5)} onBack={() => setStep(3)} />}
-      {step === 5 && <Slide5 onFinish={handleFinish} />}
+      {step === 3 && <Slide2Name onNext={() => setStep(4)} onBack={() => setStep(2)} name={name} setName={setName} />}
+      {step === 4 && <Slide3 onNext={() => setStep(5)} onBack={() => setStep(3)} />}
+      {step === 5 && <Slide4 onNext={() => setStep(6)} onBack={() => setStep(4)} />}
+      {step === 6 && <Slide5 onFinish={handleFinish} />}
     </main>
   )
 }
