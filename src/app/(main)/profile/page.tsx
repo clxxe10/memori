@@ -350,17 +350,31 @@ export default function ProfilePage() {
         />
       )}
 
-      {/* 테마 바텀시트 */}
+      {/* 테마 모달 */}
       {showThemeSheet && (
         <>
-          <div onClick={() => setShowThemeSheet(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 200 }} />
+          <div onClick={() => setShowThemeSheet(false)} style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            background: document.documentElement.classList.contains('dark') ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.16)',
+          }} />
           <div style={{
-            position: 'fixed', bottom: 0, left: 0, right: 0,
-            background: 'var(--color-surface)', borderRadius: '24px 24px 0 0',
-            padding: '12px 20px 100px', zIndex: 201,
+            position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+            width: '320px', zIndex: 201,
+            background: document.documentElement.classList.contains('dark')
+              ? 'linear-gradient(165deg, rgba(70,68,80,0.5), rgba(20,18,26,0.55))'
+              : '#FEFEFF',
+            backdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
+            WebkitBackdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
+            boxShadow: document.documentElement.classList.contains('dark')
+              ? 'inset 0 1.5px 0 rgba(255,255,255,0.16), 0 24px 48px rgba(0,0,0,0.6)'
+              : '0 24px 48px rgba(31,38,60,0.18)',
+            border: document.documentElement.classList.contains('dark')
+              ? '1px solid rgba(255,255,255,0.12)'
+              : '1px solid rgba(0,0,0,0.04)',
+            borderRadius: '26px',
+            padding: '24px 20px 20px',
+            maxHeight: '80vh', overflowY: 'auto' as const,
           }}>
-            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 20px' }} />
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>테마</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {['시스템', '라이트', '다크'].map(t => (
@@ -381,17 +395,31 @@ export default function ProfilePage() {
         </>
       )}
 
-      {/* 마이컬러 바텀시트 */}
+      {/* 마이컬러 모달 */}
       {showColorSheet && (
         <>
-          <div onClick={() => setShowColorSheet(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 200 }} />
+          <div onClick={() => setShowColorSheet(false)} style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            background: document.documentElement.classList.contains('dark') ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.16)',
+          }} />
           <div style={{
-            position: 'fixed', bottom: 0, left: 0, right: 0,
-            background: 'var(--color-surface)', borderRadius: '24px 24px 0 0',
-            padding: '12px 20px 100px', zIndex: 201,
+            position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+            width: '320px', zIndex: 201,
+            background: document.documentElement.classList.contains('dark')
+              ? 'linear-gradient(165deg, rgba(70,68,80,0.5), rgba(20,18,26,0.55))'
+              : '#FEFEFF',
+            backdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
+            WebkitBackdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
+            boxShadow: document.documentElement.classList.contains('dark')
+              ? 'inset 0 1.5px 0 rgba(255,255,255,0.16), 0 24px 48px rgba(0,0,0,0.6)'
+              : '0 24px 48px rgba(31,38,60,0.18)',
+            border: document.documentElement.classList.contains('dark')
+              ? '1px solid rgba(255,255,255,0.12)'
+              : '1px solid rgba(0,0,0,0.04)',
+            borderRadius: '26px',
+            padding: '24px 20px 20px',
+            maxHeight: '80vh', overflowY: 'auto' as const,
           }}>
-            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 20px' }} />
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>마이컬러</h3>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', padding: '14px 16px', background: 'var(--color-surface-2)', borderRadius: '14px' }}>
               <div>
@@ -447,17 +475,31 @@ export default function ProfilePage() {
         </>
       )}
 
-      {/* 언어 설정 바텀시트 */}
+      {/* 언어 설정 모달 */}
       {showLangSheet && (
         <>
-          <div onClick={() => setShowLangSheet(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 200 }} />
+          <div onClick={() => setShowLangSheet(false)} style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            background: document.documentElement.classList.contains('dark') ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.16)',
+          }} />
           <div style={{
-            position: 'fixed', bottom: 0, left: 0, right: 0,
-            background: 'var(--color-surface)', borderRadius: '24px 24px 0 0',
-            padding: '12px 20px 100px', zIndex: 201,
+            position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+            width: '320px', zIndex: 201,
+            background: document.documentElement.classList.contains('dark')
+              ? 'linear-gradient(165deg, rgba(70,68,80,0.5), rgba(20,18,26,0.55))'
+              : '#FEFEFF',
+            backdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
+            WebkitBackdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
+            boxShadow: document.documentElement.classList.contains('dark')
+              ? 'inset 0 1.5px 0 rgba(255,255,255,0.16), 0 24px 48px rgba(0,0,0,0.6)'
+              : '0 24px 48px rgba(31,38,60,0.18)',
+            border: document.documentElement.classList.contains('dark')
+              ? '1px solid rgba(255,255,255,0.12)'
+              : '1px solid rgba(0,0,0,0.04)',
+            borderRadius: '26px',
+            padding: '24px 20px 20px',
+            maxHeight: '80vh', overflowY: 'auto' as const,
           }}>
-            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 20px' }} />
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>언어 설정</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
               {['한국어', 'English'].map(lang => (
@@ -481,17 +523,31 @@ export default function ProfilePage() {
         </>
       )}
 
-      {/* 학습 목표 바텀시트 */}
+      {/* 학습 목표 모달 */}
       {showGoalSheet && (
         <>
-          <div onClick={() => setShowGoalSheet(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 200 }} />
+          <div onClick={() => setShowGoalSheet(false)} style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            background: document.documentElement.classList.contains('dark') ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.16)',
+          }} />
           <div style={{
-            position: 'fixed', bottom: 0, left: 0, right: 0,
-            background: 'var(--color-surface)', borderRadius: '24px 24px 0 0',
-            padding: '12px 20px 100px', zIndex: 201,
+            position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+            width: '320px', zIndex: 201,
+            background: document.documentElement.classList.contains('dark')
+              ? 'linear-gradient(165deg, rgba(70,68,80,0.5), rgba(20,18,26,0.55))'
+              : '#FEFEFF',
+            backdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
+            WebkitBackdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
+            boxShadow: document.documentElement.classList.contains('dark')
+              ? 'inset 0 1.5px 0 rgba(255,255,255,0.16), 0 24px 48px rgba(0,0,0,0.6)'
+              : '0 24px 48px rgba(31,38,60,0.18)',
+            border: document.documentElement.classList.contains('dark')
+              ? '1px solid rgba(255,255,255,0.12)'
+              : '1px solid rgba(0,0,0,0.04)',
+            borderRadius: '26px',
+            padding: '24px 20px 20px',
+            maxHeight: '80vh', overflowY: 'auto' as const,
           }}>
-            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 20px' }} />
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>하루 학습 목표</h3>
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>하루에 몇 개의 단어를 학습할까요?</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '20px' }}>
@@ -522,17 +578,31 @@ export default function ProfilePage() {
         </>
       )}
 
-      {/* 알림 설정 바텀시트 */}
+      {/* 알림 설정 모달 */}
       {showNotifSheet && (
         <>
-          <div onClick={() => setShowNotifSheet(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 200 }} />
+          <div onClick={() => setShowNotifSheet(false)} style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            background: document.documentElement.classList.contains('dark') ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.16)',
+          }} />
           <div style={{
-            position: 'fixed', bottom: 0, left: 0, right: 0,
-            background: 'var(--color-surface)', borderRadius: '24px 24px 0 0',
-            padding: '12px 20px 100px', zIndex: 201,
+            position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+            width: '320px', zIndex: 201,
+            background: document.documentElement.classList.contains('dark')
+              ? 'linear-gradient(165deg, rgba(70,68,80,0.5), rgba(20,18,26,0.55))'
+              : '#FEFEFF',
+            backdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
+            WebkitBackdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
+            boxShadow: document.documentElement.classList.contains('dark')
+              ? 'inset 0 1.5px 0 rgba(255,255,255,0.16), 0 24px 48px rgba(0,0,0,0.6)'
+              : '0 24px 48px rgba(31,38,60,0.18)',
+            border: document.documentElement.classList.contains('dark')
+              ? '1px solid rgba(255,255,255,0.12)'
+              : '1px solid rgba(0,0,0,0.04)',
+            borderRadius: '26px',
+            padding: '24px 20px 20px',
+            maxHeight: '80vh', overflowY: 'auto' as const,
           }}>
-            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 20px' }} />
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>학습 알림</h3>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: 'var(--color-surface-2)', borderRadius: '14px', marginBottom: '16px' }}>
