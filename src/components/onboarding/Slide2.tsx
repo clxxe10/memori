@@ -287,6 +287,8 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name,
                     color: titleColor, outline: 'none',
                     boxShadow: inputShadow,
                     boxSizing: 'border-box' as const,
+                    position: 'relative' as const,
+                    zIndex: 10,
                   }} />
               )}
 
