@@ -525,70 +525,44 @@ export default function VocabularyDetailPage() {
 
       {showAddSheet && (
         <>
-          <div
-            onClick={() => setShowAddSheet(false)}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              background: 'rgba(0,0,0,0.3)',
-              zIndex: 200,
-            }}
-          />
-          <div
-            style={{
-              position: 'fixed',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              background: 'var(--color-surface)',
-              borderRadius: '24px 24px 0 0',
-              padding: '12px 20px max(48px, calc(env(safe-area-inset-bottom) + 90px))',
-              zIndex: 201,
-            }}
-          >
-            <div
-              style={{
-                width: '36px',
-                height: '4px',
-                background: 'var(--color-track)',
-                borderRadius: '4px',
-                margin: '0 auto 16px',
-              }}
-            />
-            <p style={{ fontSize: '17px', fontWeight: 800, margin: '0 0 16px', color: 'var(--color-text-primary)' }}>
+          <div onClick={() => setShowAddSheet(false)} style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            background: document.documentElement.classList.contains('dark') ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.16)',
+          }} />
+          <div style={{
+            position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+            width: '320px', zIndex: 201,
+            background: document.documentElement.classList.contains('dark')
+              ? 'linear-gradient(165deg, rgba(70,68,80,0.5), rgba(20,18,26,0.55))'
+              : '#FEFEFF',
+            backdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
+            WebkitBackdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
+            boxShadow: document.documentElement.classList.contains('dark')
+              ? 'inset 0 1.5px 0 rgba(255,255,255,0.16), 0 24px 48px rgba(0,0,0,0.6)'
+              : '0 24px 48px rgba(31,38,60,0.18), 0 2px 8px rgba(31,38,60,0.06)',
+            border: document.documentElement.classList.contains('dark')
+              ? '1px solid rgba(255,255,255,0.12)'
+              : '1px solid rgba(0,0,0,0.04)',
+            borderRadius: '26px',
+            padding: '24px 20px 20px',
+          }}>
+            <p style={{ fontSize: '20px', fontWeight: 800, margin: '0 0 16px', color: 'var(--color-text-primary)', textAlign: 'center' }}>
               단어 추가
             </p>
 
-            <button
-              onClick={() => router.push(`/vocabulary/${folderId}/camera`)}
-              style={{
-                width: '100%',
-                height: '64px',
-                background: 'var(--color-bg)',
-                border: '1px solid var(--color-border)',
-                borderRadius: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '14px',
-                padding: '0 16px',
-                cursor: 'pointer',
-                marginBottom: '8px',
-                textAlign: 'left',
-              }}
-            >
-              <div
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  background: 'rgba(28,28,30,0.10)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                <Camera size={18} color="var(--color-text-primary)" />
+            <button onClick={() => router.push(`/vocabulary/${folderId}/camera`)} style={{
+              width: '100%', height: '64px',
+              background: 'var(--color-bg)', border: '1px solid var(--color-border)',
+              borderRadius: '16px', display: 'flex', alignItems: 'center',
+              gap: '14px', padding: '0 16px', cursor: 'pointer', marginBottom: '8px',
+              textAlign: 'left' as const,
+            }}>
+              <div style={{
+                width: '40px', height: '40px', borderRadius: '50%',
+                background: 'color-mix(in srgb, var(--color-my) 12%, transparent)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                <Camera size={18} color="var(--color-my)" />
               </div>
               <div>
                 <p style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>사진으로 추가</p>
@@ -596,41 +570,33 @@ export default function VocabularyDetailPage() {
               </div>
             </button>
 
-            <button
-              onClick={() => router.push(`/vocabulary/${folderId}/add`)}
-              style={{
-                width: '100%',
-                height: '64px',
-                background: 'var(--color-bg)',
-                border: '1px solid var(--color-border)',
-                borderRadius: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '14px',
-                padding: '0 16px',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-            >
-              <div
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  background: 'rgba(28,28,30,0.10)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                <Pencil size={18} color="var(--color-text-primary)" />
+            <button onClick={() => router.push(`/vocabulary/${folderId}/add`)} style={{
+              width: '100%', height: '64px',
+              background: 'var(--color-bg)', border: '1px solid var(--color-border)',
+              borderRadius: '16px', display: 'flex', alignItems: 'center',
+              gap: '14px', padding: '0 16px', cursor: 'pointer', marginBottom: '12px',
+              textAlign: 'left' as const,
+            }}>
+              <div style={{
+                width: '40px', height: '40px', borderRadius: '50%',
+                background: 'color-mix(in srgb, var(--color-my) 12%, transparent)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                <Plus size={18} color="var(--color-my)" />
               </div>
               <div>
                 <p style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>직접 입력</p>
-                <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-text-secondary)' }}>단어와 뜻을 입력하면 AI가 채워줘요</p>
+                <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-text-secondary)' }}>단어와 뜻을 하나씩 추가해요</p>
               </div>
             </button>
+
+            <button onClick={() => setShowAddSheet(false)} style={{
+              width: '100%', padding: '14px',
+              borderRadius: '9999px', border: 'none',
+              background: document.documentElement.classList.contains('dark') ? 'rgba(255,255,255,0.1)' : 'rgba(120,120,128,0.14)',
+              color: 'var(--color-text-primary)',
+              fontSize: '16px', fontWeight: 600, cursor: 'pointer',
+            }}>취소</button>
           </div>
         </>
       )}

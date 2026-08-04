@@ -8,6 +8,7 @@ import { applyMyColor } from '@/lib/colorUtils'
 import { isPremium } from '@/lib/premium'
 import { usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
+import AlertModal from '@/components/AlertModal'
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -339,51 +340,14 @@ export default function ProfilePage() {
 
       {/* 로그아웃 확인 바텀시트 */}
       {showLogoutSheet && (
-        <>
-          <div onClick={() => setShowLogoutSheet(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 200 }} />
-          <div style={{
-            position: 'fixed', bottom: 0, left: 0, right: 0,
-            background: 'var(--color-surface)', borderRadius: '24px 24px 0 0',
-            padding: '12px 20px 100px', zIndex: 201,
-          }}>
-            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 20px' }} />
-            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <div style={{ fontSize: '40px', marginBottom: '12px' }}>👋</div>
-              <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>
-                로그아웃 할까요?
-              </h3>
-              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
-                다시 로그인하면 학습 데이터가<br />그대로 유지돼요
-              </p>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <button
-                onClick={handleLogout}
-                style={{
-                  width: '100%', height: '52px',
-                  background: '#E24B4A', color: '#fff',
-                  border: 'none', borderRadius: '14px',
-                  fontSize: '15px', fontWeight: 700, cursor: 'pointer',
-                }}
-              >
-                로그아웃
-              </button>
-              <button
-                onClick={() => setShowLogoutSheet(false)}
-                style={{
-                  width: '100%', height: '52px',
-                  background: 'var(--color-surface-2)',
-                  color: 'var(--color-text-primary)',
-                  border: 'none', borderRadius: '14px',
-                  fontSize: '15px', fontWeight: 600, cursor: 'pointer',
-                }}
-              >
-                취소
-              </button>
-            </div>
-          </div>
-        </>
+        <AlertModal
+          title="로그아웃 할까요?"
+          description="다시 로그인하면 데이터가 유지돼요."
+          confirmText="로그아웃"
+          isDestructive={true}
+          onConfirm={handleLogout}
+          onCancel={() => setShowLogoutSheet(false)}
+        />
       )}
 
       {/* 테마 바텀시트 */}
@@ -621,73 +585,39 @@ export default function ProfilePage() {
 
       {/* 계정 탈퇴 바텀시트 */}
       {showDeleteSheet && (
-        <>
-          <div onClick={() => setShowDeleteSheet(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 200 }} />
-          <div style={{
-            position: 'fixed', bottom: 0, left: 0, right: 0,
-            background: 'var(--color-surface)', borderRadius: '24px 24px 0 0',
-            padding: '12px 20px 100px', zIndex: 201,
-          }}>
-            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 20px' }} />
-            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-              <div style={{ fontSize: '40px', marginBottom: '12px' }}>⚠️</div>
-              <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>계정을 탈퇴할까요?</h3>
-              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
-                모든 단어장과 학습 데이터가<br />영구적으로 삭제돼요.
-              </p>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <button
-                onClick={async () => {
-                  try {
-                    const supabase = createClient()
-
-                    // user state에서 직접 가져오기 (이미 fetchData에서 setUser 완료된 상태)
-                    if (!user) {
-                      alert('로그인 상태를 확인해주세요.')
-                      return
-                    }
-
-                    // 데이터 삭제
-                    await supabase.from('words').delete().eq('user_id', user.id)
-                    await supabase.from('folders').delete().eq('user_id', user.id)
-                    await supabase.from('user_learning_stats').delete().eq('user_id', user.id)
-                    await supabase.from('user_daily_study').delete().eq('user_id', user.id)
-
-                    // Auth 계정 삭제 시도 (세션 있을 때만)
-                    let session = (await supabase.auth.getSession()).data.session
-                    if (!session) {
-                      const { data } = await supabase.auth.refreshSession()
-                      session = data.session
-                    }
-                    if (session?.access_token) {
-                      await fetch('/api/delete-account', {
-                        method: 'DELETE',
-                        headers: { 'Authorization': `Bearer ${session.access_token}` }
-                      })
-                    }
-
-                    await supabase.auth.signOut()
-                    router.push('/onboarding')
-                  } catch (e) {
-                    console.error('탈퇴 오류:', e)
-                    alert('탈퇴 처리 중 오류가 발생했어요.')
-                  }
-                }}
-                style={{ width: '100%', height: '52px', background: '#E24B4A', color: '#fff', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}
-              >
-                탈퇴하기
-              </button>
-              <button
-                onClick={() => setShowDeleteSheet(false)}
-                style={{ width: '100%', height: '52px', background: 'var(--color-surface-2)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}
-              >
-                취소
-              </button>
-            </div>
-          </div>
-        </>
+        <AlertModal
+          title="계정을 탈퇴할까요?"
+          description="모든 데이터가 영구적으로 삭제되며 복구할 수 없어요."
+          confirmText="탈퇴하기"
+          isDestructive={true}
+          onConfirm={async () => {
+            try {
+              const supabase = createClient()
+              if (!user) { alert('로그인 상태를 확인해주세요.'); return }
+              await supabase.from('words').delete().eq('user_id', user.id)
+              await supabase.from('folders').delete().eq('user_id', user.id)
+              await supabase.from('user_learning_stats').delete().eq('user_id', user.id)
+              await supabase.from('user_daily_study').delete().eq('user_id', user.id)
+              let session = (await supabase.auth.getSession()).data.session
+              if (!session) {
+                const { data } = await supabase.auth.refreshSession()
+                session = data.session
+              }
+              if (session?.access_token) {
+                await fetch('/api/delete-account', {
+                  method: 'DELETE',
+                  headers: { 'Authorization': `Bearer ${session.access_token}` }
+                })
+              }
+              await supabase.auth.signOut()
+              router.push('/onboarding')
+            } catch (e) {
+              console.error('탈퇴 오류:', e)
+              alert('탈퇴 처리 중 오류가 발생했어요.')
+            }
+          }}
+          onCancel={() => setShowDeleteSheet(false)}
+        />
       )}
 
     </main>

@@ -336,146 +336,113 @@ export default function VocabularyPage() {
 
       {showModal && (
         <>
-          <div
-            onClick={() => setShowModal(false)}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              background: 'rgba(0,0,0,0.4)',
-              zIndex: 200,
-            }}
-          />
-          <div
-            style={{
-              position: 'fixed',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              background: 'var(--color-surface)',
-              borderRadius: '24px 24px 0 0',
-              padding: '12px 20px 100px',
-              zIndex: 201,
-              maxHeight: '90vh',
-              overflowY: 'auto',
-            }}
-          >
-            <div style={{ maxWidth: '480px', margin: '0 auto' }}>
-
-              <div style={{ width: '36px', height: '4px', background: 'var(--color-border)', borderRadius: '4px', margin: '8px auto 16px' }} />
-
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-                <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>새 단어장</h2>
-                <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>
-                  <X size={20} color="var(--color-text-secondary)" />
-                </button>
-              </div>
-
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>
-                  이름
-                </label>
-                <input
-                  value={newFolder.name}
-                  onChange={e => setNewFolder(f => ({ ...f, name: e.target.value }))}
-                  placeholder="예: 토익 필수 단어"
-                  style={{
-                    width: '100%', height: '52px', padding: '0 16px',
-                    fontSize: '16px', borderRadius: '14px',
-                    border: '1px solid var(--color-border)',
-                    background: 'var(--color-surface-2)',
-                    color: 'var(--color-text-primary)',
-                    outline: 'none', boxSizing: 'border-box',
-                  }}
-                />
-              </div>
-
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>
-                  설명 <span style={{ fontWeight: 400, color: 'var(--color-text-tertiary)' }}>(선택)</span>
-                </label>
-                <input
-                  value={newFolder.description}
-                  onChange={e => setNewFolder(f => ({ ...f, description: e.target.value }))}
-                  placeholder="이 단어장에 대한 간단한 설명"
-                  style={{
-                    width: '100%', height: '52px', padding: '0 16px',
-                    fontSize: '14px', borderRadius: '14px',
-                    border: '1px solid var(--color-border)',
-                    background: 'var(--color-surface-2)',
-                    color: 'var(--color-text-primary)',
-                    outline: 'none', boxSizing: 'border-box',
-                  }}
-                />
-              </div>
-
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>
-                  카테고리
-                </label>
-                <SelectDropdown
-                  value={newFolder.category}
-                  onChange={val => setNewFolder(f => ({ ...f, category: val }))}
-                  options={[
-                    { value: '수능', label: '수능' },
-                    { value: '토익', label: '토익' },
-                    { value: '일상', label: '일상' },
-                    { value: '비즈니스', label: '비즈니스' },
-                    { value: '기타', label: '기타' },
-                  ]}
-                  placeholder="카테고리 선택"
-                />
-              </div>
-
-              <div style={{
-                background: 'var(--color-surface-2)', borderRadius: '14px',
-                padding: '14px 16px', marginBottom: '24px',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              }}>
-                <div>
-                  <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>전체 공개</p>
-                  <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: '2px 0 0' }}>다른 사용자들이 볼 수 있어요</p>
-                </div>
-                <div
-                  onClick={() => setNewFolder((f) => ({ ...f, is_public: !f.is_public }))}
-                  style={{
-                    width: '44px',
-                    height: '26px',
-                    borderRadius: '20px',
-                    background: newFolder.is_public ? 'var(--color-my)' : 'var(--color-track)',
-                    position: 'relative',
-                    cursor: 'pointer',
-                    flexShrink: 0,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: '20px',
-                      height: '20px',
-                      borderRadius: '50%',
-                      background: '#fff',
-                      position: 'absolute',
-                      top: '3px',
-                      left: newFolder.is_public ? '21px' : '3px',
-                      transition: 'left 0.2s',
-                    }}
-                  />
-                </div>
-              </div>
-
-              <button
-                onClick={handleCreate}
-                disabled={creating || !newFolder.name.trim()}
-                style={{
-                  width: '100%', height: '54px',
-                  background: 'var(--color-text-primary)', color: 'var(--color-bg)',
-                  border: 'none', borderRadius: '16px',
-                  fontSize: '16px', fontWeight: 800, cursor: 'pointer',
-                  opacity: (creating || !newFolder.name.trim()) ? 0.5 : 1,
-                }}
-              >
-                {creating ? '만드는 중...' : '단어장 만들기'}
+          <div onClick={() => setShowModal(false)} style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            background: document.documentElement.classList.contains('dark') ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.16)',
+          }} />
+          <div style={{
+            position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+            width: '320px', zIndex: 201,
+            background: document.documentElement.classList.contains('dark')
+              ? 'linear-gradient(165deg, rgba(70,68,80,0.5), rgba(20,18,26,0.55))'
+              : '#FEFEFF',
+            backdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
+            WebkitBackdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
+            boxShadow: document.documentElement.classList.contains('dark')
+              ? 'inset 0 1.5px 0 rgba(255,255,255,0.16), 0 24px 48px rgba(0,0,0,0.6)'
+              : '0 24px 48px rgba(31,38,60,0.18), 0 2px 8px rgba(31,38,60,0.06)',
+            border: document.documentElement.classList.contains('dark')
+              ? '1px solid rgba(255,255,255,0.12)'
+              : '1px solid rgba(0,0,0,0.04)',
+            borderRadius: '26px',
+            padding: '24px 20px 20px',
+            maxHeight: '80vh', overflowY: 'auto' as const,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>새 단어장</h2>
+              <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>
+                <X size={20} color="var(--color-text-secondary)" />
               </button>
             </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>이름</label>
+              <input value={newFolder.name} onChange={e => setNewFolder(f => ({ ...f, name: e.target.value }))}
+                placeholder="예: 토익 필수 단어"
+                style={{
+                  width: '100%', height: '48px', padding: '0 16px', fontSize: '15px', borderRadius: '14px',
+                  border: '1px solid var(--color-border)',
+                  background: document.documentElement.classList.contains('dark') ? 'rgba(120,120,128,0.24)' : '#F5F5F7',
+                  color: 'var(--color-text-primary)', outline: 'none', boxSizing: 'border-box' as const,
+                }} />
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>
+                설명 <span style={{ fontWeight: 400, color: 'var(--color-text-tertiary)' }}>(선택)</span>
+              </label>
+              <input value={newFolder.description} onChange={e => setNewFolder(f => ({ ...f, description: e.target.value }))}
+                placeholder="이 단어장에 대한 간단한 설명"
+                style={{
+                  width: '100%', height: '48px', padding: '0 16px', fontSize: '14px', borderRadius: '14px',
+                  border: '1px solid var(--color-border)',
+                  background: document.documentElement.classList.contains('dark') ? 'rgba(120,120,128,0.24)' : '#F5F5F7',
+                  color: 'var(--color-text-primary)', outline: 'none', boxSizing: 'border-box' as const,
+                }} />
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>카테고리</label>
+              <SelectDropdown
+                value={newFolder.category}
+                onChange={val => setNewFolder(f => ({ ...f, category: val }))}
+                options={[
+                  { value: '수능', label: '수능' },
+                  { value: '토익', label: '토익' },
+                  { value: '일상', label: '일상' },
+                  { value: '비즈니스', label: '비즈니스' },
+                  { value: '기타', label: '기타' },
+                ]}
+                placeholder="카테고리 선택"
+              />
+            </div>
+
+            <div style={{
+              background: document.documentElement.classList.contains('dark') ? 'rgba(120,120,128,0.24)' : '#F5F5F7',
+              borderRadius: '14px', padding: '14px 16px', marginBottom: '20px',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}>
+              <div>
+                <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>전체 공개</p>
+                <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: '2px 0 0' }}>다른 사용자들이 볼 수 있어요</p>
+              </div>
+              <div onClick={() => setNewFolder(f => ({ ...f, is_public: !f.is_public }))} style={{
+                width: '44px', height: '26px', borderRadius: '20px',
+                background: newFolder.is_public ? 'var(--color-my)' : 'var(--color-track)',
+                position: 'relative', cursor: 'pointer', flexShrink: 0,
+              }}>
+                <div style={{
+                  width: '20px', height: '20px', borderRadius: '50%', background: '#fff',
+                  position: 'absolute', top: '3px', left: newFolder.is_public ? '21px' : '3px', transition: 'left 0.2s',
+                }} />
+              </div>
+            </div>
+
+            <button onClick={handleCreate} disabled={creating || !newFolder.name.trim()} style={{
+              width: '100%', padding: '16px',
+              background: document.documentElement.classList.contains('dark')
+                ? 'linear-gradient(180deg, #FFFFFF 0%, #EDEDF0 100%)'
+                : 'linear-gradient(180deg, #333335 0%, #1C1C1E 55%, #0E0E0F 100%)',
+              color: document.documentElement.classList.contains('dark') ? '#000000' : '#FFFFFF',
+              border: 'none', borderRadius: '9999px',
+              fontSize: '16px', fontWeight: 700, cursor: 'pointer',
+              boxShadow: document.documentElement.classList.contains('dark')
+                ? 'inset 0 1.5px 0 rgba(255,255,255,0.95), 0 12px 24px rgba(0,0,0,0.45)'
+                : 'inset 0 1.5px 0 rgba(255,255,255,0.25), 0 12px 24px rgba(0,0,0,0.25)',
+              opacity: (creating || !newFolder.name.trim()) ? 0.5 : 1,
+            }}>
+              {creating ? '만드는 중...' : '단어장 만들기'}
+            </button>
           </div>
         </>
       )}
