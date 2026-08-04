@@ -50,19 +50,35 @@ export default function HelpSheet({ mode, onClose }: Props) {
   const content = HELP_CONTENT[mode]
   if (!content) return null
 
+  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+
   return (
     <>
-      <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 999 }} />
+      <div onClick={onClose} style={{
+        position: 'fixed', inset: 0, zIndex: 999,
+        background: isDark ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.16)',
+      }} />
       <div style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0,
-        background: 'var(--color-surface)', borderRadius: '24px 24px 0 0',
-        padding: '20px 24px 100px', zIndex: 1000,
-        maxHeight: '75vh', overflowY: 'auto',
+        position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+        width: '320px', zIndex: 1000,
+        background: isDark
+          ? 'linear-gradient(165deg, rgba(70,68,80,0.5), rgba(20,18,26,0.55))'
+          : '#FEFEFF',
+        backdropFilter: isDark ? 'blur(28px)' : 'none',
+        WebkitBackdropFilter: isDark ? 'blur(28px)' : 'none',
+        boxShadow: isDark
+          ? 'inset 0 1.5px 0 rgba(255,255,255,0.16), 0 24px 48px rgba(0,0,0,0.6)'
+          : '0 24px 48px rgba(31,38,60,0.18), 0 2px 8px rgba(31,38,60,0.06)',
+        border: isDark
+          ? '1px solid rgba(255,255,255,0.12)'
+          : '1px solid rgba(0,0,0,0.04)',
+        borderRadius: '26px',
+        padding: '24px 20px 20px',
+        maxHeight: '75vh', overflowY: 'auto' as const,
         fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
       }}>
-        <div style={{ width: '36px', height: '4px', background: 'var(--color-border)', borderRadius: '4px', margin: '0 auto 20px' }} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
+          <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
             {content.title} 사용법
           </h3>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>
@@ -87,7 +103,11 @@ export default function HelpSheet({ mode, onClose }: Props) {
           ))}
         </div>
 
-        <div style={{ background: 'var(--color-surface-2)', borderRadius: '14px', padding: '14px 16px', border: '1px solid var(--color-border)' }}>
+        <div style={{
+          background: isDark ? 'rgba(255,255,255,0.06)' : 'var(--color-surface-2)',
+          borderRadius: '14px', padding: '14px 16px',
+          border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid var(--color-border)',
+        }}>
           <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '10px', letterSpacing: '0.3px' }}>
             💡 꿀팁
           </p>
