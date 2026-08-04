@@ -48,7 +48,8 @@ export default function AddWordPage() {
       if (!res.ok) throw new Error('API 오류')
       const data = await res.json()
       setGenerated(data)
-    } catch {
+    } catch (e: any) {
+      alert('AI 오류: ' + (e?.message || '알 수 없는 오류'))
       setError('AI 생성에 실패했어요. 다시 시도해주세요.')
     } finally {
       setIsGenerating(false)
