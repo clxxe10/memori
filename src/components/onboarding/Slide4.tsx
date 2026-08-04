@@ -163,6 +163,25 @@ export default function Slide4({ onNext, onBack }: { onNext: () => void; onBack:
           <p style={{ fontSize: '14px', color: hexColor, margin: 0, letterSpacing: '0.5px', fontWeight: 500 }}>
             {myColor.toUpperCase()}
           </p>
+
+          {/* 기본 테마 버튼 */}
+          <button
+            onClick={() => {
+              const defaultColor = isDark ? '#FFFFFF' : '#1C1C1E'
+              setMyColor(defaultColor)
+            }}
+            style={{
+              padding: '10px 20px',
+              borderRadius: '9999px',
+              background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+              border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(60,60,67,0.08)',
+              color: isDark ? 'rgba(235,235,245,0.6)' : 'rgba(60,60,67,0.6)',
+              fontSize: '14px', fontWeight: 500,
+              cursor: 'pointer',
+            }}
+          >
+            기본 테마 사용하기
+          </button>
         </div>
 
         {/* 하단 버튼 */}
