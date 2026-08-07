@@ -156,13 +156,15 @@ export default function PublicFolderPage() {
     if (!myUserId) return
     const supabase = createClient()
     if (isLiked) {
-      await supabase.from('folder_likes')
+      const { error } = await supabase.from('folder_likes')
         .delete().eq('folder_id', folderId).eq('user_id', myUserId)
+      if (error) { alert('좋아요 처리에 실패했어요.'); return }
       setIsLiked(false)
       setLikeCount(p => p - 1)
     } else {
-      await supabase.from('folder_likes')
+      const { error } = await supabase.from('folder_likes')
         .insert({ folder_id: folderId, user_id: myUserId })
+      if (error) { alert('좋아요 처리에 실패했어요.'); return }
       setIsLiked(true)
       setLikeCount(p => p + 1)
     }
@@ -172,7 +174,7 @@ export default function PublicFolderPage() {
     if (importing || !myUserId) return
     setImporting(true)
     const supabase = createClient()
-    const { data: newFolder } = await supabase
+    const { data: newFolder, error: folderError } = await supabase
       .from('folders')
       .insert({
         user_id: myUserId,
@@ -185,38 +187,47 @@ export default function PublicFolderPage() {
       })
       .select().single()
 
-    if (newFolder) {
-      const { data: allWords } = await supabase
-        .from('words').select('*').eq('folder_id', folderId)
-      if (allWords && allWords.length > 0) {
-        await supabase.from('words').insert(
-          allWords.map(w => ({
-            user_id: myUserId,
-            folder_id: newFolder.id,
-            word: w.word,
-            meaning: w.meaning,
-            part_of_speech: w.part_of_speech,
-            pronunciation: w.pronunciation,
-            example: w.example,
-          }))
-        )
-      }
+    if (folderError || !newFolder) {
+      alert('가져오기에 실패했어요.')
+      setImporting(false)
+      return
+    }
+
+    const { data: allWords } = await supabase
+      .from('words').select('*').eq('folder_id', folderId)
+    if (allWords && allWords.length > 0) {
+      await supabase.from('words').insert(
+        allWords.map(w => ({
+          user_id: myUserId,
+          folder_id: newFolder.id,
+          word: w.word,
+          meaning: w.meaning,
+          part_of_speech: w.part_of_speech,
+          pronunciation: w.pronunciation,
+          example: w.example,
+        }))
+      )
     }
     setIsImported(true)
     setImporting(false)
-    if (newFolder) showToast('내 단어장에 추가됐어요!')
+    showToast('내 단어장에 추가됐어요!')
   }
 
   const handleComment = async () => {
     if (!commentText.trim() || !myUserId || submitting) return
     setSubmitting(true)
     const supabase = createClient()
-    const { data } = await supabase.from('folder_comments').insert({
+    const { data, error } = await supabase.from('folder_comments').insert({
       folder_id: folderId,
       user_id: myUserId,
       content: commentText.trim(),
       nickname: myNickname,
     }).select().single()
+    if (error) {
+      alert('댓글 작성에 실패했어요.')
+      setSubmitting(false)
+      return
+    }
     if (data) setComments(prev => [...prev, data])
     setCommentText('')
     setSubmitting(false)
