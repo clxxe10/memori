@@ -97,6 +97,7 @@ function TypingContent() {
     setWrongWords([])
     setCurrent(0)
     setInputValue('')
+    setResult(null)
     setFinished(false)
     setStats({ correct: 0, wrong: 0 })
   }

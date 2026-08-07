@@ -21,7 +21,10 @@ function BlinkContent() {
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    if (!folderId) return
+    if (!folderId) {
+      setLoading(false)
+      return
+    }
     const fetchWords = async () => {
       const supabase = createClient()
       const { data } = await supabase

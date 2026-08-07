@@ -52,10 +52,13 @@ function QuizContent() {
       let query = supabase.from('words').select('*').eq('user_id', user.id)
       if (folderId) query = query.eq('folder_id', folderId)
       const { data } = await query
-      if (data) {
+      if (data && data.length > 0) {
         const shuffled = data.sort(() => Math.random() - 0.5)
         setWords(shuffled)
         generateOptions(shuffled[0], all || [])
+      } else {
+        setWords([])
+        setLoading(false)
       }
       setLoading(false)
     }
@@ -192,10 +195,11 @@ function QuizContent() {
     </main>
   )
 
-  if (words.length === 0) return (
-    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif', padding: '0 24px' }}>
+  if (!loading && words.length === 0) return (
+    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', padding: '0 24px' }}>
       <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>단어가 없어요</p>
-      <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
+      <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px' }}>단어장에 단어를 먼저 추가해주세요</p>
+      <button onClick={() => router.back()} style={{ padding: '12px 24px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
     </main>
   )
 
