@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.memori.app',
+  appId: 'com.oneidea.memori',
   appName: 'Memori',
   webDir: 'public',
   server: {
