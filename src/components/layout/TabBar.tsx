@@ -30,7 +30,7 @@ export default function TabBar() {
 
   const isActive = (path: string) => pathname.startsWith(path)
 
-  const isStudyMode = [
+  const hideTabBar = [
     '/study/flashcard',
     '/study/quiz',
     '/study/typing',
@@ -39,9 +39,10 @@ export default function TabBar() {
     '/study/blink',
     '/study/speed',
     '/study/pdf',
+    '/search/folder',
   ].some(path => pathname.startsWith(path))
 
-  if (isStudyMode) return null
+  if (hideTabBar) return null
 
   if (isDesktop) {
     return (

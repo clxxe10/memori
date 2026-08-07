@@ -161,7 +161,7 @@ function QuizContent() {
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', maxWidth: '320px' }}>
         <button onClick={() => { setCurrent(0); setFinished(false); setSelectedOption(null); setStats({ correct: 0, wrong: 0 }); setWords(prev => { const s = [...prev].sort(() => Math.random() - 0.5); generateOptions(s[0], allWords); return s }) }}
-          style={{ width: '100%', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          style={{ width: '100%', height: '52px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
           <RotateCcw size={18} /> 다시 풀기
         </button>
         {wrongWords.length > 0 && (
@@ -179,7 +179,7 @@ function QuizContent() {
         )}
         {isMemorySet ? (
           <button onClick={() => router.push(`/study/typing?folder=${memorySetFolder}&memoryset=true`)}
-            style={{ width: '100%', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
+            style={{ width: '100%', height: '52px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
             다음 단계: 타이핑 →
           </button>
         ) : (
@@ -195,7 +195,7 @@ function QuizContent() {
   if (words.length === 0) return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif', padding: '0 24px' }}>
       <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>단어가 없어요</p>
-      <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
+      <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
     </main>
   )
 
@@ -218,7 +218,7 @@ function QuizContent() {
         </div>
 
         <div style={{ height: '4px', background: 'var(--color-track)', borderRadius: '4px', marginBottom: '14px', flexShrink: 0 }}>
-          <div style={{ height: '4px', background: 'var(--color-my)', borderRadius: '4px', width: `${progress}%`, transition: 'width 0.3s ease' }} />
+          <div style={{ height: '4px', background: 'var(--color-neutral)', borderRadius: '4px', width: `${progress}%`, transition: 'width 0.3s ease' }} />
         </div>
 
         <div style={{ background: 'var(--color-surface)', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.09)', padding: '24px 20px', textAlign: 'center', marginBottom: '0', flexShrink: 0, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>

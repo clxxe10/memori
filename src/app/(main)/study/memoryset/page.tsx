@@ -51,11 +51,16 @@ export default function MemorySetPage() {
           paddingTop: 'max(60px, calc(env(safe-area-inset-top) + 16px))',
           marginBottom: '24px',
         }}>
-          <button onClick={() => router.back()} style={{
-            background: 'none', border: 'none', cursor: 'pointer',
-            fontSize: '16px', color: 'var(--color-text-secondary)',
-            padding: '4px', marginBottom: '12px', display: 'block',
-          }}>← 뒤로</button>
+          <button
+            className="back-button"
+            onClick={() => router.back()}
+            style={{ marginBottom: '12px' }}
+          >
+            <svg width="10" height="17" viewBox="0 0 10 17" fill="none" aria-hidden="true">
+              <path d="M8.5 1.5 1.5 8.5l7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span>뒤로</span>
+          </button>
           <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.5px', margin: '0 0 6px' }}>
             암기세트
           </h1>

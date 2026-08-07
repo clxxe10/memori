@@ -285,8 +285,8 @@ export default function VocabularyPage() {
                         style={{
                           fontSize: '11px',
                           fontWeight: 600,
-                          color: 'var(--color-my)',
-                          background: 'var(--color-my-light)',
+                          color: 'var(--color-neutral)',
+                          background: 'var(--color-neutral-soft)',
                           borderRadius: '6px',
                           padding: '2px 7px',
                         }}
@@ -297,7 +297,7 @@ export default function VocabularyPage() {
                     {folder.description && <p style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{folder.description}</p>}
                     <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '5px' }}>{total}개 단어</div>
                     <div style={{ height: '3px', background: 'var(--color-surface-2)', borderRadius: '3px' }}>
-                      <div style={{ height: '3px', background: 'var(--color-my)', borderRadius: '3px', width: `${percent}%` }} />
+                      <div style={{ height: '3px', background: 'var(--color-neutral)', borderRadius: '3px', width: `${percent}%` }} />
                     </div>
                   </div>
                   <ChevronRight size={16} color="var(--color-text-tertiary)" style={{ flexShrink: 0 }} />
@@ -418,7 +418,7 @@ export default function VocabularyPage() {
               </div>
               <div onClick={() => setNewFolder(f => ({ ...f, is_public: !f.is_public }))} style={{
                 width: '44px', height: '26px', borderRadius: '20px',
-                background: newFolder.is_public ? 'var(--color-my)' : 'var(--color-track)',
+                background: newFolder.is_public ? 'var(--color-neutral)' : 'var(--color-track)',
                 position: 'relative', cursor: 'pointer', flexShrink: 0,
               }}>
                 <div style={{

@@ -280,15 +280,7 @@ export default function VocabularyDetailPage() {
             <button
               key={f}
               onClick={() => setActiveFilter(f)}
-              style={{
-                padding: '6px 14px', borderRadius: '20px',
-                border: activeFilter === f ? 'none' : '1px solid var(--color-border)',
-                background: activeFilter === f ? 'var(--color-my)' : 'var(--color-surface)',
-                color: activeFilter === f ? 'var(--color-my-contrast)' : '#8E8E93',
-                fontSize: '13px', fontWeight: activeFilter === f ? 600 : 400,
-                cursor: 'pointer', whiteSpace: 'nowrap',
-                transition: 'all 0.2s',
-              }}
+              className={`filter-tab${activeFilter === f ? ' selected' : ''}`}
             >
               {f}
             </button>
@@ -375,7 +367,7 @@ export default function VocabularyDetailPage() {
                         onClick={() => toggleBookmark(word)}
                         style={{ background: 'none', border: 'none', padding: '2px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                       >
-                        <Bookmark size={14} color={word.is_bookmarked ? 'var(--color-my)' : '#AEAEB2'} fill={word.is_bookmarked ? 'var(--color-my)' : 'none'} />
+                        <Bookmark size={14} color={word.is_bookmarked ? 'var(--color-neutral)' : '#AEAEB2'} fill={word.is_bookmarked ? 'var(--color-neutral)' : 'none'} />
                       </button>
                     </div>
                   </div>
@@ -406,7 +398,7 @@ export default function VocabularyDetailPage() {
                       {[1,2,3,4,5].map(i => (
                         <div key={i} style={{
                           width: '7px', height: '7px', borderRadius: '50%',
-                          background: i <= (word.correct_count || 0) ? 'var(--color-my)' : 'var(--color-track)',
+                          background: i <= (word.correct_count || 0) ? 'var(--color-neutral)' : 'var(--color-track)',
                         }} />
                       ))}
                     </div>
@@ -503,13 +495,13 @@ export default function VocabularyDetailPage() {
                   <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>다른 사용자에게 공개</p>
                 </div>
                 <div onClick={() => setEditForm(f => ({ ...f, is_public: !f.is_public }))}
-                  style={{ width: '44px', height: '26px', borderRadius: '20px', background: editForm.is_public ? 'var(--color-my)' : 'var(--color-track)', position: 'relative', cursor: 'pointer', transition: 'background 0.2s', flexShrink: 0 }}>
+                  style={{ width: '44px', height: '26px', borderRadius: '20px', background: editForm.is_public ? 'var(--color-neutral)' : 'var(--color-track)', position: 'relative', cursor: 'pointer', transition: 'background 0.2s', flexShrink: 0 }}>
                   <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#fff', position: 'absolute', top: '3px', left: editForm.is_public ? '21px' : '3px', transition: 'left 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }} />
                 </div>
               </div>
 
               <button onClick={handleEditSave}
-                style={{ width: '100%', height: '50px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
+                style={{ width: '100%', height: '50px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
                 저장하기
               </button>
 
@@ -559,10 +551,10 @@ export default function VocabularyDetailPage() {
             }}>
               <div style={{
                 width: '40px', height: '40px', borderRadius: '50%',
-                background: 'color-mix(in srgb, var(--color-my) 12%, transparent)',
+                background: 'var(--color-neutral-soft)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>
-                <Camera size={18} color="var(--color-my)" />
+                <Camera size={18} color="var(--color-neutral)" />
               </div>
               <div>
                 <p style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>사진으로 추가</p>
@@ -579,10 +571,10 @@ export default function VocabularyDetailPage() {
             }}>
               <div style={{
                 width: '40px', height: '40px', borderRadius: '50%',
-                background: 'color-mix(in srgb, var(--color-my) 12%, transparent)',
+                background: 'var(--color-neutral-soft)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>
-                <Plus size={18} color="var(--color-my)" />
+                <Plus size={18} color="var(--color-neutral)" />
               </div>
               <div>
                 <p style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>직접 입력</p>

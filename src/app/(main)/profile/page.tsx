@@ -378,16 +378,13 @@ export default function ProfilePage() {
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>테마</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {['시스템', '라이트', '다크'].map(t => (
-                <div key={t} onClick={() => handleThemeChange(t)}
-                  style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '14px 16px', borderRadius: '14px', cursor: 'pointer',
-                    border: `1.5px solid ${theme === t ? 'var(--color-my)' : 'var(--color-border)'}`,
-                    background: theme === t ? 'var(--color-my)' : 'var(--color-surface)',
-                  }}
+                <div
+                  key={t}
+                  onClick={() => handleThemeChange(t)}
+                  className={`setting-option${theme === t ? ' selected' : ''}`}
                 >
-                  <span style={{ fontSize: '15px', fontWeight: 600, color: theme === t ? 'var(--color-my-contrast)' : 'var(--color-text-primary)' }}>{t}</span>
-                  {theme === t && <Check size={18} color="var(--color-my-contrast)" />}
+                  <span>{t}</span>
+                  {theme === t && <Check size={18} className="check-icon" color="currentColor" />}
                 </div>
               ))}
             </div>
@@ -503,16 +500,12 @@ export default function ProfilePage() {
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>언어 설정</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
               {['한국어', 'English'].map(lang => (
-                <div key={lang}
-                  style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '14px 16px', borderRadius: '14px',
-                    border: `1.5px solid ${lang === '한국어' ? 'var(--color-my)' : 'var(--color-border)'}`,
-                    background: lang === '한국어' ? 'var(--color-my)' : 'var(--color-surface)',
-                  }}
+                <div
+                  key={lang}
+                  className={`setting-option${lang === '한국어' ? ' selected' : ''}`}
                 >
-                  <span style={{ fontSize: '15px', fontWeight: 600, color: lang === '한국어' ? 'var(--color-my-contrast)' : 'var(--color-text-primary)' }}>{lang}</span>
-                  {lang === '한국어' && <Check size={18} color="var(--color-my-contrast)" />}
+                  <span>{lang}</span>
+                  {lang === '한국어' && <Check size={18} className="check-icon" color="currentColor" />}
                 </div>
               ))}
             </div>
@@ -552,25 +545,22 @@ export default function ProfilePage() {
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>하루에 몇 개의 단어를 학습할까요?</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '20px' }}>
               {[5, 10, 15, 20, 30, 50].map(n => (
-                <button key={n} onClick={() => setDailyGoal(n)}
-                  style={{
-                    width: 'calc(33% - 7px)', height: '52px',
-                    borderRadius: '14px', border: 'none', cursor: 'pointer',
-                    background: dailyGoal === n ? 'var(--color-my)' : 'var(--color-surface-2)',
-                    color: dailyGoal === n ? 'var(--color-my-contrast)' : 'var(--color-text-primary)',
-                    fontSize: '16px', fontWeight: 700,
-                  }}
+                <button
+                  key={n}
+                  onClick={() => setDailyGoal(n)}
+                  className={`goal-option${dailyGoal === n ? ' selected' : ''}`}
                 >
                   {n}개
                 </button>
               ))}
             </div>
             <button
+              className="btn-neutral-solid"
               onClick={() => {
                 localStorage.setItem('daily_goal', String(dailyGoal))
                 setShowGoalSheet(false)
               }}
-              style={{ width: '100%', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}
+              style={{ width: '100%', height: '52px', borderRadius: '14px', fontSize: '15px' }}
             >
               저장하기
             </button>
@@ -615,7 +605,8 @@ export default function ProfilePage() {
                 setNotificationEnabled(next)
                 localStorage.setItem('notification_enabled', String(next))
               }}
-                style={{ width: '44px', height: '26px', borderRadius: '20px', background: notificationEnabled ? 'var(--color-my)' : 'var(--color-track)', position: 'relative', cursor: 'pointer', transition: 'background 0.2s', flexShrink: 0 }}>
+                className={notificationEnabled ? 'toggle-on' : undefined}
+                style={{ width: '44px', height: '26px', borderRadius: '20px', background: notificationEnabled ? undefined : 'var(--color-track)', position: 'relative', cursor: 'pointer', transition: 'background 0.2s', flexShrink: 0 }}>
                 <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#fff', position: 'absolute', top: '3px', left: notificationEnabled ? '21px' : '3px', transition: 'left 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
               </div>
             </div>
@@ -644,8 +635,9 @@ export default function ProfilePage() {
             )}
 
             <button
+              className="btn-neutral-solid"
               onClick={() => setShowNotifSheet(false)}
-              style={{ width: '100%', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}
+              style={{ width: '100%', height: '52px', borderRadius: '14px', fontSize: '15px' }}
             >
               완료
             </button>

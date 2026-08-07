@@ -176,13 +176,13 @@ export default function ProfileEditPage() {
               style={{
                 position: 'absolute', bottom: 0, right: 0,
                 width: '28px', height: '28px', borderRadius: '50%',
-                background: 'var(--color-my)', border: '2px solid var(--color-bg)',
+                background: 'var(--color-neutral)', border: '2px solid var(--color-bg)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 cursor: uploading ? 'wait' : 'pointer',
-                fontSize: '11px', fontWeight: 700, color: 'var(--color-my-contrast)',
+                fontSize: '11px', fontWeight: 700, color: 'var(--color-neutral-contrast)',
               }}
             >
-              {uploading ? '...' : <Camera size={13} color="var(--color-my-contrast)" />}
+              {uploading ? '...' : <Camera size={13} color="var(--color-neutral-contrast)" />}
             </div>
           </div>
         </div>
@@ -223,8 +223,8 @@ export default function ProfileEditPage() {
             disabled={saving || !nickname.trim()}
             style={{
               width: '100%', height: '52px', marginTop: '8px',
-              background: nickname.trim() ? 'var(--color-my)' : 'var(--color-surface-2)',
-              color: nickname.trim() ? 'var(--color-my-contrast)' : 'var(--color-text-tertiary)',
+              background: nickname.trim() ? 'var(--color-neutral)' : 'var(--color-surface-2)',
+              color: nickname.trim() ? 'var(--color-neutral-contrast)' : 'var(--color-text-tertiary)',
               border: 'none', borderRadius: '14px',
               fontSize: '15px', fontWeight: 700,
               cursor: nickname.trim() ? 'pointer' : 'not-allowed',

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronRight, HelpCircle, Star } from 'lucide-react'
+import { ChevronRight, HelpCircle } from 'lucide-react'
 import HelpSheet from '@/components/ui/HelpSheet'
 import { createClient } from '@/lib/supabase/client'
 import { usePagePadding } from '@/lib/responsive'
@@ -191,11 +191,7 @@ export default function StudyPage() {
         </div>
 
         {/* 세그먼트 탭 */}
-        <div style={{
-          display: 'flex', background: 'var(--color-surface-2)',
-          borderRadius: '12px', padding: '3px', gap: '3px',
-          marginBottom: '20px',
-        }}>
+        <div className="segment-track" style={{ marginBottom: '20px' }}>
           {[
             { key: 'favorites', label: '즐겨찾기' },
             { key: 'all', label: '모든 모드' },
@@ -203,15 +199,7 @@ export default function StudyPage() {
             <button
               key={t.key}
               onClick={() => setTab(t.key as any)}
-              style={{
-                flex: 1, height: '34px', borderRadius: '10px',
-                border: 'none', cursor: 'pointer',
-                fontSize: '13px', fontWeight: tab === t.key ? 700 : 500,
-                background: tab === t.key ? 'var(--color-my)' : 'transparent',
-                color: tab === t.key ? 'var(--color-my-contrast)' : 'var(--color-text-secondary)',
-                boxShadow: tab === t.key ? '0 1px 4px rgba(0,0,0,0.09)' : 'none',
-                transition: 'all 0.2s',
-              }}
+              className={`segment-item${tab === t.key ? ' selected' : ''}`}
             >
               {t.label}
             </button>
@@ -226,21 +214,24 @@ export default function StudyPage() {
           margin: '0 auto',
           gap: '8px',
         }}>
+          {tab === 'all' && (
           <div
+            className="memoryset-card"
             onClick={() => router.push('/study/memoryset')}
             role="button"
             style={{
-              background: 'var(--vocab-card-bg)',
-              backdropFilter: 'blur(20px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-              borderRadius: '18px',
-              padding: '18px 18px',
-              border: '0.5px solid var(--vocab-card-border)',
-              borderTop: '1px solid var(--vocab-card-border-top)',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-              borderLeft: '4px solid var(--color-my)',
-              display: 'flex', alignItems: 'center', gap: '12px',
+              width: '100%',
+              background: 'var(--memoryset-card-bg)',
+              borderRadius: '20px',
+              padding: '18px',
+              border: '1px solid var(--memoryset-card-border)',
+              boxShadow: 'var(--memoryset-card-shadow)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
               cursor: 'pointer',
+              boxSizing: 'border-box',
+              position: 'relative',
             }}
           >
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -248,12 +239,7 @@ export default function StudyPage() {
                 <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
                   암기세트
                 </span>
-                <span style={{
-                  fontSize: '11px', fontWeight: 700,
-                  background: 'var(--color-my)',
-                  color: '#FFFFFF',
-                  borderRadius: '6px', padding: '2px 7px',
-                }}>NEW</span>
+                <span className="badge-new">NEW</span>
               </div>
               <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: 0 }}>
                 플래시카드 → 깜빡이 → 퀴즈 → 타이핑 순서로 완벽하게 암기해요
@@ -261,6 +247,7 @@ export default function StudyPage() {
             </div>
             <ChevronRight size={18} color="var(--color-text-tertiary)" style={{ flexShrink: 0, opacity: 0.8 }} />
           </div>
+          )}
           {modes.map(mode => (
             <div
               key={mode.id}
@@ -326,16 +313,17 @@ export default function StudyPage() {
                   onClick={e => toggleFavorite(mode.id, e)}
                   style={{
                     background: 'none', border: 'none',
-                    padding: '4px', cursor: 'pointer',
-                    display: 'flex', alignItems: 'center',
+                    width: '44px', height: '44px', minWidth: '44px', minHeight: '44px',
+                    padding: 0, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
                   }}
                 >
-                  <Star
-                    size={18}
-                    fill={favorites.includes(mode.id) ? '#FFB800' : 'none'}
-                    color={favorites.includes(mode.id) ? '#FFB800' : '#C7C7CC'}
-                  />
+                  <span style={{
+                    fontSize: 22,
+                    lineHeight: 1,
+                    opacity: favorites.includes(mode.id) ? 1 : 0.35,
+                  }}>⭐️</span>
                 </button>
                 <ChevronRight size={16} color="#C7C7CC" style={{ flexShrink: 0 }} />
               </div>
@@ -413,7 +401,7 @@ export default function StudyPage() {
                   <p style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>단어장이 없어요</p>
                   <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>단어장을 먼저 만들어주세요</p>
                   <button onClick={() => { setShowFolderSheet(false); router.push('/vocabulary') }}
-                    style={{ padding: '10px 24px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '20px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
+                    style={{ padding: '10px 24px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '20px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
                     단어장 만들러 가기
                   </button>
                 </div>

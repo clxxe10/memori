@@ -359,7 +359,7 @@ export default function CameraPage() {
                   background: 'rgba(0,0,0,0.5)',
                   border: 'none',
                   cursor: 'pointer',
-                  color: 'var(--color-my-contrast)',
+                  color: 'var(--color-neutral-contrast)',
                   fontSize: '14px',
                   display: 'flex',
                   alignItems: 'center',
@@ -378,8 +378,8 @@ export default function CameraPage() {
                 style={{
                   width: '100%',
                   height: '52px',
-                  background: 'var(--color-my)',
-                  color: 'var(--color-my-contrast)',
+                  background: 'var(--color-neutral)',
+                  color: 'var(--color-neutral-contrast)',
                   border: 'none',
                   borderRadius: '14px',
                   fontSize: '15px',
@@ -445,7 +445,7 @@ export default function CameraPage() {
                         background: 'var(--color-surface)',
                         borderRadius: '14px',
                         padding: '12px 14px',
-                        border: w.selected ? '1.5px solid var(--color-my)' : '1.5px solid var(--color-border)',
+                        border: w.selected ? '1.5px solid var(--color-neutral)' : '1.5px solid var(--color-border)',
                         cursor: 'pointer',
                         transition: 'all 0.15s',
                       }}
@@ -474,14 +474,14 @@ export default function CameraPage() {
                             width: '20px',
                             height: '20px',
                             borderRadius: '50%',
-                            background: w.selected ? 'var(--color-my)' : 'var(--color-surface-2)',
+                            background: w.selected ? 'var(--color-neutral)' : 'var(--color-surface-2)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             flexShrink: 0,
                           }}
                         >
-                          {w.selected && <span style={{ color: 'var(--color-my-contrast)', fontSize: '11px' }}>✓</span>}
+                          {w.selected && <span style={{ color: 'var(--color-neutral-contrast)', fontSize: '11px' }}>✓</span>}
                         </div>
                       </div>
                       <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: 0 }}>{w.meaning}</p>
@@ -496,8 +496,8 @@ export default function CameraPage() {
                   style={{
                     width: '100%',
                     height: '52px',
-                    background: 'var(--color-my)',
-                    color: 'var(--color-my-contrast)',
+                    background: 'var(--color-neutral)',
+                    color: 'var(--color-neutral-contrast)',
                     border: 'none',
                     borderRadius: '14px',
                     fontSize: '15px',
@@ -551,8 +551,8 @@ export default function CameraPage() {
                 style={{
                   width: '100%',
                   height: '52px',
-                  background: 'var(--color-my)',
-                  color: 'var(--color-my-contrast)',
+                  background: 'var(--color-neutral)',
+                  color: 'var(--color-neutral-contrast)',
                   border: 'none',
                   borderRadius: '14px',
                   fontSize: '15px',
@@ -638,7 +638,7 @@ export default function CameraPage() {
               style={{
                 height: '100%',
                 borderRadius: '4px',
-                background: 'var(--color-my)',
+                background: 'var(--color-neutral)',
                 width: `${Math.min((elapsed / 20) * 100, 95)}%`,
                 transition: 'width 1s ease',
               }}

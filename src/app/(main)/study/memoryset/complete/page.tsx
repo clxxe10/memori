@@ -58,8 +58,8 @@ export default function MemorySetCompletePage() {
       }}>
         {['플래시카드', '깜빡이', '퀴즈', '타이핑'].map(mode => (
           <div key={mode} style={{
-            background: 'var(--color-my)',
-            color: 'var(--color-my-contrast)',
+            background: 'var(--color-neutral)',
+            color: 'var(--color-neutral-contrast)',
             borderRadius: '9999px', padding: '6px 14px',
             fontSize: '13px', fontWeight: 600,
           }}>✓ {mode}</div>
@@ -73,7 +73,7 @@ export default function MemorySetCompletePage() {
       }}>
         <button onClick={() => router.push('/study/memoryset')} style={{
           width: '100%', height: '52px',
-          background: 'var(--color-my)', color: 'var(--color-my-contrast)',
+          background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)',
           border: 'none', borderRadius: '14px',
           fontSize: '15px', fontWeight: 700, cursor: 'pointer',
         }}>

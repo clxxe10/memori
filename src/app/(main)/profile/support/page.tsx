@@ -121,7 +121,7 @@ export default function SupportPage() {
               {contactEmail}으로 답변 드릴게요
             </p>
             <button onClick={() => setSent(false)}
-              style={{ marginTop: '16px', padding: '8px 20px', borderRadius: '20px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
+              style={{ marginTop: '16px', padding: '8px 20px', borderRadius: '20px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}>
               다시 문의하기
             </button>
           </div>
@@ -149,7 +149,7 @@ export default function SupportPage() {
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
               {CATEGORIES.map(cat => (
                 <button key={cat} onClick={() => setCategory(cat)}
-                  style={{ padding: '7px 14px', borderRadius: '20px', border: 'none', cursor: 'pointer', background: category === cat ? 'var(--color-my)' : 'var(--color-surface-2)', color: category === cat ? 'var(--color-my-contrast)' : 'var(--color-text-secondary)', fontSize: '13px', fontWeight: category === cat ? 600 : 400 }}>
+                  style={{ padding: '7px 14px', borderRadius: '20px', border: 'none', cursor: 'pointer', background: category === cat ? 'var(--color-neutral)' : 'var(--color-surface-2)', color: category === cat ? 'var(--color-neutral-contrast)' : 'var(--color-text-secondary)', fontSize: '13px', fontWeight: category === cat ? 600 : 400 }}>
                   {cat}
                 </button>
               ))}
@@ -163,7 +163,7 @@ export default function SupportPage() {
             <button
               onClick={handleSend}
               disabled={!content.trim()}
-              style={{ width: '100%', height: '52px', background: content.trim() ? 'var(--color-my)' : 'var(--color-surface-2)', color: content.trim() ? 'var(--color-my-contrast)' : 'var(--color-text-tertiary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: content.trim() ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              style={{ width: '100%', height: '52px', background: content.trim() ? 'var(--color-neutral)' : 'var(--color-surface-2)', color: content.trim() ? 'var(--color-neutral-contrast)' : 'var(--color-text-tertiary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: content.trim() ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <Send size={16} />
               문의 보내기
             </button>

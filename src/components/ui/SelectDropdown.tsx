@@ -127,7 +127,7 @@ export default function SelectDropdown({
               >
                 {opt.flag && <span style={{ fontSize: '16px' }}>{opt.flag}</span>}
                 <span style={{ flex: 1, fontWeight: isSelected ? 700 : 400 }}>{opt.label}</span>
-                {isSelected && <span style={{ color: 'var(--color-my)', fontSize: '12px' }}>✓</span>}
+                {isSelected && <span style={{ color: 'var(--color-neutral)', fontSize: '12px' }}>✓</span>}
               </button>
             )
           })}

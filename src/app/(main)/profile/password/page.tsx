@@ -159,8 +159,8 @@ export default function ProfilePasswordPage() {
             disabled={saving || !canSubmit}
             style={{
               width: '100%', height: '52px', marginTop: '8px',
-              background: canSubmit ? 'var(--color-my)' : 'var(--color-surface-2)',
-              color: canSubmit ? 'var(--color-my-contrast)' : 'var(--color-text-tertiary)',
+              background: canSubmit ? 'var(--color-neutral)' : 'var(--color-surface-2)',
+              color: canSubmit ? 'var(--color-neutral-contrast)' : 'var(--color-text-tertiary)',
               border: 'none', borderRadius: '14px',
               fontSize: '15px', fontWeight: 700,
               cursor: canSubmit ? 'pointer' : 'not-allowed',

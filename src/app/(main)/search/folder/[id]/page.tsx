@@ -40,7 +40,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { ArrowLeft, Heart, Download, Send } from 'lucide-react'
+import { ArrowLeft, Send, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { showToast } from '@/components/ui/Toast'
@@ -89,6 +89,7 @@ export default function PublicFolderPage() {
   const [commentText, setCommentText] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [myNickname, setMyNickname] = useState('')
+  const [showCommentSheet, setShowCommentSheet] = useState(false)
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -223,14 +224,6 @@ export default function PublicFolderPage() {
 
   const isMyFolder = folder?.user_id === myUserId
 
-  const inputStyle = {
-    width: '100%', height: '50px',
-    background: 'var(--color-surface)', border: '1.5px solid var(--color-border)',
-    borderRadius: '14px', padding: '0 16px',
-    fontSize: '15px', color: 'var(--color-text-primary)',
-    outline: 'none', boxSizing: 'border-box' as const,
-  }
-
   if (loading) return (
     <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif' }}>
       <p style={{ color: 'var(--color-text-secondary)' }}>불러오는 중...</p>
@@ -240,7 +233,7 @@ export default function PublicFolderPage() {
   return (
     <main style={{
       minHeight: '100vh', backgroundColor: 'var(--color-bg)',
-      paddingBottom: '100px',
+      paddingBottom: 'max(112px, calc(env(safe-area-inset-bottom) + 96px))',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
       <div style={{ maxWidth: CONTENT_MAX_WIDTH, margin: '0 auto', padding }}>
@@ -256,7 +249,7 @@ export default function PublicFolderPage() {
 
         {/* 단어장 정보 카드 */}
         <div style={{ background: 'var(--color-surface)', borderRadius: '20px', padding: '16px', border: '1px solid var(--color-border)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', marginBottom: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '3px' }}>
                 by @{folder?.author_nickname || '익명'}
@@ -274,44 +267,8 @@ export default function PublicFolderPage() {
                   </span>
                 )}
                 <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>{words.length}개 단어</span>
-                <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>❤️ {likeCount}</span>
               </div>
             </div>
-          </div>
-
-          <div style={{ display: 'flex', gap: '8px' }}>
-            {!isMyFolder && (
-              <button
-                onClick={handleImport}
-                disabled={isImported || importing}
-                style={{
-                  flex: 2, height: '44px',
-                  background: isImported ? 'var(--color-surface-2)' : 'var(--color-my)',
-                  color: isImported ? 'var(--color-text-secondary)' : 'var(--color-my-contrast)',
-                  border: 'none', borderRadius: '12px',
-                  fontSize: '14px', fontWeight: 700, cursor: isImported ? 'default' : 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                  opacity: importing ? 0.6 : 1,
-                }}
-              >
-                <Download size={16} />
-                {importing ? '가져오는 중...' : isImported ? '가져오기 완료 ✓' : '내 단어장에 가져오기'}
-              </button>
-            )}
-            <button
-              onClick={handleLike}
-              style={{
-                flex: 1, height: '44px',
-                background: isLiked ? '#FFE5E5' : 'var(--color-surface-2)',
-                color: isLiked ? '#D92D20' : 'var(--color-text-secondary)',
-                border: 'none', borderRadius: '12px',
-                fontSize: '14px', fontWeight: 600, cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px',
-              }}
-            >
-              <Heart size={16} fill={isLiked ? '#D92D20' : 'none'} />
-              {likeCount}
-            </button>
           </div>
         </div>
 
@@ -337,73 +294,134 @@ export default function PublicFolderPage() {
             </p>
           )}
         </div>
-
-        {/* 댓글 */}
-        <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '10px' }}>
-          댓글 {comments.length}개
-        </p>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
-          {comments.length === 0 ? (
-            <p style={{ fontSize: '13px', color: 'var(--color-text-tertiary)', textAlign: 'center', padding: '20px 0' }}>
-              첫 댓글을 남겨보세요 😊
-            </p>
-          ) : (
-            comments.map(comment => (
-              <div key={comment.id} style={{ display: 'flex', gap: '10px', background: 'var(--color-surface)', borderRadius: '12px', padding: '12px 14px', border: '1px solid var(--color-border)' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#E8EAF0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '13px', fontWeight: 700, color: 'var(--color-text-secondary)' }}>
-                  {(comment.nickname || '?')[0].toUpperCase()}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{comment.nickname || '익명'}</span>
-                    <span style={{ fontSize: '11px', color: 'var(--color-text-tertiary)' }}>
-                      {new Date(comment.created_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
-                    </span>
-                  </div>
-                  <p style={{ fontSize: '13px', color: '#3C3C43', margin: 0 }}>{comment.content}</p>
-                </div>
-                {comment.user_id === myUserId && (
-                  <button
-                    onClick={async () => {
-                      const supabase = createClient()
-                      await supabase.from('folder_comments').delete().eq('id', comment.id)
-                      setComments(prev => prev.filter(c => c.id !== comment.id))
-                    }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-tertiary)', fontSize: '11px', padding: '0 4px', flexShrink: 0 }}
-                  >
-                    삭제
-                  </button>
-                )}
-              </div>
-            ))
-          )}
-        </div>
-
-        {/* 댓글 입력 */}
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <input
-            value={commentText}
-            onChange={e => setCommentText(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleComment()}
-            placeholder="댓글을 남겨보세요..."
-            style={{ ...inputStyle, flex: 1, height: '46px' }}
-          />
-          <button
-            onClick={handleComment}
-            disabled={!commentText.trim() || submitting}
-            style={{
-              width: '46px', height: '46px', borderRadius: '14px',
-              background: commentText.trim() ? 'var(--color-my)' : 'var(--color-surface-2)',
-              border: 'none', cursor: commentText.trim() ? 'pointer' : 'not-allowed',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}
-          >
-            <Send size={16} color={commentText.trim() ? 'var(--color-my-contrast)' : 'var(--color-text-tertiary)'} />
-          </button>
-        </div>
-
       </div>
+
+      {/* 하단 액션 바 */}
+      <div className="detail-bottom-bar" style={{ maxWidth: CONTENT_MAX_WIDTH, width: 'calc(100% - 32px)' }}>
+        <button className="icon-pill" onClick={handleLike} type="button">
+          <span>{isLiked ? '❤️' : '🤍'}</span>
+          <span>{likeCount}</span>
+        </button>
+        <button
+          className="icon-pill comment-trigger"
+          onClick={() => setShowCommentSheet(true)}
+          type="button"
+        >
+          <span>💬</span>
+          <span>{comments.length}</span>
+        </button>
+        {!isMyFolder && (
+          <button
+            className="btn-import-primary"
+            onClick={handleImport}
+            disabled={isImported || importing || !myUserId}
+            type="button"
+          >
+            {importing ? (
+              '가져오는 중...'
+            ) : isImported ? (
+              '가져오기 완료 ✓'
+            ) : (
+              <>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                내 단어장에 가져오기
+              </>
+            )}
+          </button>
+        )}
+      </div>
+
+      {/* 댓글 바텀시트 */}
+      {showCommentSheet && (
+        <>
+          <div className="comment-sheet-overlay" onClick={() => setShowCommentSheet(false)} />
+          <div className="comment-sheet">
+            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 16px' }} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
+                댓글 {comments.length}개
+              </h3>
+              <button
+                onClick={() => setShowCommentSheet(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex' }}
+                type="button"
+              >
+                <X size={20} color="var(--color-text-secondary)" />
+              </button>
+            </div>
+
+            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px', minHeight: 0 }}>
+              {comments.length === 0 ? (
+                <p style={{ fontSize: '13px', color: 'var(--color-text-tertiary)', textAlign: 'center', padding: '28px 0' }}>
+                  첫 댓글을 남겨보세요 😊
+                </p>
+              ) : (
+                comments.map(comment => (
+                  <div key={comment.id} style={{ display: 'flex', gap: '10px', background: 'var(--color-surface-2)', borderRadius: '12px', padding: '12px 14px' }}>
+                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#E8EAF0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '13px', fontWeight: 700, color: 'var(--color-text-secondary)' }}>
+                      {(comment.nickname || '?')[0].toUpperCase()}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{comment.nickname || '익명'}</span>
+                        <span style={{ fontSize: '11px', color: 'var(--color-text-tertiary)' }}>
+                          {new Date(comment.created_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+                        </span>
+                      </div>
+                      <p style={{ fontSize: '13px', color: 'var(--color-text-primary)', margin: 0 }}>{comment.content}</p>
+                    </div>
+                    {comment.user_id === myUserId && (
+                      <button
+                        onClick={async () => {
+                          const supabase = createClient()
+                          await supabase.from('folder_comments').delete().eq('id', comment.id)
+                          setComments(prev => prev.filter(c => c.id !== comment.id))
+                        }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-tertiary)', fontSize: '11px', padding: '0 4px', flexShrink: 0 }}
+                        type="button"
+                      >
+                        삭제
+                      </button>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                value={commentText}
+                onChange={e => setCommentText(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleComment()}
+                placeholder="댓글을 남겨보세요..."
+                style={{
+                  flex: 1, height: '46px',
+                  background: 'var(--color-surface-2)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: '14px', padding: '0 16px',
+                  fontSize: '15px', color: 'var(--color-text-primary)',
+                  outline: 'none', boxSizing: 'border-box',
+                }}
+              />
+              <button
+                onClick={handleComment}
+                disabled={!commentText.trim() || submitting}
+                style={{
+                  width: '46px', height: '46px', borderRadius: '14px',
+                  background: commentText.trim() ? '#1C1C1E' : 'var(--color-surface-2)',
+                  border: 'none', cursor: commentText.trim() ? 'pointer' : 'not-allowed',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+                type="button"
+              >
+                <Send size={16} color={commentText.trim() ? '#FFFFFF' : 'var(--color-text-tertiary)'} />
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </main>
   )
 }

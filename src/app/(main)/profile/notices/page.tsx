@@ -40,7 +40,7 @@ export default function NoticesPage() {
                 style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
               >
                 {notice.isNew && (
-                  <span style={{ background: 'var(--color-my)', color: 'var(--color-my-contrast)', borderRadius: '6px', padding: '2px 7px', fontSize: '10px', fontWeight: 700, flexShrink: 0 }}>NEW</span>
+                  <span style={{ background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', borderRadius: '6px', padding: '2px 7px', fontSize: '10px', fontWeight: 700, flexShrink: 0 }}>NEW</span>
                 )}
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '3px' }}>{notice.title}</div>

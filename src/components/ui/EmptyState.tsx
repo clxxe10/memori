@@ -36,12 +36,11 @@ export default function EmptyState({ icon, title, desc, actionLabel, onAction }:
       </p>
       {actionLabel && onAction && (
         <button
+          className="btn-add-word-empty"
           onClick={onAction}
           style={{
-            background: 'var(--color-my)', color: 'var(--color-my-contrast)',
-            border: 'none', borderRadius: '20px',
-            padding: '12px 24px', fontSize: '14px', fontWeight: 700,
-            cursor: 'pointer',
+            padding: '12px 24px',
+            fontSize: '14px',
           }}
         >
           {actionLabel}

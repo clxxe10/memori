@@ -248,14 +248,14 @@ export default function PDFPage() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <div style={{
                     width: '20px', height: '20px', borderRadius: '50%',
-                    background: isActive ? 'var(--color-my)' : 'var(--color-surface-2)',
+                    background: isActive ? 'var(--color-neutral)' : 'var(--color-surface-2)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
-                    <span style={{ fontSize: '10px', fontWeight: 700, color: isActive ? 'var(--color-my-contrast)' : 'var(--color-text-tertiary)' }}>{i + 1}</span>
+                    <span style={{ fontSize: '10px', fontWeight: 700, color: isActive ? 'var(--color-neutral-contrast)' : 'var(--color-text-tertiary)' }}>{i + 1}</span>
                   </div>
                   <span style={{ fontSize: '10px', color: isActive ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)', fontWeight: isActive ? 600 : 400 }}>{s}</span>
                 </div>
-                {i < 4 && <div style={{ flex: 1, height: '1px', background: isActive ? 'var(--color-my)' : 'var(--color-track)' }} />}
+                {i < 4 && <div style={{ flex: 1, height: '1px', background: isActive ? 'var(--color-neutral)' : 'var(--color-track)' }} />}
               </div>
             )
           })}
@@ -297,16 +297,16 @@ export default function PDFPage() {
                     onClick={() => setExamType(opt.type as ExamType)}
                     style={{
                       padding: '12px 16px', borderRadius: '14px', cursor: 'pointer',
-                      border: `1.5px solid ${examType === opt.type ? 'var(--color-my)' : 'var(--color-border)'}`,
-                      background: examType === opt.type ? 'var(--color-my)' : 'var(--color-surface)',
+                      border: `1.5px solid ${examType === opt.type ? 'var(--color-neutral)' : 'var(--color-border)'}`,
+                      background: examType === opt.type ? 'var(--color-neutral)' : 'var(--color-surface)',
                       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     }}
                   >
                     <div>
-                      <div style={{ fontSize: '14px', fontWeight: 700, color: examType === opt.type ? 'var(--color-my-contrast)' : 'var(--color-text-primary)' }}>{opt.label}</div>
+                      <div style={{ fontSize: '14px', fontWeight: 700, color: examType === opt.type ? 'var(--color-neutral-contrast)' : 'var(--color-text-primary)' }}>{opt.label}</div>
                       <div style={{ fontSize: '12px', color: examType === opt.type ? 'rgba(255,255,255,0.7)' : 'var(--color-text-secondary)', marginTop: '2px' }}>{opt.desc}</div>
                     </div>
-                    {examType === opt.type && <Check size={16} color="var(--color-my-contrast)" />}
+                    {examType === opt.type && <Check size={16} color="var(--color-neutral-contrast)" />}
                   </div>
                 ))}
               </div>
@@ -315,7 +315,7 @@ export default function PDFPage() {
               onClick={() => setStep('words')}
               style={{
                 width: '100%', height: '52px',
-                background: 'var(--color-my)', color: 'var(--color-my-contrast)',
+                background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)',
                 border: 'none', borderRadius: '14px',
                 fontSize: '15px', fontWeight: 700, cursor: 'pointer',
               }}
@@ -346,17 +346,17 @@ export default function PDFPage() {
                   onClick={() => toggleWord(word.id)}
                   style={{
                     background: 'var(--color-surface)', borderRadius: '12px', padding: '12px 14px',
-                    border: `1.5px solid ${word.selected ? 'var(--color-my)' : 'var(--color-border)'}`,
+                    border: `1.5px solid ${word.selected ? 'var(--color-neutral)' : 'var(--color-border)'}`,
                     display: 'flex', alignItems: 'center', gap: '12px',
                     cursor: 'pointer',
                   }}
                 >
                   <div style={{
                     width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0,
-                    background: word.selected ? 'var(--color-my)' : 'var(--color-surface-2)',
+                    background: word.selected ? 'var(--color-neutral)' : 'var(--color-surface-2)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
-                    {word.selected && <Check size={12} color="var(--color-my-contrast)" />}
+                    {word.selected && <Check size={12} color="var(--color-neutral-contrast)" />}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{word.word}</div>
@@ -375,8 +375,8 @@ export default function PDFPage() {
                 disabled={selectedCount === 0}
                 style={{
                   width: '100%', height: '52px',
-                  background: selectedCount > 0 ? 'var(--color-my)' : 'var(--color-surface-2)',
-                  color: selectedCount > 0 ? 'var(--color-my-contrast)' : 'var(--color-text-tertiary)',
+                  background: selectedCount > 0 ? 'var(--color-neutral)' : 'var(--color-surface-2)',
+                  color: selectedCount > 0 ? 'var(--color-neutral-contrast)' : 'var(--color-text-tertiary)',
                   border: 'none', borderRadius: '14px',
                   fontSize: '15px', fontWeight: 700,
                   cursor: selectedCount > 0 ? 'pointer' : 'not-allowed',
@@ -431,7 +431,7 @@ export default function PDFPage() {
               disabled={generating}
               style={{
                 width: '100%', height: '52px',
-                background: 'var(--color-my)', color: 'var(--color-my-contrast)',
+                background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)',
                 border: 'none', borderRadius: '14px',
                 fontSize: '15px', fontWeight: 700, cursor: 'pointer',
                 opacity: generating ? 0.6 : 1,
@@ -469,7 +469,7 @@ export default function PDFPage() {
                   a.download = `${selectedFolder?.name || '단어장'}_시험지.pdf`
                   a.click()
                 }}
-                style={{ width: '100%', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                style={{ width: '100%', height: '52px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
               >
                 <Download size={18} /> 저장하기
               </button>
@@ -545,8 +545,8 @@ export default function PDFPage() {
                 style={{
                   width: '100%',
                   height: '52px',
-                  background: 'var(--color-my)',
-                  color: 'var(--color-my-contrast)',
+                  background: 'var(--color-neutral)',
+                  color: 'var(--color-neutral-contrast)',
                   border: 'none',
                   borderRadius: '14px',
                   fontSize: '15px',

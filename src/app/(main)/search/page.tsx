@@ -353,26 +353,24 @@ function SearchPageContent() {
                       {isMyFolder(folder) ? (
                         <span style={{
                           padding: '7px 14px', borderRadius: '20px', flexShrink: 0,
-                          background: 'var(--color-my-light)',
-                          color: 'var(--color-my)',
+                          background: 'var(--color-neutral-soft)',
+                          color: 'var(--color-neutral)',
                           fontSize: '12px', fontWeight: 700,
                         }}>
                           내 단어장
                         </span>
                       ) : (
                         <button
+                          className={`btn-import${isImported ? ' is-imported' : ''}`}
                           onClick={e => {
                             e.stopPropagation()
                             if (!isImported) handleImport(folder)
                           }}
                           disabled={isImported || importing === folder.id}
                           style={{
-                            padding: '7px 14px', borderRadius: '20px', flexShrink: 0,
-                            background: isImported ? 'var(--color-surface-2)' : 'var(--color-my)',
-                            color: isImported ? 'var(--color-text-secondary)' : 'var(--color-my-contrast)',
-                            border: 'none',
-                            cursor: isImported ? 'default' : 'pointer',
-                            fontSize: '12px', fontWeight: 600,
+                            padding: '7px 14px',
+                            flexShrink: 0,
+                            fontSize: '12px',
                             opacity: importing === folder.id ? 0.6 : 1,
                           }}
                         >

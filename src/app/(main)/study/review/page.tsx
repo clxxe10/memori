@@ -218,7 +218,7 @@ function ReviewContent() {
       <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎉</div>
       <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>복습할 단어가 없어요!</p>
       <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px' }}>모든 단어를 완벽하게 학습했어요</p>
-      <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
+      <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
     </main>
   )
 
@@ -239,7 +239,7 @@ function ReviewContent() {
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', maxWidth: '320px' }}>
         <button onClick={() => { setCurrent(0); setFinished(false); setStats({ know: 0, dontKnow: 0 }); setWords(prev => [...prev].sort(() => Math.random() - 0.5)) }}
-          style={{ width: '100%', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          style={{ width: '100%', height: '52px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
           <RotateCcw size={18} /> 다시 복습하기
         </button>
         <button onClick={() => router.push('/home')} style={{ width: '100%', height: '52px', background: 'var(--color-surface-2)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
@@ -268,7 +268,7 @@ function ReviewContent() {
         </div>
 
         <div style={{ height: '4px', background: 'var(--color-track)', borderRadius: '4px', marginBottom: '14px', flexShrink: 0 }}>
-          <div style={{ height: '4px', background: 'var(--color-my)', borderRadius: '4px', width: `${progress}%`, transition: 'width 0.3s ease' }} />
+          <div style={{ height: '4px', background: 'var(--color-neutral)', borderRadius: '4px', width: `${progress}%`, transition: 'width 0.3s ease' }} />
         </div>
 
         {mode === 'flashcard' && (
@@ -365,8 +365,8 @@ function ReviewContent() {
                 disabled={!inputValue.trim()}
                 style={{
                   width: '100%', height: '52px',
-                  background: inputValue.trim() ? 'var(--color-my)' : 'var(--color-surface-2)',
-                  color: inputValue.trim() ? 'var(--color-my-contrast)' : 'var(--color-text-tertiary)',
+                  background: inputValue.trim() ? 'var(--color-neutral)' : 'var(--color-surface-2)',
+                  color: inputValue.trim() ? 'var(--color-neutral-contrast)' : 'var(--color-text-tertiary)',
                   border: 'none', borderRadius: '14px',
                   fontSize: '15px', fontWeight: 700,
                   cursor: inputValue.trim() ? 'pointer' : 'not-allowed',
@@ -395,7 +395,7 @@ function ReviewContent() {
                 }}
                 style={{
                   width: '100%', height: '52px',
-                  background: 'var(--color-my)', color: 'var(--color-my-contrast)',
+                  background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)',
                   border: 'none', borderRadius: '14px',
                   fontSize: '15px', fontWeight: 700,
                   opacity: isAnswered ? 1 : 0.4,

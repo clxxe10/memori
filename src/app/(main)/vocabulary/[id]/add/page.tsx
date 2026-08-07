@@ -171,9 +171,9 @@ export default function AddWordPage() {
             style={{
               width: '100%',
               height: '52px',
-              background: word.trim() ? 'var(--color-my-light)' : 'var(--color-surface-2)',
+              background: word.trim() ? 'var(--color-neutral-soft)' : 'var(--color-surface-2)',
               border: '1.5px solid',
-              borderColor: word.trim() ? 'var(--color-my)' : 'var(--color-border)',
+              borderColor: word.trim() ? 'var(--color-neutral)' : 'var(--color-border)',
               borderRadius: '14px',
               cursor: word.trim() ? 'pointer' : 'not-allowed',
               display: 'flex',
@@ -182,7 +182,7 @@ export default function AddWordPage() {
               gap: '8px',
               fontSize: '14px',
               fontWeight: 600,
-              color: word.trim() ? 'var(--color-my)' : '#AEAEB2',
+              color: word.trim() ? 'var(--color-neutral)' : '#AEAEB2',
             }}
           >
             <Sparkles size={16} />
@@ -241,8 +241,8 @@ export default function AddWordPage() {
             style={{
               width: '100%',
               height: '52px',
-              background: word.trim() && meaning.trim() ? 'var(--color-my)' : 'var(--color-surface-2)',
-              color: word.trim() && meaning.trim() ? 'var(--color-my-contrast)' : 'var(--color-text-tertiary)',
+              background: word.trim() && meaning.trim() ? 'var(--color-neutral)' : 'var(--color-surface-2)',
+              color: word.trim() && meaning.trim() ? 'var(--color-neutral-contrast)' : 'var(--color-text-tertiary)',
               border: 'none',
               borderRadius: '14px',
               fontSize: '15px',

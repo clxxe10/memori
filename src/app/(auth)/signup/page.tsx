@@ -88,7 +88,7 @@ export default function SignupPage() {
         </p>
         <button
           onClick={() => router.push('/login')}
-          style={{ width: '100%', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}
+          style={{ width: '100%', height: '52px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}
         >
           로그인 하러 가기
         </button>
@@ -161,7 +161,7 @@ export default function SignupPage() {
           disabled={loading}
           style={{
             width: '100%', height: '52px',
-            background: 'var(--color-my)', color: 'var(--color-my-contrast)',
+            background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)',
             border: 'none', borderRadius: '14px',
             fontSize: '15px', fontWeight: 700, cursor: 'pointer',
             opacity: loading ? 0.6 : 1, marginBottom: '14px',

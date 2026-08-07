@@ -215,7 +215,7 @@ function BlinkContent() {
       </div>
       {isMemorySet && (
         <button onClick={() => router.push(`/study/quiz?folder=${memorySetFolder}&memoryset=true`)}
-          style={{ position: 'fixed', bottom: 'max(40px, calc(env(safe-area-inset-bottom) + 20px))', left: '24px', right: '24px', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', zIndex: 100 }}>
+          style={{ position: 'fixed', bottom: 'max(40px, calc(env(safe-area-inset-bottom) + 20px))', left: '24px', right: '24px', height: '52px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', zIndex: 100 }}>
           다음 단계: 퀴즈 →
         </button>
       )}

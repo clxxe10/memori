@@ -212,14 +212,9 @@ export default function HomePage() {
             </h1>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '4px',
-              background: 'var(--color-my)', borderRadius: '20px', padding: '5px 10px',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <span style={{ fontSize: '12px' }}>🔥</span>
-                <span style={{ fontSize: '11px', color: 'var(--color-my-contrast)', fontWeight: 700 }}>{animatedStreakDays}일</span>
-              </div>
+            <div className="streak-badge">
+              <span>🔥</span>
+              <span>{animatedStreakDays}일</span>
             </div>
             <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#E8EAF0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
               {user?.user_metadata?.avatar_url ? (
@@ -250,16 +245,15 @@ export default function HomePage() {
               </div>
             </div>
             <button
-              className="tap-feedback"
+              className="tap-feedback btn-review-start"
               onClick={() => router.push('/study/review')}
-              style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '20px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', transition: 'transform 0.15s' }}
             >
               <Play size={12} fill="currentColor" />
               복습 시작
             </button>
           </div>
           <div style={{ height: '5px', background: 'var(--color-track)', borderRadius: '5px', marginBottom: '6px' }}>
-            <div style={{ height: '5px', background: 'var(--color-my)', borderRadius: '5px', width: `${Math.min(animatedProgress, 100)}%` }} />
+            <div className="progress-fill" style={{ height: '5px', borderRadius: '5px', width: `${Math.min(animatedProgress, 100)}%` }} />
           </div>
           <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: 0 }}>
             전체 {animatedTotalWords}개 중 {animatedMasteredWords}개 마스터 · {animatedProgress}%
@@ -284,11 +278,10 @@ export default function HomePage() {
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '14px', whiteSpace: 'pre-line' }}>
               사진 한 장으로 단어를 추출하거나{'\n'}직접 입력해서 시작해보세요
             </p>
-            <div style={{
+            <div className="btn-add-word-empty" style={{
               display: 'inline-flex', alignItems: 'center', gap: '6px',
-              background: 'var(--color-my)', color: 'var(--color-my-contrast)',
-              padding: '10px 20px', borderRadius: '20px',
-              fontSize: '14px', fontWeight: 600,
+              padding: '10px 20px',
+              fontSize: '14px',
             }}>
               단어장 만들기 →
             </div>
@@ -302,7 +295,7 @@ export default function HomePage() {
             { icon: Clock, label: 'Today', value: formatStudyTime(animatedTotalStudyTime) },
           ].map((item) => (
             <div key={item.label} style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '14px', border: '1px solid var(--color-border)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-              <div style={{ width: '22px', height: '3px', background: 'var(--color-my)', borderRadius: '3px', marginBottom: '8px' }} />
+              <div style={{ width: '22px', height: '3px', background: 'var(--color-neutral)', borderRadius: '3px', marginBottom: '8px' }} />
               <p style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.3px', marginBottom: '3px', margin: 0 }}>
                 {item.value}
               </p>
@@ -385,11 +378,11 @@ export default function HomePage() {
           }
 
           const levelColors = [
-            'var(--color-surface-2)',
-            'rgba(128,128,128,0.25)',
-            'rgba(128,128,128,0.50)',
-            'rgba(128,128,128,0.75)',
-            'var(--color-text-primary)',
+            'rgba(120,120,128,0.12)',
+            'rgba(var(--color-my-rgb), 0.25)',
+            'rgba(var(--color-my-rgb), 0.5)',
+            'rgba(var(--color-my-rgb), 0.75)',
+            'rgba(var(--color-my-rgb), 1)',
           ]
           const levelTextColors = [
             'var(--color-text-tertiary)',
@@ -437,17 +430,21 @@ export default function HomePage() {
                   const isToday = dateStr === todayStr
                   const isFuture = dateStr > todayStr
                   return (
-                    <div key={day} style={{
-                      aspectRatio: '1',
-                      borderRadius: '5px',
-                      background: isFuture ? 'transparent' : levelColors[level],
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '9px', fontWeight: 500,
-                      color: isFuture ? 'var(--color-text-tertiary)' : levelTextColors[level],
-                      outline: isToday ? '2px solid var(--color-my)' : 'none',
-                      outlineOffset: '1px',
-                      opacity: isFuture ? 0.3 : 1,
-                    }}>
+                    <div
+                      key={day}
+                      className={isFuture ? undefined : `calendar-heat-${level}`}
+                      style={{
+                        aspectRatio: '1',
+                        borderRadius: '5px',
+                        background: isFuture ? 'transparent' : levelColors[level],
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '9px', fontWeight: 500,
+                        color: isFuture ? 'var(--color-text-tertiary)' : levelTextColors[level],
+                        outline: isToday ? '2px solid var(--color-my)' : 'none',
+                        outlineOffset: '1px',
+                        opacity: isFuture ? 0.3 : 1,
+                      }}
+                    >
                       {day}
                     </div>
                   )
@@ -457,7 +454,11 @@ export default function HomePage() {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', marginBottom: '10px' }}>
                 <span style={{ fontSize: '9px', color: 'var(--color-text-tertiary)' }}>적음</span>
                 {levelColors.map((c, i) => (
-                  <div key={i} style={{ width: '12px', height: '12px', borderRadius: '3px', background: c, border: '1px solid var(--color-border)' }} />
+                  <div
+                    key={i}
+                    className={`calendar-heat-${i}`}
+                    style={{ width: '12px', height: '12px', borderRadius: '3px', background: c, border: '1px solid var(--color-border)' }}
+                  />
                 ))}
                 <span style={{ fontSize: '9px', color: 'var(--color-text-tertiary)' }}>많음</span>
               </div>
@@ -536,7 +537,7 @@ export default function HomePage() {
 
         {/* 오늘의 단어 */}
         {todayWord && (
-          <div style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px', borderTop: '1px solid var(--color-border)', borderRight: '1px solid var(--color-border)', borderBottom: '1px solid var(--color-border)', borderLeft: '3px solid var(--color-my)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+          <div style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px', borderTop: '1px solid var(--color-border)', borderRight: '1px solid var(--color-border)', borderBottom: '1px solid var(--color-border)', borderLeft: '3px solid var(--color-neutral)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
             <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '6px', margin: '0 0 6px' }}>오늘의 단어</p>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '3px' }}>
               <span style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)' }}>{todayWord.word}</span>

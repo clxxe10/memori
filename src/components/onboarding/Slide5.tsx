@@ -70,7 +70,7 @@ export default function Slide5({ onFinish }: { onFinish: () => void }) {
         {/* 체크 배지 */}
         <div className="s5-badge-anim" style={{
           width: '80px', height: '80px', borderRadius: '50%',
-          background: 'var(--color-my)',
+          background: 'var(--color-neutral)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           boxShadow: 'inset 0 1.5px 0 rgba(255,255,255,0.4), 0 12px 28px rgba(0,0,0,0.2)',
           marginBottom: '24px',
@@ -104,7 +104,7 @@ export default function Slide5({ onFinish }: { onFinish: () => void }) {
               background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
               borderRadius: '9999px', padding: '8px 14px',
             }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-my)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
               <span style={{ fontSize: '13px', fontWeight: 600, color: titleColor }}>{step}</span>
             </div>
           ))}

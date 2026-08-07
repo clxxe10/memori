@@ -370,7 +370,7 @@ function SpeedContent() {
       setFlashWord(matched.id)
       setTimeout(() => setFlashWord(null), 400)
 
-      const colors = ['#FFB800', 'var(--color-correct)', 'var(--color-my)', '#EC4899', '#0EA5E9']
+      const colors = ['#FFB800', 'var(--color-correct)', 'var(--color-neutral)', '#EC4899', '#0EA5E9']
       const newParticles = Array.from({ length: 6 }, (_, i) => ({
         id: `p_${Date.now()}_${i}`,
         x: matched.x,
@@ -459,7 +459,7 @@ function SpeedContent() {
       <div style={{ fontSize: '48px', marginBottom: '16px' }}>📚</div>
       <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>단어가 없어요</p>
       <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px' }}>단어장에 단어를 먼저 추가해주세요</p>
-      <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
+      <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
     </main>
   )
 
@@ -473,9 +473,9 @@ function SpeedContent() {
     }}>
       <div key={countdown} className="count-down" style={{
         fontSize: '120px', fontWeight: 900,
-        color: 'var(--color-my)',
+        color: 'var(--color-neutral)',
         lineHeight: 1,
-        textShadow: '0 0 40px var(--color-my-light)',
+        textShadow: '0 0 40px var(--color-neutral-soft)',
       }}>
         {countdown}
       </div>
@@ -498,13 +498,13 @@ function SpeedContent() {
             <div key={m.key} onClick={() => setMode(m.key)}
               style={{
                 flex: 1, padding: '12px', borderRadius: '14px', cursor: 'pointer',
-                border: `1.5px solid ${mode === m.key ? 'var(--color-my)' : 'var(--color-border)'}`,
-                background: mode === m.key ? 'var(--color-my)' : 'var(--color-surface)',
+                border: `1.5px solid ${mode === m.key ? 'var(--color-neutral)' : 'var(--color-border)'}`,
+                background: mode === m.key ? 'var(--color-neutral)' : 'var(--color-surface)',
                 textAlign: 'center',
               }}
             >
-              <div style={{ fontSize: '13px', fontWeight: 700, color: mode === m.key ? 'var(--color-my-contrast)' : 'var(--color-text-primary)', marginBottom: '4px' }}>{m.label}</div>
-              <div style={{ fontSize: '10px', color: mode === m.key ? 'var(--color-my-contrast)' : 'var(--color-text-secondary)', opacity: 0.8 }}>{m.desc}</div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: mode === m.key ? 'var(--color-neutral-contrast)' : 'var(--color-text-primary)', marginBottom: '4px' }}>{m.label}</div>
+              <div style={{ fontSize: '10px', color: mode === m.key ? 'var(--color-neutral-contrast)' : 'var(--color-text-secondary)', opacity: 0.8 }}>{m.desc}</div>
             </div>
           ))}
         </div>
@@ -521,7 +521,7 @@ function SpeedContent() {
           ))}
         </div>
         <button onClick={startGame}
-          style={{ width: '100%', height: '54px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '16px', fontSize: '17px', fontWeight: 800, cursor: 'pointer', letterSpacing: '-0.3px' }}>
+          style={{ width: '100%', height: '54px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '16px', fontSize: '17px', fontWeight: 800, cursor: 'pointer', letterSpacing: '-0.3px' }}>
           게임 시작 →
         </button>
         <button onClick={() => router.back()}
@@ -542,7 +542,7 @@ function SpeedContent() {
           {lives > 0 ? '완주!' : '게임 종료'}
         </h1>
         <div style={{ background: 'var(--color-surface)', borderRadius: '20px', padding: '20px', border: '1px solid var(--color-border)', marginBottom: '16px' }}>
-          <div style={{ fontSize: '42px', fontWeight: 900, color: 'var(--color-my)', letterSpacing: '-1px', marginBottom: '4px' }}>{score.toLocaleString()}</div>
+          <div style={{ fontSize: '42px', fontWeight: 900, color: 'var(--color-neutral)', letterSpacing: '-1px', marginBottom: '4px' }}>{score.toLocaleString()}</div>
           <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', fontWeight: 600, letterSpacing: '1px' }}>TOTAL SCORE</div>
         </div>
         {score >= bestScore && score > 0 && (
@@ -570,7 +570,7 @@ function SpeedContent() {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <button onClick={handleRestart}
-            style={{ width: '100%', height: '52px', background: 'var(--color-my)', color: 'var(--color-my-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 800, cursor: 'pointer' }}>
+            style={{ width: '100%', height: '52px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 800, cursor: 'pointer' }}>
             🔄 다시 하기
           </button>
           <button onClick={() => router.push('/home')}
@@ -655,7 +655,7 @@ function SpeedContent() {
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '10px', color: 'var(--color-text-tertiary)', fontWeight: 700, letterSpacing: '0.5px' }}>STAGE</div>
-            <div style={{ fontSize: '20px', fontWeight: 900, color: 'var(--color-my)', lineHeight: 1 }}>{stage}</div>
+            <div style={{ fontSize: '20px', fontWeight: 900, color: 'var(--color-neutral)', lineHeight: 1 }}>{stage}</div>
           </div>
         </div>
         <div style={{ display: 'flex', gap: '4px' }}>
@@ -774,7 +774,7 @@ function SpeedContent() {
         <div style={{ height: '3px', background: 'var(--color-surface-2)', borderRadius: '3px', marginBottom: '8px', overflow: 'hidden' }}>
           <div style={{
             height: '100%', borderRadius: '3px',
-            background: 'var(--color-my)',
+            background: 'var(--color-neutral)',
             width: `${(correct / Math.max(words.length, 1)) * 100}%`,
             transition: 'width 0.3s ease',
           }} />

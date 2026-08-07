@@ -128,7 +128,7 @@ export default function EditWordPage() {
               disabled={saving}
               style={{
                 width: '100%', height: '52px', marginTop: '8px',
-                backgroundColor: 'var(--color-my)', color: 'var(--color-my-contrast)',
+                backgroundColor: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)',
                 border: 'none', borderRadius: '14px',
                 fontSize: '15px', fontWeight: 600,
                 cursor: 'pointer', opacity: saving ? 0.6 : 1,
