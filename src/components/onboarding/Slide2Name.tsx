@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 interface Props {
   onNext: () => void
@@ -132,7 +133,18 @@ export default function Slide2Name({ onNext, onBack, name, setName }: Props) {
           />
 
           <button
-            onClick={() => { if (name.trim()) onNext() }}
+            onClick={async () => {
+              if (!name.trim()) return
+              try {
+                const supabase = createClient()
+                await supabase.auth.updateUser({
+                  data: { full_name: name.trim(), nickname: name.trim() }
+                })
+              } catch (e) {
+                console.error('닉네임 저장 실패:', e)
+              }
+              onNext()
+            }}
             style={{
               width: '100%', padding: '17px',
               background: name.trim() ? ctaBg : (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'),
