@@ -236,13 +236,13 @@ export default function ProfilePage() {
           border: '0.5px solid var(--color-border)',
           position: 'relative', overflow: 'hidden',
         }}>
-          <div style={{
+          <div className="memori-plus-icon-box" style={{
             width: '42px', height: '42px', borderRadius: '12px',
             background: 'linear-gradient(135deg, #1C1C1E 0%, #3A3A3C 100%)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0,
           }}>
-            <span style={{ fontSize: '20px' }}>✦</span>
+            <span style={{ fontSize: '20px', color: '#FFFFFF', lineHeight: 1 }}>✦</span>
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '2px' }}>

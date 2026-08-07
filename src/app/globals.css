@@ -427,6 +427,16 @@ textarea {
   background: var(--color-neutral) !important;
 }
 
+.memori-plus-icon-box {
+  color: #FFFFFF;
+}
+
+.memori-plus-icon-box svg,
+.memori-plus-icon-box span {
+  color: #FFFFFF;
+  fill: #FFFFFF;
+}
+
 .detail-bottom-bar {
   position: fixed;
   left: 50%;
