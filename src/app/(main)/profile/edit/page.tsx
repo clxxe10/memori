@@ -85,7 +85,6 @@ export default function ProfileEditPage() {
       }
 
       setAvatarUrl(publicUrl)
-      console.log('프로필 사진 업로드 완료:', publicUrl)
     } catch (e) {
       console.error('프로필 사진 오류:', e)
       alert('오류가 발생했어요')

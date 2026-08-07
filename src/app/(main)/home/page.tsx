@@ -366,8 +366,6 @@ export default function HomePage() {
           const monthTotalWords = Object.values(monthlyData).reduce((a, b) => a + b, 0)
           const attendanceRate = daysInMonth > 0 ? Math.round((monthStudyDays / Math.min(today.getDate(), daysInMonth)) * 100) : 0
 
-          const maxWords = Math.max(...Object.values(monthlyData), 1)
-
           const getLevel = (dateStr: string) => {
             const w = monthlyData[dateStr] || 0
             if (w === 0) return 0

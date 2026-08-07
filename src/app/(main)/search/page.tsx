@@ -46,10 +46,9 @@
 
 import { Suspense, useCallback, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Search, Star } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { usePagePadding } from '@/lib/responsive'
-import { useBreakpoint } from '@/hooks/useBreakpoint'
 import SelectDropdown from '@/components/ui/SelectDropdown'
 import EmptyState from '@/components/ui/EmptyState'
 import { FolderSkeleton } from '@/components/ui/Skeleton'
@@ -81,7 +80,6 @@ function SearchPageContent() {
   const [importedIds, setImportedIds] = useState<Set<string>>(new Set())
   const [myUserId, setMyUserId] = useState<string | null>(null)
   const pagePadding = usePagePadding()
-  const bp = useBreakpoint()
 
   const fetchPublicFolders = useCallback(async () => {
     const supabase = createClient()

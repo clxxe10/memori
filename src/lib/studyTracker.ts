@@ -63,7 +63,6 @@ export async function recordStudyProgress(wordsStudied: number) {
     let newStreak = 1
     if (stats) {
       const last = stats.last_study_date
-      console.log('last_study_date:', last, 'today:', today, 'yesterday:', yesterdayStr)
 
       if (last === today) {
         newStreak = stats.streak_days || 1
@@ -82,7 +81,6 @@ export async function recordStudyProgress(wordsStudied: number) {
         })
         .eq('user_id', user.id)
       if (error) console.error('stats update 오류:', error)
-      else console.log('스트릭 업데이트:', newStreak, '일')
     } else {
       const { error } = await supabase
         .from('user_learning_stats')
@@ -94,9 +92,7 @@ export async function recordStudyProgress(wordsStudied: number) {
           total_study_time: 0,
         })
       if (error) console.error('stats insert 오류:', error)
-      else console.log('첫 학습 기록 완료')
     }
-    console.log('단어 기록 완료:', wordsStudied, '개')
   } catch (e) {
     console.error('recordStudyProgress 오류:', e)
   }

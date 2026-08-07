@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronRight, Check, User } from 'lucide-react'
+import { ChevronRight, Check } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { applyMyColor } from '@/lib/colorUtils'
-import { isPremium } from '@/lib/premium'
 import { usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import AlertModal from '@/components/AlertModal'
@@ -30,7 +29,6 @@ export default function ProfilePage() {
   const [showNotifSheet, setShowNotifSheet] = useState(false)
   const [showDeleteSheet, setShowDeleteSheet] = useState(false)
   const [showLogoutSheet, setShowLogoutSheet] = useState(false)
-  const [isPremiumUser, setIsPremiumUser] = useState(false)
   const [dailyGoal, setDailyGoal] = useState(10)
   const [notificationTime, setNotificationTime] = useState('09:00')
   const [notificationEnabled, setNotificationEnabled] = useState(false)
@@ -93,8 +91,6 @@ export default function ProfilePage() {
       if (savedGoal) setDailyGoal(Number(savedGoal))
       if (savedNotif !== null) setNotificationEnabled(savedNotif === 'true')
       if (savedNotifTime) setNotificationTime(savedNotifTime)
-
-      setIsPremiumUser(await isPremium())
     }
     fetchData()
   }, [])
@@ -309,7 +305,7 @@ export default function ProfilePage() {
             <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>문의하기</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
-          <div style={menuRowStyle()} onClick={() => {}}>
+          <div style={menuRowStyle()} onClick={() => window.open('https://apps.apple.com/app/memori/id6785504180', '_blank')}>
             <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>앱 평가하기</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>

@@ -200,7 +200,10 @@ export default function PremiumPage() {
           >
             나중에 할게요
           </button>
-          <p style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', textAlign: 'center', cursor: 'pointer' }}>
+          <p
+            onClick={() => alert('준비 중이에요')}
+            style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', textAlign: 'center', cursor: 'pointer' }}
+          >
             구매 복원
           </p>
         </div>

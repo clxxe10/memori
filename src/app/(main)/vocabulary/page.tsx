@@ -21,9 +21,7 @@ import { useRouter } from 'next/navigation'
 import { ChevronRight, Plus, Search, X } from 'lucide-react'
 
 import { createClient } from '@/lib/supabase/client'
-import { detectLanguage } from '@/lib/detectLanguage'
 import { usePagePadding } from '@/lib/responsive'
-import { useBreakpoint } from '@/hooks/useBreakpoint'
 import SelectDropdown from '@/components/ui/SelectDropdown'
 import EmptyState from '@/components/ui/EmptyState'
 import { showToast } from '@/components/ui/Toast'
@@ -49,7 +47,6 @@ export default function VocabularyPage() {
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const pagePadding = usePagePadding()
-  const bp = useBreakpoint()
   const [creating, setCreating] = useState(false)
   const [newFolder, setNewFolder] = useState({
     name: '',

@@ -12,7 +12,7 @@ interface Props {
   setName: (v: string) => void
 }
 
-export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name, setName }: Props) {
+export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name }: Props) {
   const [mode, setMode] = useState<'select' | 'signup' | 'login'>('select')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -126,7 +126,6 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name,
   const inputBg = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.5)'
   const inputShadow = isDark ? 'inset 0 1px 2px rgba(0,0,0,0.3)' : 'inset 0 1px 2px rgba(0,0,0,0.04)'
   const inputBorder = isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.7)'
-  const inputPlaceholder = isDark ? 'rgba(235,235,245,0.3)' : 'rgba(60,60,67,0.4)'
 
   // CTA 버튼
   const ctaBg = isDark
