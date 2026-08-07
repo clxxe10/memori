@@ -82,7 +82,7 @@ export default function CameraPage() {
   }, [])
 
   const compressImage = (file: File, maxWidth = 1024): Promise<string> => {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const canvas = document.createElement('canvas')
       const ctx = canvas.getContext('2d')!
       const img = document.createElement('img')
@@ -98,6 +98,7 @@ export default function CameraPage() {
         const compressed = canvas.toDataURL('image/jpeg', 0.8)
         resolve(compressed.split(',')[1])
       }
+      img.onerror = () => reject(new Error('이미지 로드 실패'))
       img.src = URL.createObjectURL(file)
     })
   }
@@ -113,7 +114,6 @@ export default function CameraPage() {
   const handleAnalyzeClick = async () => {
     const { canUse, needAd } = await canUsePhotoExtract()
     if (canUse) {
-      incrementExtractCount()
       handleAnalyze()
     } else if (needAd) {
       setShowPhotoGate(true)
@@ -162,8 +162,8 @@ export default function CameraPage() {
       const {
         data: { user },
       } = await supabase.auth.getUser()
-      if (!user) return
-      await supabase.from('words').insert(
+      if (!user) { setIsSaving(false); return }
+      const { error } = await supabase.from('words').insert(
         selected.map((w) => ({
           user_id: user.id,
           folder_id: folderId,
@@ -174,6 +174,8 @@ export default function CameraPage() {
           example: w.example || null,
         }))
       )
+      if (error) { alert('단어 저장에 실패했어요.'); setIsSaving(false); return }
+      incrementExtractCount()
       if (selected.length > 0) {
         const detectedLang = detectLanguage(selected[0].word)
         await supabase

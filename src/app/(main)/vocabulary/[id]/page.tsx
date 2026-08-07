@@ -159,13 +159,15 @@ export default function VocabularyDetailPage() {
 
   const toggleBookmark = async (word: Word) => {
     const supabase = createClient()
-    await supabase.from('words').update({ is_bookmarked: !word.is_bookmarked }).eq('id', word.id)
+    const { error } = await supabase.from('words').update({ is_bookmarked: !word.is_bookmarked }).eq('id', word.id)
+    if (error) { alert('업데이트에 실패했어요.'); return }
     setWords(prev => prev.map(w => w.id === word.id ? { ...w, is_bookmarked: !w.is_bookmarked } : w))
   }
 
   const handleDeleteWord = async (wordId: string) => {
     const supabase = createClient()
-    await supabase.from('words').delete().eq('id', wordId)
+    const { error } = await supabase.from('words').delete().eq('id', wordId)
+    if (error) { alert('삭제에 실패했어요.'); return }
     setWords(prev => prev.filter(w => w.id !== wordId))
     showToast('삭제되었습니다', 'success')
   }
