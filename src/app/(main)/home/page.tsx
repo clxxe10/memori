@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Play, BookOpen, Clock, ChevronRight } from 'lucide-react'
@@ -24,8 +24,6 @@ export default function HomePage() {
   const [monthlyData, setMonthlyData] = useState<Record<string, number>>({})
   const [todayWord, setTodayWord] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [streakAnimating, setStreakAnimating] = useState(false)
-  const prevStreakRef = useRef<number | null>(null)
   const pagePadding = usePagePadding()
   const bp = useBreakpoint()
 
@@ -34,38 +32,6 @@ export default function HomePage() {
   const animatedMasteredWords = useCountUp(masteredWords)
   const animatedStreakDays = useCountUp(streakDays)
   const animatedTotalStudyTime = useCountUp(totalStudyTime)
-
-  useEffect(() => {
-    const style = document.createElement('style')
-    style.textContent = `
-      @keyframes streakBounce {
-        0% { transform: scale(1); }
-        30% { transform: scale(1.3) rotate(-8deg); }
-        50% { transform: scale(1.15) rotate(5deg); }
-        70% { transform: scale(1.2) rotate(-3deg); }
-        100% { transform: scale(1) rotate(0deg); }
-      }
-      @keyframes streakGlow {
-        0%, 100% { filter: drop-shadow(0 0 0 rgba(255,149,0,0)); }
-        50% { filter: drop-shadow(0 0 12px rgba(255,149,0,0.6)); }
-      }
-      .streak-bounce {
-        animation: streakBounce 0.6s cubic-bezier(0.34,1.56,0.64,1), streakGlow 0.6s ease-out;
-      }
-    `
-    document.head.appendChild(style)
-    return () => { document.head.removeChild(style) }
-  }, [])
-
-  useEffect(() => {
-    if (prevStreakRef.current !== null && streakDays > prevStreakRef.current) {
-      setStreakAnimating(true)
-      const timer = setTimeout(() => setStreakAnimating(false), 600)
-      prevStreakRef.current = streakDays
-      return () => clearTimeout(timer)
-    }
-    prevStreakRef.current = streakDays
-  }, [streakDays])
 
   const fetchData = useCallback(async () => {
     try {
@@ -250,7 +216,7 @@ export default function HomePage() {
               display: 'flex', alignItems: 'center', gap: '4px',
               background: 'var(--color-my)', borderRadius: '20px', padding: '5px 10px',
             }}>
-              <div className={streakAnimating ? 'streak-bounce' : ''} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <span style={{ fontSize: '12px' }}>🔥</span>
                 <span style={{ fontSize: '11px', color: 'var(--color-my-contrast)', fontWeight: 700 }}>{animatedStreakDays}일</span>
               </div>
