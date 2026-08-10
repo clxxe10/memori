@@ -18,8 +18,10 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Camera, User } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import { useTranslation } from '@/lib/i18n'
 
 export default function ProfileEditPage() {
+  const { t } = useTranslation()
   const router = useRouter()
   const padding = usePagePadding()
   const fileRef = useRef<HTMLInputElement>(null)
@@ -144,7 +146,7 @@ export default function ProfileEditPage() {
             <ArrowLeft size={22} color="var(--color-text-primary)" />
           </button>
           <h1 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
-            프로필 편집
+            {t.profile.editProfile}
           </h1>
         </div>
 
@@ -230,7 +232,7 @@ export default function ProfileEditPage() {
               opacity: saving ? 0.6 : 1,
             }}
           >
-            {saving ? '저장 중...' : '저장하기'}
+            {saving ? '저장 중...' : t.common.save}
           </button>
 
         </div>

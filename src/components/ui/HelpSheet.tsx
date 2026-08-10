@@ -1,5 +1,6 @@
 'use client'
 import { X } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n'
 
 type Props = { mode: string; onClose: () => void }
 
@@ -47,6 +48,7 @@ const HELP_CONTENT: Record<string, { title: string; steps: string[]; tips: strin
 }
 
 export default function HelpSheet({ mode, onClose }: Props) {
+  const { lang } = useTranslation()
   const content = HELP_CONTENT[mode]
   if (!content) return null
 
@@ -79,7 +81,7 @@ export default function HelpSheet({ mode, onClose }: Props) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
           <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
-            {content.title} 사용법
+            {content.title} {lang === 'en' ? 'Guide' : '사용법'}
           </h3>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>
             <X size={20} color="var(--color-text-secondary)" />
@@ -87,7 +89,7 @@ export default function HelpSheet({ mode, onClose }: Props) {
         </div>
 
         <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '10px', letterSpacing: '0.3px' }}>
-          사용 방법
+          {lang === 'en' ? 'How to Use' : '사용 방법'}
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
           {content.steps.map((step, i) => (
@@ -109,7 +111,7 @@ export default function HelpSheet({ mode, onClose }: Props) {
           border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid var(--color-border)',
         }}>
           <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '10px', letterSpacing: '0.3px' }}>
-            💡 꿀팁
+            {lang === 'en' ? '💡 Tips' : '💡 꿀팁'}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             {content.tips.map((tip, i) => (

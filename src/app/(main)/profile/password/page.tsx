@@ -6,8 +6,10 @@ import { ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/ui/Toast'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import { useTranslation } from '@/lib/i18n'
 
 export default function ProfilePasswordPage() {
+  const { t } = useTranslation()
   const router = useRouter()
   const padding = usePagePadding()
   const [currentPassword, setCurrentPassword] = useState('')
@@ -105,7 +107,7 @@ export default function ProfilePasswordPage() {
             <ArrowLeft size={22} color="var(--color-text-primary)" />
           </button>
           <h1 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
-            비밀번호 변경
+            {t.profile.changePassword}
           </h1>
         </div>
 

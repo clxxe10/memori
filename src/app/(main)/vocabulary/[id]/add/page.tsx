@@ -9,8 +9,10 @@ import { detectLanguage } from '@/lib/detectLanguage'
 import { showToast } from '@/components/ui/Toast'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useKeyboard } from '@/hooks/useKeyboard'
+import { useTranslation } from '@/lib/i18n'
 
 export default function AddWordPage() {
+  const { t } = useTranslation()
   const router = useRouter()
   const params = useParams()
   const folderId = params.id as string
@@ -49,7 +51,7 @@ export default function AddWordPage() {
       const data = await res.json()
       setGenerated(data)
     } catch {
-      setError('AI 생성에 실패했어요. 다시 시도해주세요.')
+      setError(t.alert.aiFailed)
     } finally {
       setIsGenerating(false)
     }
@@ -140,7 +142,7 @@ export default function AddWordPage() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <div>
-            <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>단어</p>
+            <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>{t.vocab.word}</p>
             <input
               style={inputStyle}
               placeholder="영어 단어"
@@ -153,7 +155,7 @@ export default function AddWordPage() {
           </div>
 
           <div>
-            <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>뜻</p>
+            <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>{t.vocab.meaning}</p>
             <input
               style={inputStyle}
               placeholder="한국어 뜻"
@@ -186,7 +188,7 @@ export default function AddWordPage() {
             }}
           >
             <Sparkles size={16} />
-            {isGenerating ? 'AI가 분석 중...' : 'AI로 품사 · 발음 · 예문 자동 생성'}
+            {isGenerating ? t.vocab.aiGenerating : t.vocab.aiGenerate}
           </button>
 
           {generated && (
@@ -251,7 +253,7 @@ export default function AddWordPage() {
               opacity: isSaving ? 0.6 : 1,
             }}
           >
-            {isSaving ? '저장 중...' : '저장하기'}
+            {isSaving ? '저장 중...' : t.common.save}
           </button>
         </div>
       </div>
