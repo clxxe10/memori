@@ -8,9 +8,11 @@ import { usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import { useCountUp } from '@/hooks/useCountUp'
 import PullToRefresh from '@/components/ui/PullToRefresh'
+import { useTranslation } from '@/lib/i18n'
 
 export default function HomePage() {
   const router = useRouter()
+  const { t } = useTranslation()
   const [user, setUser] = useState<any>(null)
   const [reviewCount, setReviewCount] = useState(0)
   const [totalWords, setTotalWords] = useState(0)
@@ -206,7 +208,7 @@ export default function HomePage() {
         {/* 상단 인사말 */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
           <div>
-            <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '4px', margin: 0 }}>안녕하세요 👋</p>
+            <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '4px', margin: 0 }}>{t.home.greeting} 👋</p>
             <h1 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.5px', margin: '4px 0 0' }}>
               {nickname}님
             </h1>
@@ -238,7 +240,7 @@ export default function HomePage() {
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
             <div>
-              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '4px', margin: 0 }}>오늘 복습할 단어</p>
+              <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '4px', margin: 0 }}>{t.home.reviewCard}</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginTop: '4px' }}>
                 <span style={{ fontSize: '58px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-1px', lineHeight: 1 }}>{animatedReviewCount}</span>
                 <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>개</span>
@@ -249,7 +251,7 @@ export default function HomePage() {
               onClick={() => router.push('/study/review')}
             >
               <Play size={12} fill="currentColor" />
-              복습 시작
+              {t.home.reviewStart}
             </button>
           </div>
           <div style={{ height: '5px', background: 'var(--color-track)', borderRadius: '5px', marginBottom: '6px' }}>
@@ -291,8 +293,8 @@ export default function HomePage() {
         {/* 통계 카드 2개 */}
         <div style={{ display: 'grid', gridTemplateColumns: bp === 'mobile' ? '1fr 1fr' : '1fr 1fr 1fr 1fr', gap: '8px', marginBottom: '12px' }}>
           {[
-            { icon: BookOpen, label: '마스터 단어', value: animatedMasteredWords.toString() },
-            { icon: Clock, label: 'Today', value: formatStudyTime(animatedTotalStudyTime) },
+            { icon: BookOpen, label: t.home.masteredWords, value: animatedMasteredWords.toString() },
+            { icon: Clock, label: t.home.today, value: formatStudyTime(animatedTotalStudyTime) },
           ].map((item) => (
             <div key={item.label} style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '14px', border: '1px solid var(--color-border)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
               <div style={{ width: '22px', height: '3px', background: 'var(--color-neutral)', borderRadius: '3px', marginBottom: '8px' }} />
@@ -307,12 +309,12 @@ export default function HomePage() {
         {/* 내 단어장 바로가기 */}
         <div style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px', border: '1px solid var(--color-border)', marginBottom: '12px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-            <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>내 단어장</p>
+            <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>{t.home.myVocab}</p>
             <span
               onClick={() => router.push('/vocabulary')}
               style={{ fontSize: '12px', color: 'var(--color-text-secondary)', cursor: 'pointer' }}
             >
-              전체보기 →
+              {t.home.viewAll} →
             </span>
           </div>
 
@@ -394,7 +396,7 @@ export default function HomePage() {
             <div style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px', border: '1px solid var(--color-border)', marginBottom: '12px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>학습 캘린더</p>
+                <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>{t.home.studyCalendar}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <button
                     onClick={() => setCalendarMonth(new Date(year, month - 1, 1))}
@@ -450,7 +452,7 @@ export default function HomePage() {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px', marginBottom: '10px' }}>
-                <span style={{ fontSize: '9px', color: 'var(--color-text-tertiary)' }}>적음</span>
+                <span style={{ fontSize: '9px', color: 'var(--color-text-tertiary)' }}>{t.home.few}</span>
                 {levelColors.map((c, i) => (
                   <div
                     key={i}
@@ -458,14 +460,14 @@ export default function HomePage() {
                     style={{ width: '12px', height: '12px', borderRadius: '3px', background: c, border: '1px solid var(--color-border)' }}
                   />
                 ))}
-                <span style={{ fontSize: '9px', color: 'var(--color-text-tertiary)' }}>많음</span>
+                <span style={{ fontSize: '9px', color: 'var(--color-text-tertiary)' }}>{t.home.many}</span>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
                 {[
-                  { val: `${monthStudyDays}일`, lbl: '학습일' },
-                  { val: `${monthTotalWords}개`, lbl: '학습 단어' },
-                  { val: `${attendanceRate}%`, lbl: '출석률' },
+                  { val: `${monthStudyDays}일`, lbl: t.home.studyDays },
+                  { val: `${monthTotalWords}개`, lbl: t.home.studyWords },
+                  { val: `${attendanceRate}%`, lbl: t.home.attendance },
                 ].map(s => (
                   <div key={s.lbl} style={{ background: 'var(--color-surface-2)', borderRadius: '10px', padding: '8px', textAlign: 'center' }}>
                     <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--color-text-primary)' }}>{s.val}</div>
@@ -506,10 +508,10 @@ export default function HomePage() {
         >
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
-              <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>스피드 모드</span>
+              <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{t.home.speedMode}</span>
               <span style={{ fontSize: '10px', fontWeight: 600, color: '#B45309', background: 'rgba(251,191,36,0.12)', borderRadius: '6px', padding: '1px 6px' }}>NEW</span>
             </div>
-            <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>단어가 내려오기 전에 맞혀보세요!</p>
+            <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>{t.home.speedModeDesc}</p>
           </div>
           <ChevronRight size={16} color="var(--color-text-tertiary)" />
         </div>
@@ -526,9 +528,9 @@ export default function HomePage() {
         >
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
-              <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>PDF 시험지</span>
+              <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{t.home.pdfTest}</span>
             </div>
-            <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>단어장을 PDF로 만들어 굿노트에서 공부해요</p>
+            <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>{t.home.pdfTestDesc}</p>
           </div>
           <ChevronRight size={16} color="var(--color-text-tertiary)" />
         </div>
@@ -536,7 +538,7 @@ export default function HomePage() {
         {/* 오늘의 단어 */}
         {todayWord && (
           <div style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px', borderTop: '1px solid var(--color-border)', borderRight: '1px solid var(--color-border)', borderBottom: '1px solid var(--color-border)', borderLeft: '3px solid var(--color-neutral)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-            <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '6px', margin: '0 0 6px' }}>오늘의 단어</p>
+            <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginBottom: '6px', margin: '0 0 6px' }}>{t.home.todayWord}</p>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '3px' }}>
               <span style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)' }}>{todayWord.word}</span>
               {todayWord.part_of_speech && (
