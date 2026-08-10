@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { calculateNextReview } from '@/lib/srs'
 import { recordStudyProgress } from '@/lib/studyTracker'
 import { usePagePadding } from '@/lib/responsive'
+import { useTranslation } from '@/lib/i18n'
 
 type Word = {
   id: string
@@ -27,6 +28,7 @@ type QuizMode = 'flashcard' | 'quiz' | 'typing'
 const MODES: QuizMode[] = ['flashcard', 'quiz', 'typing']
 
 function ReviewContent() {
+  const { t } = useTranslation()
   const router = useRouter()
   const searchParams = useSearchParams()
   const folderId = searchParams.get('folderId')
@@ -209,40 +211,40 @@ function ReviewContent() {
 
   if (loading) return (
     <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
-      <p style={{ color: 'var(--color-text-secondary)' }}>불러오는 중...</p>
+      <p style={{ color: 'var(--color-text-secondary)' }}>{t.common.loading}</p>
     </main>
   )
 
   if (words.length === 0) return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', padding: '0 24px' }}>
       <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎉</div>
-      <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>복습할 단어가 없어요!</p>
-      <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px' }}>모든 단어를 완벽하게 학습했어요</p>
-      <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
+      <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>{t.study.noReview}</p>
+      <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px' }}>{t.study.allMastered}</p>
+      <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>{t.study.goBack}</button>
     </main>
   )
 
   if (finished) return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', padding: '0 24px' }}>
       <div style={{ fontSize: '56px', marginBottom: '16px' }}>🎉</div>
-      <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>복습 완료!</h1>
-      <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '32px' }}>총 {words.length}개 복습했어요</p>
+      <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>{t.study.reviewComplete}</h1>
+      <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '32px' }}>{t.study.totalReviewed.replace('{count}', String(words.length))}</p>
       <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', width: '100%', maxWidth: '320px' }}>
         <div style={{ flex: 1, background: 'var(--color-correct-bg)', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
           <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-correct)' }}>{stats.know}</div>
-          <div style={{ fontSize: '13px', color: 'var(--color-correct)', marginTop: '4px' }}>알아요</div>
+          <div style={{ fontSize: '13px', color: 'var(--color-correct)', marginTop: '4px' }}>{t.study.know}</div>
         </div>
         <div style={{ flex: 1, background: 'var(--color-incorrect-bg)', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
           <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-incorrect)' }}>{stats.dontKnow}</div>
-          <div style={{ fontSize: '13px', color: 'var(--color-incorrect)', marginTop: '4px' }}>몰라요</div>
+          <div style={{ fontSize: '13px', color: 'var(--color-incorrect)', marginTop: '4px' }}>{t.study.dontKnow}</div>
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', maxWidth: '320px' }}>
         <button onClick={() => { setCurrent(0); setFinished(false); setStats({ know: 0, dontKnow: 0 }); setWords(prev => [...prev].sort(() => Math.random() - 0.5)) }}
           style={{ width: '100%', height: '52px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-          <RotateCcw size={18} /> 다시 복습하기
+          <RotateCcw size={18} /> {t.study.restartReview}
         </button>
-        <button onClick={() => router.push('/home')} style={{ width: '100%', height: '52px', background: 'var(--color-surface-2)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
+        <button onClick={() => router.push('/home')} style={{ width: '100%', height: '52px', background: 'var(--color-surface-2)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>{t.study.goBack}</button>
       </div>
     </main>
   )
@@ -261,7 +263,7 @@ function ReviewContent() {
             <ArrowLeft size={22} color="var(--color-text-primary)" />
           </button>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>복습</div>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{t.study.review}</div>
             <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>{modeLabel} 모드</div>
           </div>
           <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>{current + 1}/{words.length}</div>
@@ -277,7 +279,7 @@ function ReviewContent() {
               <button onClick={e => { e.stopPropagation(); handleSpeak(word.word) }} style={{ position: 'absolute', top: '14px', left: '14px', width: '30px', height: '30px', borderRadius: '50%', background: 'var(--color-surface-2)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Volume2 size={14} color="var(--color-text-secondary)" />
               </button>
-              <div style={{ position: 'absolute', top: '16px', right: '14px', fontSize: '10px', color: 'var(--color-text-tertiary)' }}>{flipped ? '탭해서 단어 보기' : '탭해서 뜻 보기'}</div>
+              <div style={{ position: 'absolute', top: '16px', right: '14px', fontSize: '10px', color: 'var(--color-text-tertiary)' }}>{flipped ? t.study.tapToSeeWord : t.study.tapToSeeMeaning}</div>
               {!flipped ? (
                 <>
                   <span style={{ background: posStyle.bg, color: posStyle.color, borderRadius: '8px', padding: '3px 10px', fontSize: '11px', fontWeight: 600, marginBottom: '14px', display: 'inline-block' }}>{word.part_of_speech || '기타'}</span>
@@ -294,8 +296,8 @@ function ReviewContent() {
               )}
             </div>
             <div style={{ display: 'flex', gap: '10px', flexShrink: 0 }}>
-              <button onClick={() => handleAnswer(false)} style={{ flex: 1, height: '52px', background: 'var(--color-incorrect-bg)', color: 'var(--color-incorrect)', border: 'none', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}>몰라요</button>
-              <button onClick={() => handleAnswer(true)} style={{ flex: 1, height: '52px', background: 'var(--color-correct-bg)', color: 'var(--color-correct)', border: 'none', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}>알아요</button>
+              <button onClick={() => handleAnswer(false)} style={{ flex: 1, height: '52px', background: 'var(--color-incorrect-bg)', color: 'var(--color-incorrect)', border: 'none', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}>{t.study.dontKnow}</button>
+              <button onClick={() => handleAnswer(true)} style={{ flex: 1, height: '52px', background: 'var(--color-correct-bg)', color: 'var(--color-correct)', border: 'none', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}>{t.study.know}</button>
             </div>
           </>
         )}
@@ -330,7 +332,7 @@ function ReviewContent() {
         {mode === 'typing' && (
           <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <div style={{ background: 'var(--color-surface)', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.09)', padding: '24px 20px', textAlign: 'center', marginBottom: '20px' }}>
-              <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>뜻을 보고 단어를 입력하세요</div>
+              <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>{t.study.typeWord}</div>
               <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '6px' }}>{word.meaning}</div>
               {word.part_of_speech && <span style={{ background: posStyle.bg, color: posStyle.color, borderRadius: '6px', padding: '2px 8px', fontSize: '11px', fontWeight: 600 }}>{word.part_of_speech}</span>}
             </div>
@@ -338,7 +340,7 @@ function ReviewContent() {
               value={inputValue}
               onChange={e => { setInputValue(e.target.value); setInputResult(null) }}
               onKeyDown={e => e.key === 'Enter' && inputResult === null && handleTypingCheck()}
-              placeholder="영어 단어 입력..."
+              placeholder={t.study.typeWordPlaceholder}
               style={{
                 width: '100%', height: '52px',
                 background: inputResult === 'correct' ? 'var(--color-correct-bg)' : inputResult === 'wrong' ? 'var(--color-incorrect-bg)' : 'var(--color-surface)',
@@ -355,7 +357,7 @@ function ReviewContent() {
                   color: inputResult === 'correct' ? 'var(--color-correct)' : 'var(--color-incorrect)',
                   marginBottom: '8px',
                 }}>
-                  {inputResult === 'correct' ? '정답이에요! 🎉' : `정답: ${word.word}`}
+                  {inputResult === 'correct' ? t.study.correctCelebrate : `정답: ${word.word}`}
                 </div>
               </div>
             )}
@@ -373,7 +375,7 @@ function ReviewContent() {
                   marginTop: '10px',
                 }}
               >
-                확인
+                {t.study.confirm}
               </button>
             ) : (
               <button
@@ -403,7 +405,7 @@ function ReviewContent() {
                   marginTop: '10px',
                 }}
               >
-                다음 →
+                {t.study.nextArrow}
               </button>
             )}
           </div>

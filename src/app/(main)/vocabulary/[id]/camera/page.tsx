@@ -9,8 +9,10 @@ import { detectLanguage } from '@/lib/detectLanguage'
 import { showToast } from '@/components/ui/Toast'
 import { canUsePhotoExtract, incrementExtractCount } from '@/lib/premium'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import { useTranslation } from '@/lib/i18n'
 
 export default function CameraPage() {
+  const { t } = useTranslation()
   const router = useRouter()
   const params = useParams()
   const folderId = params.id as string
@@ -137,14 +139,14 @@ export default function CameraPage() {
       const data = await response.json()
 
       if (!response.ok || data.error) {
-        showToast('단어를 찾지 못했어요', 'error')
+        showToast(t.alert.aiFailed, 'error')
         return
       }
 
       setWords(prev => [...prev, ...data.words.map((w: { word: string; meaning: string; part_of_speech?: string; pronunciation?: string; example?: string }) => ({ ...w, selected: true }))])
       showToast('단어를 찾았어요!')
     } catch {
-      showToast('단어를 찾지 못했어요', 'error')
+      showToast(t.alert.aiFailed, 'error')
     } finally {
       stopTimer()
       setIsAnalyzing(false)
@@ -225,7 +227,7 @@ export default function CameraPage() {
           >
             <ArrowLeft size={22} color="var(--color-text-primary)" />
           </button>
-          <h1 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>사진으로 추가</h1>
+          <h1 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>{t.vocab.camera}</h1>
         </div>
 
         <input
@@ -276,7 +278,7 @@ export default function CameraPage() {
               >
                 <Camera size={22} color="var(--color-text-primary)" />
               </div>
-              <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>카메라로 촬영</span>
+              <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{t.vocab.takePhoto}</span>
             </button>
             <button
               onClick={() => {
@@ -313,7 +315,7 @@ export default function CameraPage() {
               >
                 <Image size={22} color="var(--color-text-primary)" />
               </div>
-              <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>갤러리에서 선택</span>
+              <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{t.vocab.fromGallery}</span>
             </button>
           </div>
           <div style={{
@@ -326,7 +328,7 @@ export default function CameraPage() {
             border: '0.5px solid var(--vocab-card-border)',
           }}>
             <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
-              💡 AI가 더 잘 인식하려면
+              {t.vocab.aiTip}
             </p>
             <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '12px', color: 'var(--color-text-tertiary)', lineHeight: 1.6 }}>
               <li>글자가 흐릿하지 않고 또렷하게 보이도록 촬영해주세요</li>
@@ -397,10 +399,10 @@ export default function CameraPage() {
               >
                 {isAnalyzing ? (
                   <>
-                    <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> AI가 단어 추출 중...
+                    <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> {t.vocab.extracting}
                   </>
                 ) : (
-                  '🔍 AI로 단어 추출하기'
+                  t.vocab.extractBtn
                 )}
               </button>
             )}
@@ -430,7 +432,7 @@ export default function CameraPage() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
                   }}
                 >
-                  📷 사진 더 추가하기
+                  {t.vocab.addMorePhoto}
                 </button>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
                   {words.map((w, i) => {
@@ -508,7 +510,7 @@ export default function CameraPage() {
                     opacity: isSaving ? 0.6 : 1,
                   }}
                 >
-                  {isSaving ? '저장 중...' : `선택한 ${words.filter((w) => w.selected).length}개 저장하기`}
+                  {isSaving ? t.vocab.saving : `선택한 ${words.filter((w) => w.selected).length}개 저장하기`}
                 </button>
               </div>
             )}
@@ -537,7 +539,7 @@ export default function CameraPage() {
             <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 20px' }} />
             <div style={{ fontSize: '44px', marginBottom: '12px' }}>📸</div>
             <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>
-              오늘 무료 사용을 다 썼어요
+              {t.vocab.dailyLimit}
             </h3>
             <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px', lineHeight: 1.6 }}>
               광고를 시청하거나 프리미엄으로<br />무제한 사용해보세요
@@ -566,7 +568,7 @@ export default function CameraPage() {
                   gap: '8px',
                 }}
               >
-                📺 광고 보고 사용하기
+                {t.vocab.watchAd}
               </button>
               <button
                 onClick={() => { setShowPhotoGate(false); router.push('/profile/premium') }}
@@ -588,7 +590,7 @@ export default function CameraPage() {
                 onClick={() => setShowPhotoGate(false)}
                 style={{ background: 'none', border: 'none', fontSize: '14px', color: 'var(--color-text-secondary)', cursor: 'pointer', padding: '8px' }}
               >
-                취소
+                {t.common.cancel}
               </button>
             </div>
           </div>

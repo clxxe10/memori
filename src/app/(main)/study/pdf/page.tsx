@@ -6,6 +6,7 @@ import { ArrowLeft, ChevronRight, Check, Download, Share2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { canUsePdfExtract, incrementPdfCount } from '@/lib/premium'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import { useTranslation } from '@/lib/i18n'
 
 type Folder = {
   id: string
@@ -26,6 +27,7 @@ type Step = 'folder' | 'format' | 'words' | 'preview' | 'done'
 type ExamType = 'word-to-meaning' | 'meaning-to-word' | 'mixed'
 
 export default function PDFPage() {
+  const { t } = useTranslation()
   const router = useRouter()
   const padding = usePagePadding()
   const [step, setStep] = useState<Step>('folder')
@@ -201,7 +203,7 @@ export default function PDFPage() {
       setStep('done')
     } catch (e) {
       console.error('PDF 생성 오류:', e)
-      alert('PDF 생성에 실패했어요.')
+      alert(t.study.pdfGenFailed)
     } finally {
       setGenerating(false)
     }
@@ -231,9 +233,9 @@ export default function PDFPage() {
             <ArrowLeft size={22} color="var(--color-text-primary)" />
           </button>
           <div>
-            <h1 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>PDF 시험지</h1>
+            <h1 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>{t.study.pdf}</h1>
             <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>
-              {step === 'folder' ? '단어장 선택' : step === 'words' ? '단어 선택' : step === 'preview' ? '미리보기' : '완료'}
+              {step === 'folder' ? t.study.selectFolder : step === 'words' ? t.study.word : step === 'preview' ? '미리보기' : '완료'}
             </p>
           </div>
         </div>
@@ -288,9 +290,9 @@ export default function PDFPage() {
               <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '10px' }}>시험 형식</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {[
-                  { type: 'word-to-meaning', label: '단어 → 빈칸', desc: '단어를 보고 뜻을 쓰세요' },
-                  { type: 'meaning-to-word', label: '뜻 → 빈칸', desc: '뜻을 보고 단어를 쓰세요' },
-                  { type: 'mixed', label: '혼합', desc: '단어→뜻, 뜻→단어 섞어서' },
+                  { type: 'word-to-meaning', label: t.study.wordToBlank, desc: '단어를 보고 뜻을 쓰세요' },
+                  { type: 'meaning-to-word', label: t.study.meaningToBlank, desc: '뜻을 보고 단어를 쓰세요' },
+                  { type: 'mixed', label: t.study.mixed, desc: '단어→뜻, 뜻→단어 섞어서' },
                 ].map(opt => (
                   <div
                     key={opt.type}
@@ -320,7 +322,7 @@ export default function PDFPage() {
                 fontSize: '15px', fontWeight: 700, cursor: 'pointer',
               }}
             >
-              다음
+              {t.common.next}
             </button>
           </>
         )}
@@ -331,7 +333,7 @@ export default function PDFPage() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
               <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>{selectedCount}개 선택됨</span>
               <button onClick={toggleAll} style={{ background: 'none', border: 'none', fontSize: '13px', color: 'var(--color-text-primary)', fontWeight: 600, cursor: 'pointer' }}>
-                {words.every(w => w.selected) ? '전체 해제' : '전체 선택'}
+                {words.every(w => w.selected) ? t.study.deselectAll : t.study.selectAll}
               </button>
             </div>
             <div style={{
@@ -339,7 +341,7 @@ export default function PDFPage() {
               marginBottom: '80px',
             }}>
               {loading ? (
-                <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--color-text-secondary)' }}>불러오는 중...</div>
+                <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--color-text-secondary)' }}>{t.common.loading}</div>
               ) : words.map(word => (
                 <div
                   key={word.id}
@@ -438,15 +440,15 @@ export default function PDFPage() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
               }}
             >
-              {generating ? '생성 중...' : '📥 PDF 추출하기'}
+              {generating ? t.study.generating : t.study.extractPdf}
             </button>
             {generating && (
               <div style={{ textAlign: 'center', padding: '20px 0' }}>
                 <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '8px' }}>
-                  시험지를 만들고 있어요...
+                  {t.study.pdfGenerating}
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>
-                  잠시만 기다려주세요
+                  {t.study.pdfWait}
                 </div>
               </div>
             )}
@@ -457,7 +459,7 @@ export default function PDFPage() {
         {step === 'done' && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '20px' }}>
             <div style={{ fontSize: '56px', marginBottom: '16px' }}>✅</div>
-            <h2 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>시험지 준비 완료!</h2>
+            <h2 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>{t.study.pdfReady}</h2>
             <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '32px', textAlign: 'center' }}>
               {selectedFolder?.name} 시험지 ({selectedCount}개 단어)
             </p>
@@ -471,7 +473,7 @@ export default function PDFPage() {
                 }}
                 style={{ width: '100%', height: '52px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
               >
-                <Download size={18} /> 저장하기
+                <Download size={18} /> {t.study.savePdf}
               </button>
               <button
                 onClick={async () => {
@@ -493,13 +495,13 @@ export default function PDFPage() {
                 }}
                 style={{ width: '100%', height: '52px', background: 'var(--color-surface)', color: 'var(--color-text-primary)', border: '1.5px solid var(--color-border)', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
               >
-                <Share2 size={18} /> 공유하기
+                <Share2 size={18} /> {t.study.sharePdf}
               </button>
               <button
                 onClick={() => router.back()}
                 style={{ width: '100%', height: '52px', background: 'var(--color-surface-2)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}
               >
-                돌아가기
+                {t.study.goBack}
               </button>
             </div>
           </div>
@@ -529,7 +531,7 @@ export default function PDFPage() {
             <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 20px' }} />
             <div style={{ fontSize: '44px', marginBottom: '12px' }}>📄</div>
             <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>
-              PDF 추출은 첫 1회 무료예요
+              {t.study.freeOnce}
             </h3>
             <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px', lineHeight: 1.6 }}>
               광고를 시청하거나 프리미엄으로<br />무제한 사용해보세요
@@ -558,7 +560,7 @@ export default function PDFPage() {
                   gap: '8px',
                 }}
               >
-                📺 광고 보고 사용하기
+                {t.vocab.watchAd}
               </button>
               <button
                 onClick={() => { setShowPdfGate(false); router.push('/profile/premium') }}
@@ -580,7 +582,7 @@ export default function PDFPage() {
                 onClick={() => setShowPdfGate(false)}
                 style={{ background: 'none', border: 'none', fontSize: '14px', color: 'var(--color-text-secondary)', cursor: 'pointer', padding: '8px' }}
               >
-                취소
+                {t.common.cancel}
               </button>
             </div>
           </div>

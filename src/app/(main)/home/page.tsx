@@ -275,17 +275,17 @@ export default function HomePage() {
           >
             <div style={{ fontSize: '36px', marginBottom: '10px' }}>📚</div>
             <p style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>
-              첫 단어장을 만들어볼까요?
+              {t.home.noVocab}
             </p>
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '14px', whiteSpace: 'pre-line' }}>
-              사진 한 장으로 단어를 추출하거나{'\n'}직접 입력해서 시작해보세요
+              {t.home.noVocabDesc}
             </p>
             <div className="btn-add-word-empty" style={{
               display: 'inline-flex', alignItems: 'center', gap: '6px',
               padding: '10px 20px',
               fontSize: '14px',
             }}>
-              단어장 만들기 →
+              {t.home.createVocab}
             </div>
           </div>
         )}
@@ -579,14 +579,14 @@ export default function HomePage() {
             maxHeight: '70vh', overflowY: 'auto' as const,
           }}>
             <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '6px', textAlign: 'center' }}>단어장 선택</h3>
-            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px', textAlign: 'center' }}>스피드 모드로 학습할 단어장을 선택하세요</p>
+            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px', textAlign: 'center' }}>{t.study.selectFolderDesc}</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
               <button onClick={() => { setShowSpeedSheet(false); router.push('/study/speed') }}
                 style={{ width: '100%', background: 'rgba(28,28,30,0.06)', borderRadius: '16px', padding: '14px 16px', border: '1.5px solid rgba(28,28,30,0.12)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textAlign: 'left' as const }}>
                 <div style={{ width: '42px', height: '42px', borderRadius: '13px', background: 'rgba(28,28,30,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>📚</div>
                 <div>
-                  <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>전체 단어장</div>
-                  <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>모든 단어로 플레이</div>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{t.study.allWords}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>{t.study.allWordsDesc}</div>
                 </div>
               </button>
               {speedFolders.map(f => (
@@ -600,7 +600,7 @@ export default function HomePage() {
                   <div>
                     <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{f.name}</div>
                     <div style={{ fontSize: '12px', color: f.word_count === 0 ? '#E24B4A' : 'var(--color-text-secondary)' }}>
-                      {f.word_count === 0 ? '단어 없음' : `${f.word_count}개 단어`}
+                      {f.word_count === 0 ? t.home.noWord : `${f.word_count}개 단어`}
                     </div>
                   </div>
                 </button>
@@ -612,7 +612,7 @@ export default function HomePage() {
               background: document.documentElement.classList.contains('dark') ? 'rgba(255,255,255,0.1)' : 'rgba(120,120,128,0.14)',
               color: 'var(--color-text-primary)',
               fontSize: '16px', fontWeight: 600, cursor: 'pointer',
-            }}>취소</button>
+            }}>{t.common.cancel}</button>
           </div>
         </>
       )}

@@ -3,8 +3,10 @@ import { Suspense, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Pause, Play } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { useTranslation } from '@/lib/i18n'
 
 function BlinkContent() {
+  const { t } = useTranslation()
   const router = useRouter()
   const searchParams = useSearchParams()
   const isMemorySet = searchParams.get('memoryset') === 'true'
@@ -62,13 +64,13 @@ function BlinkContent() {
 
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-      <div style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>불러오는 중...</div>
+      <div style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.common.loading}</div>
     </div>
   )
 
   if (words.length === 0) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-      <div style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>단어가 없어요</div>
+      <div style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.study.noWords}</div>
     </div>
   )
 
@@ -89,7 +91,7 @@ function BlinkContent() {
           background: 'none', border: 'none', cursor: 'pointer',
           fontSize: '16px', color: 'var(--color-text-secondary)',
           padding: '4px',
-        }}>← 뒤로</button>
+        }}>{`← ${t.common.back}`}</button>
         <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>
           {index + 1} / {words.length}
         </span>
@@ -130,10 +132,10 @@ function BlinkContent() {
             fontSize: '13px', color: 'var(--color-text-primary)', cursor: 'pointer',
           }}
         >
-          <option value={3000}>느리게</option>
-          <option value={2000}>보통</option>
-          <option value={1200}>빠르게</option>
-          <option value={700}>매우 빠르게</option>
+          <option value={3000}>{t.study.slow}</option>
+          <option value={2000}>{t.study.normal}</option>
+          <option value={1200}>{t.study.fast}</option>
+          <option value={700}>{t.study.veryFast}</option>
         </select>
       </div>
 
@@ -219,7 +221,7 @@ function BlinkContent() {
       {isMemorySet && (
         <button onClick={() => router.push(`/study/quiz?folder=${memorySetFolder}&memoryset=true`)}
           style={{ position: 'fixed', bottom: 'max(40px, calc(env(safe-area-inset-bottom) + 20px))', left: '24px', right: '24px', height: '52px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', zIndex: 100 }}>
-          다음 단계: 퀴즈 →
+          {`${t.study.nextStep}: ${t.study.quiz} →`}
         </button>
       )}
     </div>

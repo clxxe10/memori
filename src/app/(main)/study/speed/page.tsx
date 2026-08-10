@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { recordStudyProgress } from '@/lib/studyTracker'
+import { useTranslation } from '@/lib/i18n'
 
 type Word = {
   id: string
@@ -28,6 +29,7 @@ type FallingWord = {
 type GameMode = 'word-to-meaning' | 'meaning-to-word'
 
 function SpeedContent() {
+  const { t } = useTranslation()
   const router = useRouter()
   const searchParams = useSearchParams()
   const folderId = searchParams.get('folderId')
@@ -450,16 +452,16 @@ function SpeedContent() {
 
   if (loading) return (
     <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif' }}>
-      <p style={{ color: 'var(--color-text-secondary)' }}>불러오는 중...</p>
+      <p style={{ color: 'var(--color-text-secondary)' }}>{t.common.loading}</p>
     </main>
   )
 
   if (words.length === 0) return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif', padding: '0 24px' }}>
       <div style={{ fontSize: '48px', marginBottom: '16px' }}>📚</div>
-      <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>단어가 없어요</p>
-      <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px' }}>단어장에 단어를 먼저 추가해주세요</p>
-      <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
+      <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>{t.study.noWords}</p>
+      <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px' }}>{t.study.noWordsDesc}</p>
+      <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>{t.study.goBack}</button>
     </main>
   )
 
@@ -486,14 +488,14 @@ function SpeedContent() {
     <main style={{ minHeight: '100vh', background: 'var(--color-bg)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 24px', fontFamily: '-apple-system, sans-serif' }}>
       <div style={{ textAlign: 'center', maxWidth: '360px', width: '100%' }}>
         <div style={{ fontSize: '56px', marginBottom: '16px' }}>⚡</div>
-        <h1 style={{ fontSize: '28px', fontWeight: 900, color: 'var(--color-text-primary)', marginBottom: '8px', letterSpacing: '-0.5px' }}>스피드 모드</h1>
+        <h1 style={{ fontSize: '28px', fontWeight: 900, color: 'var(--color-text-primary)', marginBottom: '8px', letterSpacing: '-0.5px' }}>{t.study.speedTitle}</h1>
         <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '32px', lineHeight: 1.6 }}>
           단어가 내려오기 전에<br/>뜻을 입력해서 맞혀요!
         </p>
         <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
           {[
-            { key: 'word-to-meaning' as const, label: '단어 → 뜻 입력', desc: '영어 단어 보고 한국어 뜻 입력' },
-            { key: 'meaning-to-word' as const, label: '뜻 → 단어 입력', desc: '한국어 뜻 보고 영어 단어 입력' },
+            { key: 'word-to-meaning' as const, label: t.study.wordToMeaning, desc: '영어 단어 보고 한국어 뜻 입력' },
+            { key: 'meaning-to-word' as const, label: t.study.meaningToWord, desc: '한국어 뜻 보고 영어 단어 입력' },
           ].map(m => (
             <div key={m.key} onClick={() => setMode(m.key)}
               style={{
@@ -510,9 +512,9 @@ function SpeedContent() {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
           {[
-            { icon: '❤️', text: '목숨 3개 — 놓치면 줄어요' },
-            { icon: '🔥', text: '콤보 — 연속으로 맞히면 점수 UP' },
-            { icon: '⚡', text: '스테이지 — 10개마다 속도 증가' },
+            { icon: '❤️', text: t.study.lives },
+            { icon: '🔥', text: t.study.combo },
+            { icon: '⚡', text: t.study.stage },
           ].map((item, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'var(--color-surface)', borderRadius: '14px', padding: '12px 16px', border: '1px solid var(--color-border)', textAlign: 'left' }}>
               <span style={{ fontSize: '20px' }}>{item.icon}</span>
@@ -522,11 +524,11 @@ function SpeedContent() {
         </div>
         <button onClick={startGame}
           style={{ width: '100%', height: '54px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '16px', fontSize: '17px', fontWeight: 800, cursor: 'pointer', letterSpacing: '-0.3px' }}>
-          게임 시작 →
+          {t.study.startGame}
         </button>
         <button onClick={() => router.back()}
           style={{ width: '100%', height: '44px', background: 'none', border: 'none', color: 'var(--color-text-secondary)', fontSize: '14px', cursor: 'pointer', marginTop: '8px' }}>
-          돌아가기
+          {t.study.goBack}
         </button>
       </div>
     </main>
@@ -539,7 +541,7 @@ function SpeedContent() {
           {lives > 0 ? '🏆' : '💀'}
         </div>
         <h1 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--color-text-primary)', marginBottom: '20px' }}>
-          {lives > 0 ? '완주!' : '게임 종료'}
+          {lives > 0 ? t.study.complete2 : t.study.gameOver}
         </h1>
         <div style={{ background: 'var(--color-surface)', borderRadius: '20px', padding: '20px', border: '1px solid var(--color-border)', marginBottom: '16px' }}>
           <div style={{ fontSize: '42px', fontWeight: 900, color: 'var(--color-neutral)', letterSpacing: '-1px', marginBottom: '4px' }}>{score.toLocaleString()}</div>
@@ -547,7 +549,7 @@ function SpeedContent() {
         </div>
         {score >= bestScore && score > 0 && (
           <div style={{ background: 'rgba(255,184,0,0.10)', border: '1px solid rgba(255,184,0,0.25)', borderRadius: '12px', padding: '8px 16px', marginBottom: '12px', textAlign: 'center' }}>
-            <span style={{ fontSize: '13px', fontWeight: 700, color: '#FFB800' }}>🏆 새로운 최고기록!</span>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: '#FFB800' }}>{t.study.newRecord}</span>
           </div>
         )}
 
@@ -558,9 +560,9 @@ function SpeedContent() {
         )}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '20px' }}>
           {[
-            { val: correct, lbl: '맞힘', color: 'var(--color-correct)' },
-            { val: missed, lbl: '놓침', color: 'var(--color-incorrect)' },
-            { val: `x${maxCombo}`, lbl: '최고콤보', color: '#FFB800' },
+            { val: correct, lbl: t.study.hit, color: 'var(--color-correct)' },
+            { val: missed, lbl: t.study.miss, color: 'var(--color-incorrect)' },
+            { val: `x${maxCombo}`, lbl: t.study.bestCombo, color: '#FFB800' },
           ].map((s, i) => (
             <div key={i} style={{ background: 'var(--color-surface)', borderRadius: '14px', padding: '12px 8px', border: '1px solid var(--color-border)', textAlign: 'center' }}>
               <div style={{ fontSize: '20px', fontWeight: 900, color: s.color }}>{s.val}</div>
@@ -571,11 +573,11 @@ function SpeedContent() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <button onClick={handleRestart}
             style={{ width: '100%', height: '52px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 800, cursor: 'pointer' }}>
-            🔄 다시 하기
+            {t.study.playAgain}
           </button>
           <button onClick={() => router.push('/home')}
             style={{ width: '100%', height: '44px', background: 'var(--color-surface-2)', color: 'var(--color-text-secondary)', border: 'none', borderRadius: '14px', fontSize: '14px', cursor: 'pointer' }}>
-            돌아가기
+            {t.study.goBack}
           </button>
         </div>
         {missedWords.length > 0 && (
@@ -800,7 +802,7 @@ function SpeedContent() {
           onFocus={() => {
             window.scrollTo(0, 0)
           }}
-          placeholder={mode === 'word-to-meaning' ? '한국어 뜻 입력...' : '영어 단어 입력...'}
+          placeholder={mode === 'word-to-meaning' ? t.study.typeMeaningPlaceholder : t.study.typeWordPlaceholder}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
