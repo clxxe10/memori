@@ -1,7 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useTranslation } from '@/lib/i18n'
 
 export default function Slide5({ onFinish }: { onFinish: () => void }) {
+  const { t } = useTranslation()
   const [isDark, setIsDark] = useState(false)
 
   useEffect(() => {
@@ -81,10 +83,10 @@ export default function Slide5({ onFinish }: { onFinish: () => void }) {
         {/* 타이틀 */}
         <div className="s5-title-anim" style={{ textAlign: 'center', marginBottom: '32px' }}>
           <h1 style={{ fontSize: '36px', fontWeight: 800, color: titleColor, letterSpacing: '-0.8px', margin: '0 0 10px' }}>
-            준비 완료!
+            {t.onboarding.ready}
           </h1>
           <p style={{ fontSize: '17px', color: subColor, margin: 0, lineHeight: 1.4 }}>
-            단어 공부 시작할 준비가 됐어요
+            {t.onboarding.readyDesc}
           </p>
         </div>
 
@@ -98,7 +100,7 @@ export default function Slide5({ onFinish }: { onFinish: () => void }) {
           width: '100%', maxWidth: '340px',
           marginBottom: '40px',
         }}>
-          {['계정 생성', '기능 확인', '마이컬러'].map(step => (
+          {[t.onboarding.accountCreated, t.onboarding.featuresChecked, t.onboarding.colorSet].map(step => (
             <div key={step} style={{
               display: 'flex', alignItems: 'center', gap: '6px',
               background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
@@ -118,14 +120,14 @@ export default function Slide5({ onFinish }: { onFinish: () => void }) {
             borderRadius: '9999px', border: 'none',
             boxShadow: ctaShadow,
             cursor: 'pointer', fontSize: '17px', fontWeight: 700,
-          }}>시작하기</button>
+          }}>{t.onboarding.start}</button>
 
           <button onClick={onFinish} style={{
             width: '100%', padding: '14px',
             background: 'none', border: 'none',
             cursor: 'pointer', fontSize: '14px',
             color: subColor, fontWeight: 500,
-          }}>홈으로 바로 가기</button>
+          }}>{t.onboarding.goHome}</button>
         </div>
       </div>
     </div>

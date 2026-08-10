@@ -1,7 +1,9 @@
 'use client'
 import { useEffect } from 'react'
+import { useTranslation } from '@/lib/i18n'
 
 export default function Slide1({ onNext }: { onNext: () => void }) {
+  const { t } = useTranslation()
   useEffect(() => {
     const style = document.createElement('style')
     style.textContent = `
@@ -74,7 +76,7 @@ export default function Slide1({ onNext }: { onNext: () => void }) {
               color: '#0B0B0C',
             }}
           >
-            단어 학습,<br/>더 스마트하게
+            {t.onboarding.welcome}
           </h1>
           <p
             className="s1-sub s1-sub-text"
@@ -85,7 +87,7 @@ export default function Slide1({ onNext }: { onNext: () => void }) {
               color: 'rgba(60,60,67,0.55)',
             }}
           >
-            사진 한 장으로 단어장을 만들고<br/>나만의 방식으로 외워요
+            {t.onboarding.tagline}
           </p>
         </div>
 
@@ -105,7 +107,7 @@ export default function Slide1({ onNext }: { onNext: () => void }) {
             letterSpacing: '-0.2px',
           }}
         >
-          시작하기
+          {t.onboarding.getStarted}
         </button>
       </div>
     </div>

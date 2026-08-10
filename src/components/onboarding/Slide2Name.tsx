@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useTranslation } from '@/lib/i18n'
 
 interface Props {
   onNext: () => void
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function Slide2Name({ onNext, onBack, name, setName }: Props) {
+  const { t } = useTranslation()
   const [isDark, setIsDark] = useState(false)
 
   useEffect(() => {
@@ -102,10 +104,10 @@ export default function Slide2Name({ onNext, onBack, name, setName }: Props) {
         {/* 타이틀 */}
         <div className="s2n-title-anim" style={{ marginBottom: '28px', marginTop: 'auto' }}>
           <h1 style={{ fontSize: '36px', fontWeight: 800, color: titleColor, letterSpacing: '-0.8px', margin: '0 0 10px', lineHeight: 1.15 }}>
-            어떻게 불러드릴까요?
+            {t.onboarding.nickname}
           </h1>
           <p style={{ fontSize: '17px', color: subColor, margin: 0, lineHeight: 1.4 }}>
-            닉네임을 입력해주세요
+            {t.onboarding.nicknameDesc}
           </p>
         </div>
 
@@ -119,7 +121,7 @@ export default function Slide2Name({ onNext, onBack, name, setName }: Props) {
         }}>
           <input
             type="text"
-            placeholder="닉네임"
+            placeholder={t.onboarding.nicknamePlaceholder}
             value={name}
             onChange={e => setName(e.target.value)}
             style={{
@@ -155,7 +157,7 @@ export default function Slide2Name({ onNext, onBack, name, setName }: Props) {
               fontSize: '17px', fontWeight: 700,
               transition: 'all 300ms ease',
             }}>
-            다음
+            {t.common.next}
           </button>
         </div>
       </div>

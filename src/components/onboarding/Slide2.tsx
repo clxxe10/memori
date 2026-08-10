@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useTranslation } from '@/lib/i18n'
 
 interface Props {
   onNext: () => void
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name }: Props) {
+  const { t } = useTranslation()
   const [mode, setMode] = useState<'select' | 'signup' | 'login'>('select')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -231,12 +233,12 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
             fontSize: '36px', fontWeight: 800, color: titleColor,
             letterSpacing: '-0.8px', margin: '0 0 10px', lineHeight: 1.15,
           }}>
-            {mode === 'select' ? '시작해볼까요?' : (mode === 'signup' ? '계정을 만들어보세요' : '다시 오셨군요!')}
+            {mode === 'select' ? t.onboarding.selectType : (mode === 'signup' ? t.onboarding.createAccount : t.onboarding.welcomeBack)}
           </h1>
           <p style={{ fontSize: '17px', fontWeight: 400, color: subColor, margin: 0, lineHeight: 1.4 }}>
             {mode === 'select'
-              ? '처음 오셨나요, 아니면 기존 회원이신가요?'
-              : (emailStep === 'email' ? '이메일로 계속하거나 다른 방법을 선택하세요' : '비밀번호를 입력해주세요')}
+              ? t.onboarding.selectTypeDesc
+              : (emailStep === 'email' ? t.onboarding.enterEmail : t.onboarding.enterPassword)}
           </p>
         </div>
 
@@ -260,7 +262,7 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
                 boxShadow: ctaShadow,
                 cursor: 'pointer', fontSize: '17px', fontWeight: 700,
                 textAlign: 'center' as const,
-              }}>처음이에요 👋</button>
+              }}>{t.onboarding.newUser}</button>
 
               <button onClick={() => setMode('login')} style={{
                 width: '100%', padding: '17px',
@@ -269,12 +271,12 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
                 boxShadow: googleShadow,
                 cursor: 'pointer', fontSize: '17px', fontWeight: 600,
                 textAlign: 'center' as const,
-              }}>기존 회원이에요 →</button>
+              }}>{t.onboarding.existingUser}</button>
             </>
           ) : (
             <>
               {emailStep === 'email' ? (
-                <input type="email" placeholder="이메일 주소" value={email}
+                <input type="email" placeholder={t.onboarding.emailPlaceholder} value={email}
                   onChange={e => setEmail(e.target.value)}
                   style={{
                     width: '100%', padding: '17px 20px',
@@ -285,7 +287,7 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
                     boxSizing: 'border-box' as const,
                   }} />
               ) : (
-                <input type="password" placeholder={mode === 'signup' ? '비밀번호 (6자 이상)' : '비밀번호'}
+                <input type="password" placeholder={t.onboarding.passwordPlaceholder}
                   value={password} onChange={e => setPassword(e.target.value)}
                   style={{
                     width: '100%', padding: '17px 20px',
@@ -310,7 +312,7 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
                   cursor: 'pointer', fontSize: '17px', fontWeight: 700,
                   opacity: loading ? 0.7 : 1,
                 }}>
-                {loading ? '처리 중...' : (emailStep === 'email' ? '이메일로 계속하기' : (mode === 'signup' ? '가입하기' : '로그인'))}
+                {loading ? t.onboarding.processing : (emailStep === 'email' ? t.onboarding.continueEmail : (mode === 'signup' ? t.onboarding.signup : t.onboarding.login))}
               </button>
 
               {emailStep === 'email' && (
@@ -324,7 +326,7 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
                   }}>
                     <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                    Google로 계속하기
+                    {t.onboarding.continueGoogle}
                   </button>
 
                   <button onClick={handleKakao} style={{
@@ -337,7 +339,7 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
                   }}>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="#1C1C1E"><path d="M12 3C6.48 3 2 6.58 2 10.94c0 2.8 1.86 5.27 4.66 6.67-.15.53-.96 3.39-.99 3.6 0 0-.02.17.09.24.11.06.24.01.24.01.32-.04 3.7-2.44 4.28-2.86.55.08 1.13.12 1.72.12 5.52 0 10-3.58 10-7.78C22 6.58 17.52 3 12 3z"/></svg>
-                    카카오로 계속하기
+                    {t.onboarding.continueKakao}
                   </button>
 
                   <button onClick={() => { setMode(m => m === 'signup' ? 'login' : 'signup'); setError(''); setEmailStep('email') }} style={{
@@ -345,7 +347,7 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
                     fontSize: '14px', color: subColor, width: '100%', textAlign: 'center',
                     padding: '8px 0',
                   }}>
-                    {mode === 'signup' ? '이미 계정이 있어요 · 로그인' : '계정이 없으신가요? · 회원가입'}
+                    {mode === 'signup' ? t.onboarding.hasAccount : t.onboarding.noAccount}
                   </button>
                 </>
               )}
@@ -367,8 +369,11 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
             <svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 6l3 3 5-5"/></svg>
           </div>
           <p style={{ fontSize: '13px', color: tertiaryColor, margin: 0, lineHeight: 1.4 }}>
-            가입 시 <span style={{ textDecoration: 'underline' }}>이용약관</span> 및{' '}
-            <span style={{ textDecoration: 'underline' }}>개인정보처리방침</span>에 동의하게 됩니다.
+            {t.onboarding.termsNotice.split(/(\{terms\}|\{privacy\})/).map((part, i) => {
+              if (part === '{terms}') return <span key={i} style={{ textDecoration: 'underline' }}>{t.onboarding.terms}</span>
+              if (part === '{privacy}') return <span key={i} style={{ textDecoration: 'underline' }}>{t.onboarding.privacy}</span>
+              return <span key={i}>{part}</span>
+            })}
           </p>
         </div>
       </div>

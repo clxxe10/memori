@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useTranslation } from '@/lib/i18n'
 
 interface Props {
   onNext: () => void
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export default function Slide3({ onNext, onBack }: Props) {
+  const { t } = useTranslation()
   const [isDark, setIsDark] = useState(false)
 
   useEffect(() => {
@@ -62,11 +64,11 @@ export default function Slide3({ onNext, onBack }: Props) {
   const featureBg = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(120,120,128,0.08)'
 
   const features = [
-    { emoji: '📸', title: 'AI 사진 단어 추출', desc: '교재 사진 한 장으로 단어장 완성' },
-    { emoji: '🎓', title: '8가지 학습 모드', desc: '플래시카드, 퀴즈, 타이핑 등 다양하게' },
-    { emoji: '🔥', title: '암기세트', desc: '4단계로 완벽하게 암기해요' },
-    { emoji: '📄', title: 'PDF 시험지', desc: '굿노트에서 바로 풀 수 있어요' },
-    { emoji: '🌐', title: '단어장 공유', desc: '다른 사람 단어장도 가져와요' },
+    { emoji: '📸', title: t.onboarding.featurePhoto, desc: t.onboarding.featurePhotoDesc },
+    { emoji: '🎓', title: t.onboarding.featureModes, desc: t.onboarding.featureModesDesc },
+    { emoji: '🔥', title: t.onboarding.featureMemoryset, desc: t.onboarding.featureMemosetDesc },
+    { emoji: '📄', title: t.onboarding.featurePdf, desc: t.onboarding.featurePdfDesc },
+    { emoji: '🌐', title: t.onboarding.featureCommunity, desc: t.onboarding.featureCommunityDesc },
   ]
 
   return (
@@ -108,10 +110,10 @@ export default function Slide3({ onNext, onBack }: Props) {
         {/* 타이틀 */}
         <div className="s3-title-anim" style={{ marginBottom: '28px', marginTop: 'auto' }}>
           <h1 style={{ fontSize: '36px', fontWeight: 800, color: titleColor, letterSpacing: '-0.8px', margin: '0 0 10px', lineHeight: 1.15 }}>
-            Memori로 할 수 있는 것들
+            {t.onboarding.features}
           </h1>
           <p style={{ fontSize: '17px', color: subColor, margin: 0, lineHeight: 1.4 }}>
-            단어 공부가 이렇게 쉬워져요
+            {t.onboarding.featuresDesc}
           </p>
         </div>
 
@@ -155,7 +157,7 @@ export default function Slide3({ onNext, onBack }: Props) {
             borderRadius: '9999px', border: 'none',
             boxShadow: ctaShadow,
             cursor: 'pointer', fontSize: '17px', fontWeight: 700,
-          }}>다음</button>
+          }}>{t.common.next}</button>
         </div>
       </div>
     </div>

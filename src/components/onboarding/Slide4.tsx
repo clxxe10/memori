@@ -2,8 +2,10 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { applyMyColor } from '@/lib/colorUtils'
+import { useTranslation } from '@/lib/i18n'
 
 export default function Slide4({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+  const { t } = useTranslation()
   const [myColor, setMyColor] = useState('#007AFF')
   const [saving, setSaving] = useState(false)
   const [isDark, setIsDark] = useState(false)
@@ -112,10 +114,10 @@ export default function Slide4({ onNext, onBack }: { onNext: () => void; onBack:
         {/* 타이틀 */}
         <div className="s4-title-anim" style={{ marginBottom: '28px', marginTop: 'auto' }}>
           <h1 style={{ fontSize: '36px', fontWeight: 800, color: titleColor, letterSpacing: '-0.8px', margin: '0 0 10px', lineHeight: 1.15 }}>
-            나만의 컬러를<br/>골라보세요
+            {t.onboarding.chooseColor}
           </h1>
           <p style={{ fontSize: '17px', color: subColor, margin: 0, lineHeight: 1.4 }}>
-            앱 전체에 적용되는 포인트 색상이에요
+            {t.onboarding.chooseColorDesc}
           </p>
         </div>
 
@@ -180,7 +182,7 @@ export default function Slide4({ onNext, onBack }: { onNext: () => void; onBack:
               cursor: 'pointer',
             }}
           >
-            기본 테마 사용하기
+            {t.onboarding.defaultTheme}
           </button>
         </div>
 
@@ -202,7 +204,7 @@ export default function Slide4({ onNext, onBack }: { onNext: () => void; onBack:
             opacity: saving ? 0.7 : 1,
             transition: 'background 200ms ease',
           }}>
-            {saving ? '저장 중...' : '다음'}
+            {saving ? t.onboarding.saving : t.common.next}
           </button>
         </div>
       </div>
