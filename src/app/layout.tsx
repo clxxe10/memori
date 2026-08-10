@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import TimeTracker from '@/components/providers/TimeTracker'
+import { TranslationProvider } from '@/lib/i18n'
 
 import './globals.css'
 
@@ -37,8 +38,10 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-bg text-primary">
         <ThemeProvider>
-          <TimeTracker />
-          {children}
+          <TranslationProvider>
+            <TimeTracker />
+            {children}
+          </TranslationProvider>
         </ThemeProvider>
       </body>
     </html>
