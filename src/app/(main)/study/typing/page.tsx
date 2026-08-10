@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { calculateNextReview } from '@/lib/srs'
 import { recordStudyProgress } from '@/lib/studyTracker'
 import { usePagePadding } from '@/lib/responsive'
+import { useTranslation } from '@/lib/i18n'
 
 type Word = {
   id: string
@@ -21,6 +22,7 @@ type Word = {
 }
 
 function TypingContent() {
+  const { t } = useTranslation()
   const router = useRouter()
   const searchParams = useSearchParams()
   const isMemorySet = searchParams.get('memoryset') === 'true'
@@ -118,7 +120,7 @@ function TypingContent() {
   if (finished) return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif', padding: '0 24px' }}>
       <div style={{ fontSize: '56px', marginBottom: '16px' }}>🎉</div>
-      <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>완료!</h1>
+      <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>{t.study.complete}</h1>
       <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '32px' }}>총 {words.length}개 풀었어요</p>
       <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', width: '100%', maxWidth: '320px' }}>
         <div style={{ flex: 1, background: 'var(--color-correct-bg)', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
@@ -133,7 +135,7 @@ function TypingContent() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', maxWidth: '320px' }}>
         <button onClick={() => { setCurrent(0); setFinished(false); setInputValue(''); setResult(null); setStats({ correct: 0, wrong: 0 }); setWords(prev => [...prev].sort(() => Math.random() - 0.5)) }}
           style={{ width: '100%', height: '52px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-          <RotateCcw size={18} /> 다시 풀기
+          <RotateCcw size={18} /> {t.study.restart}
         </button>
         {wrongWords.length > 0 && (
           <button onClick={handleRetryWrong} style={{
@@ -145,18 +147,18 @@ function TypingContent() {
             cursor: 'pointer', display: 'flex', alignItems: 'center',
             justifyContent: 'center', gap: '8px',
           }}>
-            <RotateCcw size={18} /> 틀린 단어 {wrongWords.length}개 다시 풀기
+            <RotateCcw size={18} /> {t.study.retryWrong.replace('{count}', String(wrongWords.length))}
           </button>
         )}
         {isMemorySet ? (
           <button onClick={() => router.push('/study/memoryset/complete')}
             style={{ width: '100%', height: '52px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
-            🎉 암기세트 완료!
+            {`🎉 ${t.study.memorySet} ${t.study.complete}`}
           </button>
         ) : (
           <button onClick={() => router.back()}
             style={{ width: '100%', height: '52px', background: 'var(--color-bg)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>
-            돌아가기
+            {t.study.goBack}
           </button>
         )}
       </div>
@@ -166,7 +168,7 @@ function TypingContent() {
   if (words.length === 0) return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif', padding: '0 24px' }}>
       <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>단어가 없어요</p>
-      <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
+      <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>{t.study.goBack}</button>
     </main>
   )
 

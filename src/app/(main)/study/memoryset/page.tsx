@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { ChevronRight } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n'
 
 interface Folder {
   id: string
@@ -19,6 +20,7 @@ const MODE_NAMES: Record<string, string> = {
 }
 
 export default function MemorySetPage() {
+  const { t } = useTranslation()
   const router = useRouter()
   const [folders, setFolders] = useState<Folder[]>([])
   const [loading, setLoading] = useState(true)
@@ -62,10 +64,10 @@ export default function MemorySetPage() {
             <span>뒤로</span>
           </button>
           <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.5px', margin: '0 0 6px' }}>
-            암기세트
+            {t.study.memorySet}
           </h1>
           <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', margin: 0 }}>
-            단어장을 선택하면 4가지 모드로 순서대로 학습해요
+            {t.study.memorySetDesc}
           </p>
         </div>
 
@@ -101,13 +103,13 @@ export default function MemorySetPage() {
 
         {/* 단어장 목록 */}
         <h2 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '10px' }}>
-          단어장 선택
+          {t.study.selectFolder}
         </h2>
 
         {loading ? (
-          <p style={{ color: 'var(--color-text-tertiary)', textAlign: 'center', padding: '40px 0' }}>불러오는 중...</p>
+          <p style={{ color: 'var(--color-text-tertiary)', textAlign: 'center', padding: '40px 0' }}>{t.common.loading}</p>
         ) : folders.length === 0 ? (
-          <p style={{ color: 'var(--color-text-tertiary)', textAlign: 'center', padding: '40px 0' }}>단어장이 없어요</p>
+          <p style={{ color: 'var(--color-text-tertiary)', textAlign: 'center', padding: '40px 0' }}>{t.study.noWords}</p>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {folders.map(folder => (

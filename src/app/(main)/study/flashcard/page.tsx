@@ -9,6 +9,7 @@ import { recordStudyProgress } from '@/lib/studyTracker'
 import { usePagePadding } from '@/lib/responsive'
 import { useSwipe } from '@/hooks/useSwipe'
 import { haptics } from '@/lib/haptics'
+import { useTranslation } from '@/lib/i18n'
 
 type Word = {
   id: string
@@ -24,6 +25,7 @@ type Word = {
 }
 
 function FlashcardContent() {
+  const { t } = useTranslation()
   const router = useRouter()
   const searchParams = useSearchParams()
   const isMemorySet = searchParams.get('memoryset') === 'true'
@@ -231,7 +233,7 @@ function FlashcardContent() {
       <div style={{ fontSize: '48px', marginBottom: '16px' }}>📚</div>
       <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>단어가 없어요</p>
       <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px' }}>단어장에 단어를 먼저 추가해주세요</p>
-      <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>돌아가기</button>
+      <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>{t.study.goBack}</button>
     </main>
   )
 
@@ -250,21 +252,21 @@ function FlashcardContent() {
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', padding: '0 24px' }}>
       <style>{finishStyle}</style>
       <div className="emoji-bounce" style={{ fontSize: '56px', marginBottom: '16px' }}>🎉</div>
-      <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px', letterSpacing: '-0.5px' }}>완료!</h1>
-      <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '32px' }}>총 {words.length}개 학습했어요</p>
+      <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px', letterSpacing: '-0.5px' }}>{t.study.complete}</h1>
+      <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '32px' }}>{t.study.totalStudied.replace('{count}', String(words.length))}</p>
       <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', width: '100%', maxWidth: '320px' }}>
         <div style={{ flex: 1, background: '#D1FAE5', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
           <div style={{ fontSize: '24px', fontWeight: 800, color: '#065F46' }}>{stats.know}</div>
-          <div style={{ fontSize: '13px', color: '#065F46', marginTop: '4px' }}>알아요</div>
+          <div style={{ fontSize: '13px', color: '#065F46', marginTop: '4px' }}>{t.study.know}</div>
         </div>
         <div style={{ flex: 1, background: '#FFE5E5', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
           <div style={{ fontSize: '24px', fontWeight: 800, color: '#D92D20' }}>{stats.dontKnow}</div>
-          <div style={{ fontSize: '13px', color: '#D92D20', marginTop: '4px' }}>몰라요</div>
+          <div style={{ fontSize: '13px', color: '#D92D20', marginTop: '4px' }}>{t.study.dontKnow}</div>
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', maxWidth: '320px' }}>
         <button onClick={handleRestart} style={{ width: '100%', height: '52px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-          <RotateCcw size={18} /> 다시 학습하기
+          <RotateCcw size={18} /> {t.study.restart}
         </button>
         {wrongWords.length > 0 && (
           <button onClick={handleRetryWrong} style={{
@@ -276,18 +278,18 @@ function FlashcardContent() {
             cursor: 'pointer', display: 'flex', alignItems: 'center',
             justifyContent: 'center', gap: '8px',
           }}>
-            <RotateCcw size={18} /> 틀린 단어 {wrongWords.length}개 다시 학습
+            <RotateCcw size={18} /> {t.study.retryWrong.replace('{count}', String(wrongWords.length))}
           </button>
         )}
         {isMemorySet ? (
           <button onClick={() => router.push(`/study/blink?folder=${folderId}&memoryset=true`)}
             style={{ width: '100%', height: '52px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
-            다음 단계: 깜빡이 →
+            {`${t.study.nextStep}: ${t.study.blink} →`}
           </button>
         ) : (
           <button onClick={() => router.push('/home')}
             style={{ width: '100%', height: '52px', background: 'var(--color-bg)', color: 'var(--color-text-primary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>
-            돌아가기
+            {t.study.goBack}
           </button>
         )}
       </div>
@@ -504,8 +506,8 @@ function FlashcardContent() {
           display: 'flex', justifyContent: 'space-between',
           padding: '0 24px', marginTop: '8px',
         }}>
-          <span style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>← 몰라요</span>
-          <span style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>알아요 →</span>
+          <span style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>← {t.study.dontKnow}</span>
+          <span style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>{t.study.know} →</span>
         </div>
 
         {/* 알아요/몰라요 버튼 */}
@@ -520,7 +522,7 @@ function FlashcardContent() {
             }}
             style={{ flex: 1, height: '52px', background: 'transparent', border: '1.5px solid var(--color-border)', color: 'var(--color-text-primary)', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}
           >
-            몰라요
+            {t.study.dontKnow}
           </button>
           <button
             onClick={() => {
@@ -532,7 +534,7 @@ function FlashcardContent() {
             }}
             style={{ flex: 1, height: '52px', background: 'transparent', border: '1.5px solid var(--color-border)', color: 'var(--color-text-primary)', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}
           >
-            알아요
+            {t.study.know}
           </button>
         </div>
 

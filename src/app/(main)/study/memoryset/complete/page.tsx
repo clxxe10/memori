@@ -1,8 +1,10 @@
 'use client'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslation } from '@/lib/i18n'
 
 export default function MemorySetCompletePage() {
+  const { t } = useTranslation()
   const router = useRouter()
 
   useEffect(() => {
@@ -41,7 +43,7 @@ export default function MemorySetCompletePage() {
         fontSize: '28px', fontWeight: 800,
         color: 'var(--color-text-primary)',
         letterSpacing: '-0.5px', marginBottom: '10px', textAlign: 'center',
-      }}>암기세트 완료!</h1>
+      }}>{`${t.study.memorySet} ${t.study.complete}`}</h1>
 
       <p className="cp-sub" style={{
         fontSize: '15px', color: 'var(--color-text-secondary)',
@@ -77,7 +79,7 @@ export default function MemorySetCompletePage() {
           border: 'none', borderRadius: '14px',
           fontSize: '15px', fontWeight: 700, cursor: 'pointer',
         }}>
-          다시 암기세트 하기
+          {t.study.restart}
         </button>
         <button onClick={() => router.push('/home')} style={{
           width: '100%', height: '52px',
@@ -85,7 +87,7 @@ export default function MemorySetCompletePage() {
           border: 'none', borderRadius: '14px',
           fontSize: '15px', fontWeight: 600, cursor: 'pointer',
         }}>
-          홈으로 돌아가기
+          {t.study.goBack}
         </button>
       </div>
     </main>
