@@ -14,7 +14,7 @@ export default function ProfilePage() {
   const router = useRouter()
   const pagePadding = usePagePadding()
   const bp = useBreakpoint()
-  const { lang, setLang } = useTranslation()
+  const { lang, setLang, t } = useTranslation()
   const [user, setUser] = useState<any>(null)
   const [stats, setStats] = useState({ mastered: 0, streak: 0, total: 0 })
   const [theme, setTheme] = useState('시스템')
@@ -168,7 +168,7 @@ export default function ProfilePage() {
 
         {/* 헤더 */}
         <h1 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.5px', marginBottom: '20px' }}>
-          프로필
+          {t.profile.title}
         </h1>
 
         {/* 프로필 히어로 카드 */}
@@ -209,9 +209,9 @@ export default function ProfilePage() {
           {/* 하단: 통계 3개 */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
             {[
-              { label: '마스터 단어', value: stats.mastered },
-              { label: '연속 학습일', value: `${stats.streak}일` },
-              { label: '전체 단어', value: stats.total },
+              { label: t.profile.mastered, value: stats.mastered },
+              { label: t.profile.streak, value: `${stats.streak}일` },
+              { label: t.profile.total, value: stats.total },
             ].map(item => (
               <div key={item.label} style={{
                 background: 'rgba(255,255,255,0.14)',
@@ -251,7 +251,7 @@ export default function ProfilePage() {
               Memori+
             </div>
             <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
-              광고 없이, 무제한으로 사용해요
+              {t.profile.premiumDesc}
             </div>
           </div>
           <button style={{
@@ -259,60 +259,60 @@ export default function ProfilePage() {
             border: 'none', borderRadius: '9999px',
             padding: '8px 16px', fontSize: '13px', fontWeight: 600,
             cursor: 'pointer', flexShrink: 0,
-          }}>업그레이드</button>
+          }}>{t.profile.upgrade}</button>
         </div>
 
         {/* 내 계정 */}
-        <p style={groupTitleStyle}>내 계정</p>
+        <p style={groupTitleStyle}>{t.profile.myAccount}</p>
         <div style={groupCardStyle}>
           <div style={menuRowStyle()} onClick={() => router.push('/profile/edit')}>
-            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>프로필 편집</span>
+            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{t.profile.editProfile}</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
           <div style={menuRowStyle(true)} onClick={() => router.push('/profile/password')}>
-            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>비밀번호 변경</span>
+            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{t.profile.changePassword}</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
         </div>
 
         {/* 학습 및 화면 */}
-        <p style={groupTitleStyle}>학습 및 화면</p>
+        <p style={groupTitleStyle}>{t.profile.learningScreen}</p>
         <div style={groupCardStyle}>
           <div style={menuRowStyle()} onClick={() => setShowGoalSheet(true)}>
-            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>하루 학습 목표</span>
+            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{t.profile.dailyGoal}</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
           <div style={menuRowStyle()} onClick={() => setShowNotifSheet(true)}>
-            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>학습 알림</span>
+            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{t.profile.notifications}</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
           <div style={menuRowStyle()} onClick={() => setShowThemeSheet(true)}>
-            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>테마</span>
+            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{t.profile.theme}</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
           <div style={menuRowStyle()} onClick={() => setShowColorSheet(true)}>
-            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>마이컬러</span>
+            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{t.profile.myColor}</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
           <div style={menuRowStyle(true)} onClick={() => setShowLangSheet(true)}>
-            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>언어 설정</span>
+            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{t.profile.language}</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
         </div>
 
         {/* 지원 */}
-        <p style={groupTitleStyle}>지원</p>
+        <p style={groupTitleStyle}>{t.profile.support}</p>
         <div style={groupCardStyle}>
           <div style={menuRowStyle()} onClick={() => router.push('/profile/support')}>
-            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>문의하기</span>
+            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{t.profile.contact}</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
           <div style={menuRowStyle()} onClick={() => window.open('https://apps.apple.com/app/memori/id6785504180', '_blank')}>
-            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>앱 평가하기</span>
+            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{t.profile.rateApp}</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
           <div style={menuRowStyle(true)} onClick={() => router.push('/profile/notices')}>
-            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>공지사항</span>
+            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{t.profile.notices}</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
         </div>
@@ -321,7 +321,7 @@ export default function ProfilePage() {
         <div style={{ ...groupCardStyle, marginTop: '8px' }}>
           <div style={{ ...menuRowStyle(true), justifyContent: 'center' }}
             onClick={() => setShowLogoutSheet(true)}>
-            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>로그아웃</span>
+            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{t.profile.logout}</span>
           </div>
         </div>
 
@@ -331,7 +331,7 @@ export default function ProfilePage() {
             background: 'none', border: 'none', cursor: 'pointer',
             fontSize: '14px', color: 'var(--color-text-secondary)',
             textDecoration: 'underline',
-          }}>계정 탈퇴</button>
+          }}>{t.profile.deleteAccount}</button>
         </div>
 
       </div>
@@ -339,9 +339,9 @@ export default function ProfilePage() {
       {/* 로그아웃 확인 바텀시트 */}
       {showLogoutSheet && (
         <AlertModal
-          title="로그아웃 할까요?"
-          description="다시 로그인하면 데이터가 유지돼요."
-          confirmText="로그아웃"
+          title={t.profile.logoutConfirm}
+          description={t.profile.logoutDesc}
+          confirmText={t.profile.logout}
           isDestructive={true}
           onConfirm={handleLogout}
           onCancel={() => setShowLogoutSheet(false)}
@@ -373,16 +373,20 @@ export default function ProfilePage() {
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
           }}>
-            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>테마</h3>
+            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.theme}</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {['시스템', '라이트', '다크'].map(t => (
+              {[
+                { value: '시스템', label: t.profile.system },
+                { value: '라이트', label: t.profile.light },
+                { value: '다크', label: t.profile.dark },
+              ].map(opt => (
                 <div
-                  key={t}
-                  onClick={() => handleThemeChange(t)}
-                  className={`setting-option${theme === t ? ' selected' : ''}`}
+                  key={opt.value}
+                  onClick={() => handleThemeChange(opt.value)}
+                  className={`setting-option${theme === opt.value ? ' selected' : ''}`}
                 >
-                  <span>{t}</span>
-                  {theme === t && <Check size={18} className="check-icon" color="currentColor" />}
+                  <span>{opt.label}</span>
+                  {theme === opt.value && <Check size={18} className="check-icon" color="currentColor" />}
                 </div>
               ))}
             </div>
@@ -415,11 +419,11 @@ export default function ProfilePage() {
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
           }}>
-            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>마이컬러</h3>
+            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.myColor}</h3>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', padding: '14px 16px', background: 'var(--color-surface-2)', borderRadius: '14px' }}>
               <div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>기본 모드</div>
-                <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>라이트=검정, 다크=흰색 자동 적용</div>
+                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>{t.profile.defaultMode}</div>
+                <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>{t.profile.defaultModeDesc}</div>
               </div>
               <div onClick={handleDefaultToggle} style={{
                 width: '44px', height: '24px', borderRadius: '20px',
@@ -455,7 +459,7 @@ export default function ProfilePage() {
                 }} />
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '4px' }}>컬러 선택</div>
+                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '4px' }}>{t.profile.colorSelect}</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: myColor, border: '1px solid rgba(0,0,0,0.1)' }} />
                   <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>{myColor}</span>
@@ -495,7 +499,7 @@ export default function ProfilePage() {
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
           }}>
-            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>언어 설정</h3>
+            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.language}</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
               {['한국어', 'English'].map(language => (
                 <div
@@ -530,7 +534,7 @@ export default function ProfilePage() {
               ))}
             </div>
             <p style={{ fontSize: '12px', color: 'var(--color-text-tertiary)', textAlign: 'center' }}>
-              다국어 지원은 업데이트 예정이에요
+              {t.profile.multiLangNote}
             </p>
           </div>
         </>
@@ -561,7 +565,7 @@ export default function ProfilePage() {
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
           }}>
-            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>하루 학습 목표</h3>
+            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.dailyGoal}</h3>
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>하루에 몇 개의 단어를 학습할까요?</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '20px' }}>
               {[5, 10, 15, 20, 30, 50].map(n => (
@@ -582,7 +586,7 @@ export default function ProfilePage() {
               }}
               style={{ width: '100%', height: '52px', borderRadius: '14px', fontSize: '15px' }}
             >
-              저장하기
+              {t.profile.saveGoal}
             </button>
           </div>
         </>
@@ -613,12 +617,12 @@ export default function ProfilePage() {
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
           }}>
-            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>학습 알림</h3>
+            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.notifications}</h3>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: 'var(--color-surface-2)', borderRadius: '14px', marginBottom: '16px' }}>
               <div>
-                <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>매일 알림</p>
-                <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>설정한 시간에 학습 리마인더</p>
+                <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>{t.profile.dailyReminder}</p>
+                <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>{t.profile.dailyReminderDesc}</p>
               </div>
               <div onClick={() => {
                 const next = !notificationEnabled
@@ -633,7 +637,7 @@ export default function ProfilePage() {
 
             {notificationEnabled && (
               <div style={{ marginBottom: '20px' }}>
-                <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>알림 시간</p>
+                <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>{t.profile.notifTime}</p>
                 <input
                   type="time"
                   value={notificationTime}
@@ -659,7 +663,7 @@ export default function ProfilePage() {
               onClick={() => setShowNotifSheet(false)}
               style={{ width: '100%', height: '52px', borderRadius: '14px', fontSize: '15px' }}
             >
-              완료
+              {t.common.done}
             </button>
           </div>
         </>
@@ -668,8 +672,8 @@ export default function ProfilePage() {
       {/* 계정 탈퇴 바텀시트 */}
       {showDeleteSheet && (
         <AlertModal
-          title="계정을 탈퇴할까요?"
-          description="모든 데이터가 영구적으로 삭제되며 복구할 수 없어요."
+          title={t.profile.deleteConfirm}
+          description={t.profile.deleteDesc}
           confirmText="탈퇴하기"
           isDestructive={true}
           onConfirm={async () => {
