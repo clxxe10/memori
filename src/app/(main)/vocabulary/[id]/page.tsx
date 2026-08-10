@@ -13,6 +13,7 @@ import SelectDropdown from '@/components/ui/SelectDropdown'
 import EmptyState from '@/components/ui/EmptyState'
 import { WordSkeleton } from '@/components/ui/Skeleton'
 import { showToast } from '@/components/ui/Toast'
+import { useTranslation } from '@/lib/i18n'
 
 type Word = {
   id: string
@@ -37,6 +38,7 @@ type Folder = {
 const FILTERS = ['전체', '북마크', '어려워요', '미학습']
 
 function WordCard({ word, onDelete, children }: { word: Word; onDelete: () => void; children: ReactNode }) {
+  const { t } = useTranslation()
   const [swipeX, setSwipeX] = useState(0)
   const [confirming, setConfirming] = useState(false)
 
@@ -64,7 +66,7 @@ function WordCard({ word, onDelete, children }: { word: Word; onDelete: () => vo
             padding: '8px 14px', borderRadius: '10px',
             border: 'none', background: 'rgba(255,255,255,0.2)',
             color: 'white', fontSize: '13px', cursor: 'pointer',
-          }}>취소</button>
+          }}>{t.common.cancel}</button>
           <button onClick={() => { haptics.error(); onDelete() }} style={{
             padding: '8px 14px', borderRadius: '10px',
             border: 'none', background: 'white',
@@ -88,6 +90,7 @@ export default function VocabularyDetailPage() {
   const folderId = params.id as string
   const padding = usePagePadding()
   const bp = useBreakpoint()
+  const { t } = useTranslation()
 
   const [folder, setFolder] = useState<Folder | null>(null)
   const [words, setWords] = useState<Word[]>([])
@@ -301,9 +304,9 @@ export default function VocabularyDetailPage() {
         ) : filtered.length === 0 ? (
           <EmptyState
             icon="✏️"
-            title="아직 단어가 없어요"
+            title={t.vocab.noWordsInFolder}
             desc="직접 입력하거나 사진으로 단어를 추가해봐요"
-            actionLabel="단어 추가하기"
+            actionLabel={t.vocab.addWord}
             onAction={() => router.push(`/vocabulary/${folderId}/add`)}
           />
         ) : (
@@ -541,7 +544,7 @@ export default function VocabularyDetailPage() {
             padding: '24px 20px 20px',
           }}>
             <p style={{ fontSize: '20px', fontWeight: 800, margin: '0 0 16px', color: 'var(--color-text-primary)', textAlign: 'center' }}>
-              단어 추가
+              {t.vocab.addWord}
             </p>
 
             <button onClick={() => router.push(`/vocabulary/${folderId}/camera`)} style={{
@@ -559,8 +562,8 @@ export default function VocabularyDetailPage() {
                 <Camera size={18} color="var(--color-neutral)" />
               </div>
               <div>
-                <p style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>사진으로 추가</p>
-                <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-text-secondary)' }}>AI가 자동으로 단어를 추출해요</p>
+                <p style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{t.vocab.addByPhoto}</p>
+                <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-text-secondary)' }}>{t.vocab.addByPhotoDesc}</p>
               </div>
             </button>
 
@@ -579,8 +582,8 @@ export default function VocabularyDetailPage() {
                 <Plus size={18} color="var(--color-neutral)" />
               </div>
               <div>
-                <p style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>직접 입력</p>
-                <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-text-secondary)' }}>단어와 뜻을 하나씩 추가해요</p>
+                <p style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{t.vocab.addManual}</p>
+                <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-text-secondary)' }}>{t.vocab.addManualDesc}</p>
               </div>
             </button>
 
@@ -590,7 +593,7 @@ export default function VocabularyDetailPage() {
               background: document.documentElement.classList.contains('dark') ? 'rgba(255,255,255,0.1)' : 'rgba(120,120,128,0.14)',
               color: 'var(--color-text-primary)',
               fontSize: '16px', fontWeight: 600, cursor: 'pointer',
-            }}>취소</button>
+            }}>{t.common.cancel}</button>
           </div>
         </>
       )}

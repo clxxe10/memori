@@ -27,6 +27,7 @@ import EmptyState from '@/components/ui/EmptyState'
 import { showToast } from '@/components/ui/Toast'
 import { FolderSkeleton } from '@/components/ui/Skeleton'
 import PullToRefresh from '@/components/ui/PullToRefresh'
+import { useTranslation } from '@/lib/i18n'
 
 type Folder = {
   id: string
@@ -42,6 +43,7 @@ type Folder = {
 
 export default function VocabularyPage() {
   const router = useRouter()
+  const { t } = useTranslation()
   const [folders, setFolders] = useState<Folder[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -198,7 +200,7 @@ export default function VocabularyPage() {
               marginBottom: '4px',
             }}
           >
-            단어장
+            {t.vocab.title}
           </h1>
           <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', margin: 0 }}>{folders.length}개의 폴더</p>
         </div>
@@ -218,7 +220,7 @@ export default function VocabularyPage() {
           <Search size={16} color="var(--color-text-tertiary)" />
           <input
             type="text"
-            placeholder="단어장 검색..."
+            placeholder={t.vocab.search}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
@@ -239,9 +241,9 @@ export default function VocabularyPage() {
         ) : folders.length === 0 ? (
           <EmptyState
             icon="📚"
-            title="단어장이 없어요"
-            desc="첫 단어장을 만들고 단어를 추가해봐요"
-            actionLabel="단어장 만들기"
+            title={t.vocab.noFolders}
+            desc={t.vocab.createFirst}
+            actionLabel={t.vocab.createFolder}
             onAction={() => setShowModal(true)}
           />
         ) : (
@@ -356,14 +358,14 @@ export default function VocabularyPage() {
             maxHeight: '80vh', overflowY: 'auto' as const,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>새 단어장</h2>
+              <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>{t.vocab.newFolder}</h2>
               <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>
                 <X size={20} color="var(--color-text-secondary)" />
               </button>
             </div>
 
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>이름</label>
+              <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>{t.vocab.folderName}</label>
               <input value={newFolder.name} onChange={e => setNewFolder(f => ({ ...f, name: e.target.value }))}
                 placeholder="예: 토익 필수 단어"
                 style={{
@@ -376,7 +378,7 @@ export default function VocabularyPage() {
 
             <div style={{ marginBottom: '16px' }}>
               <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>
-                설명 <span style={{ fontWeight: 400, color: 'var(--color-text-tertiary)' }}>(선택)</span>
+                {t.vocab.folderDesc} <span style={{ fontWeight: 400, color: 'var(--color-text-tertiary)' }}>(선택)</span>
               </label>
               <input value={newFolder.description} onChange={e => setNewFolder(f => ({ ...f, description: e.target.value }))}
                 placeholder="이 단어장에 대한 간단한 설명"
@@ -389,7 +391,7 @@ export default function VocabularyPage() {
             </div>
 
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>카테고리</label>
+              <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>{t.vocab.category}</label>
               <SelectDropdown
                 value={newFolder.category}
                 onChange={val => setNewFolder(f => ({ ...f, category: val }))}
@@ -410,8 +412,8 @@ export default function VocabularyPage() {
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
               <div>
-                <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>전체 공개</p>
-                <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: '2px 0 0' }}>다른 사용자들이 볼 수 있어요</p>
+                <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>{t.vocab.isPublic}</p>
+                <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: '2px 0 0' }}>{t.vocab.isPublicDesc}</p>
               </div>
               <div onClick={() => setNewFolder(f => ({ ...f, is_public: !f.is_public }))} style={{
                 width: '44px', height: '26px', borderRadius: '20px',
@@ -438,7 +440,7 @@ export default function VocabularyPage() {
                 : 'inset 0 1.5px 0 rgba(255,255,255,0.25), 0 12px 24px rgba(0,0,0,0.25)',
               opacity: (creating || !newFolder.name.trim()) ? 0.5 : 1,
             }}>
-              {creating ? '만드는 중...' : '단어장 만들기'}
+              {creating ? t.vocab.creating : t.vocab.createFolder}
             </button>
           </div>
         </>
