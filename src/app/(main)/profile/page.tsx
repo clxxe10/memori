@@ -8,11 +8,13 @@ import { applyMyColor } from '@/lib/colorUtils'
 import { usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import AlertModal from '@/components/AlertModal'
+import { useTranslation } from '@/lib/i18n'
 
 export default function ProfilePage() {
   const router = useRouter()
   const pagePadding = usePagePadding()
   const bp = useBreakpoint()
+  const { lang, setLang } = useTranslation()
   const [user, setUser] = useState<any>(null)
   const [stats, setStats] = useState({ mastered: 0, streak: 0, total: 0 })
   const [theme, setTheme] = useState('시스템')
@@ -495,13 +497,35 @@ export default function ProfilePage() {
           }}>
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>언어 설정</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
-              {['한국어', 'English'].map(lang => (
+              {['한국어', 'English'].map(language => (
                 <div
-                  key={lang}
-                  className={`setting-option${lang === '한국어' ? ' selected' : ''}`}
+                  key={language}
+                  onClick={() => {
+                    const newLang = language === 'English' ? 'en' : 'ko'
+                    setLang(newLang)
+                    setShowLangSheet(false)
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '14px 16px',
+                    borderRadius: '14px',
+                    cursor: 'pointer',
+                    border: `1.5px solid ${(language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en') ? 'var(--color-my)' : 'var(--color-border)'}`,
+                    background: (language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en') ? 'var(--color-my)' : document.documentElement.classList.contains('dark') ? 'rgba(120,120,128,0.24)' : '#F5F5F7',
+                  }}
                 >
-                  <span>{lang}</span>
-                  {lang === '한국어' && <Check size={18} className="check-icon" color="currentColor" />}
+                  <span style={{
+                    fontSize: '15px',
+                    fontWeight: 600,
+                    color: (language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en') ? 'var(--color-my-contrast)' : 'var(--color-text-primary)',
+                  }}>
+                    {language}
+                  </span>
+                  {((language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en')) &&
+                    <Check size={18} color="var(--color-my-contrast)" />
+                  }
                 </div>
               ))}
             </div>
