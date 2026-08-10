@@ -10,6 +10,7 @@ import { showToast } from '@/components/ui/Toast'
 import { canUsePhotoExtract, incrementExtractCount } from '@/lib/premium'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
+import { AdMob, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob'
 
 export default function CameraPage() {
   const { t } = useTranslation()
@@ -546,11 +547,27 @@ export default function CameraPage() {
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
-                onClick={() => {
-                  alert('광고 시청 완료! (AdMob 연동 후 실제 광고 표시)')
-                  incrementExtractCount()
-                  setShowPhotoGate(false)
-                  handleAnalyze()
+                onClick={async () => {
+                  try {
+                    const options = {
+                      adId: 'ca-app-pub-6562435784605266/6131326867',
+                    }
+                    await AdMob.prepareRewardVideoAd(options)
+
+                    AdMob.addListener(RewardAdPluginEvents.Rewarded, async (reward: AdMobRewardItem) => {
+                      // 광고 시청 완료 시 쿼터 리셋
+                      const today = new Date().toLocaleDateString('en-CA')
+                      localStorage.setItem(`extract_date`, today)
+                      localStorage.setItem(`extract_count`, '0')
+                      setShowPhotoGate(false)
+                      alert(t.study.adComplete)
+                    })
+
+                    await AdMob.showRewardVideoAd()
+                  } catch (e) {
+                    console.error('광고 로드 실패:', e)
+                    alert('광고를 불러오지 못했어요. 잠시 후 다시 시도해주세요.')
+                  }
                 }}
                 style={{
                   width: '100%',
