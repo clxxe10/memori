@@ -7,82 +7,11 @@ import HelpSheet from '@/components/ui/HelpSheet'
 import { createClient } from '@/lib/supabase/client'
 import { usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
-
-const ALL_MODES = [
-  {
-    id: 'flashcard',
-    name: '플래시카드',
-    desc: '카드를 탭해서 앞뒤로 뒤집어요',
-    emoji: '🃏',
-    color: 'rgba(28,28,30,0.09)',
-    badge: '추천',
-    badgeColor: '#1C1C1E',
-    badgeBg: 'rgba(28,28,30,0.08)',
-  },
-  {
-    id: 'blink',
-    name: '깜빡이',
-    desc: '단어를 빠르게 반복 노출해요',
-    emoji: '⚡',
-    color: 'rgba(52,199,89,0.09)',
-    badge: null,
-  },
-  {
-    id: 'quiz',
-    name: '객관식 퀴즈',
-    desc: '4개 보기 중 정답을 골라요',
-    emoji: '📝',
-    color: 'rgba(255,149,0,0.09)',
-    badge: '인기',
-    badgeColor: '#B86800',
-    badgeBg: 'rgba(255,149,0,0.10)',
-  },
-  {
-    id: 'typing',
-    name: '타이핑',
-    desc: '뜻을 보고 단어를 직접 입력해요',
-    emoji: '⌨️',
-    color: 'rgba(175,82,222,0.09)',
-    badge: null,
-  },
-  {
-    id: 'speed',
-    name: '스피드 모드',
-    desc: '단어가 내려오기 전에 뜻을 입력해요',
-    emoji: '🚀',
-    color: 'rgba(251,191,36,0.10)',
-    badge: 'NEW',
-    badgeColor: '#B45309',
-    badgeBg: 'rgba(251,191,36,0.12)',
-  },
-  {
-    id: 'pdf',
-    name: 'PDF 시험지',
-    desc: '단어 시험지를 PDF로 만들어요',
-    emoji: '📄',
-    color: 'rgba(28,28,30,0.06)',
-    badge: null,
-  },
-  {
-    id: 'review',
-    name: '복습',
-    desc: '틀린 단어만 모아서 다시 학습해요',
-    emoji: '🔁',
-    color: 'rgba(226,75,74,0.09)',
-    badge: null,
-  },
-  {
-    id: 'listening',
-    name: '리스닝',
-    desc: '음성을 듣고 단어를 맞혀요',
-    emoji: '🎧',
-    color: 'rgba(0,199,190,0.09)',
-    badge: null,
-  },
-]
+import { useTranslation } from '@/lib/i18n'
 
 export default function StudyPage() {
   const router = useRouter()
+  const { t } = useTranslation()
   const [tab, setTab] = useState<'favorites' | 'all'>('favorites')
   const [favorites, setFavorites] = useState<string[]>(['flashcard', 'blink', 'typing'])
   const [showFolderSheet, setShowFolderSheet] = useState(false)
@@ -92,6 +21,79 @@ export default function StudyPage() {
   const [helpMode, setHelpMode] = useState<string | null>(null)
   const pagePadding = usePagePadding()
   const bp = useBreakpoint()
+
+  const ALL_MODES = [
+    {
+      id: 'flashcard',
+      name: t.study.flashcard,
+      desc: t.study.flashcardDesc,
+      emoji: '🃏',
+      color: 'rgba(28,28,30,0.09)',
+      badge: '추천',
+      badgeColor: '#1C1C1E',
+      badgeBg: 'rgba(28,28,30,0.08)',
+    },
+    {
+      id: 'blink',
+      name: t.study.blink,
+      desc: t.study.blinkDesc,
+      emoji: '⚡',
+      color: 'rgba(52,199,89,0.09)',
+      badge: null,
+    },
+    {
+      id: 'quiz',
+      name: t.study.quiz,
+      desc: t.study.quizDesc,
+      emoji: '📝',
+      color: 'rgba(255,149,0,0.09)',
+      badge: '인기',
+      badgeColor: '#B86800',
+      badgeBg: 'rgba(255,149,0,0.10)',
+    },
+    {
+      id: 'typing',
+      name: t.study.typing,
+      desc: t.study.typingDesc,
+      emoji: '⌨️',
+      color: 'rgba(175,82,222,0.09)',
+      badge: null,
+    },
+    {
+      id: 'speed',
+      name: t.study.speed,
+      desc: t.study.speedDesc,
+      emoji: '🚀',
+      color: 'rgba(251,191,36,0.10)',
+      badge: 'NEW',
+      badgeColor: '#B45309',
+      badgeBg: 'rgba(251,191,36,0.12)',
+    },
+    {
+      id: 'pdf',
+      name: t.study.pdf,
+      desc: t.study.pdfDesc,
+      emoji: '📄',
+      color: 'rgba(28,28,30,0.06)',
+      badge: null,
+    },
+    {
+      id: 'review',
+      name: t.study.review,
+      desc: t.study.reviewDesc,
+      emoji: '🔁',
+      color: 'rgba(226,75,74,0.09)',
+      badge: null,
+    },
+    {
+      id: 'listening',
+      name: '리스닝',
+      desc: t.study.listeningDesc,
+      emoji: '🎧',
+      color: 'rgba(0,199,190,0.09)',
+      badge: null,
+    },
+  ]
 
   useEffect(() => {
     const saved = localStorage.getItem('study_favorites')
@@ -183,7 +185,7 @@ export default function StudyPage() {
         {/* 헤더 */}
         <div style={{ marginBottom: '20px' }}>
           <h1 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.5px', margin: 0, marginBottom: '4px' }}>
-            학습
+            {t.study.title}
           </h1>
           <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', margin: 0 }}>
             학습 모드를 선택하세요
@@ -193,15 +195,15 @@ export default function StudyPage() {
         {/* 세그먼트 탭 */}
         <div className="segment-track" style={{ marginBottom: '20px' }}>
           {[
-            { key: 'favorites', label: '즐겨찾기' },
-            { key: 'all', label: '모든 모드' },
-          ].map(t => (
+            { key: 'favorites', label: t.study.favorites },
+            { key: 'all', label: t.study.allModes },
+          ].map(seg => (
             <button
-              key={t.key}
-              onClick={() => setTab(t.key as any)}
-              className={`segment-item${tab === t.key ? ' selected' : ''}`}
+              key={seg.key}
+              onClick={() => setTab(seg.key as any)}
+              className={`segment-item${tab === seg.key ? ' selected' : ''}`}
             >
-              {t.label}
+              {seg.label}
             </button>
           ))}
         </div>
@@ -237,12 +239,12 @@ export default function StudyPage() {
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
                 <span style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                  암기세트
+                  {t.study.memorySet}
                 </span>
                 <span className="badge-new">NEW</span>
               </div>
               <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: 0 }}>
-                플래시카드 → 깜빡이 → 퀴즈 → 타이핑 순서로 완벽하게 암기해요
+                {t.study.memorySetDesc}
               </p>
             </div>
             <ChevronRight size={18} color="var(--color-text-tertiary)" style={{ flexShrink: 0, opacity: 0.8 }} />
@@ -376,20 +378,20 @@ export default function StudyPage() {
             maxHeight: '70vh', overflowY: 'auto' as const,
           }}>
             <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '6px', textAlign: 'center' }}>
-              {selectedMode === 'review' ? '복습 시작' : '단어장 선택'}
+              {selectedMode === 'review' ? '복습 시작' : t.study.selectFolder}
             </h3>
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px', textAlign: 'center' }}>
-              {selectedMode === 'review' ? '어떤 단어를 복습할까요?' : '학습할 단어장을 선택하세요'}
+              {selectedMode === 'review' ? '어떤 단어를 복습할까요?' : t.study.selectFolderDesc}
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
               <button onClick={() => handleStart()}
                 style={{ width: '100%', background: 'rgba(28,28,30,0.06)', borderRadius: '16px', padding: '14px 16px', border: '1.5px solid rgba(28,28,30,0.15)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textAlign: 'left' as const }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                    {selectedMode === 'review' ? '전체 복습' : '전체 단어장'}
+                    {selectedMode === 'review' ? '전체 복습' : t.study.allWords}
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
-                    {selectedMode === 'review' ? '틀린 단어 전체를 복습해요' : '모든 단어를 학습해요'}
+                    {selectedMode === 'review' ? '틀린 단어 전체를 복습해요' : t.study.allWordsDesc}
                   </div>
                 </div>
               </button>
@@ -398,11 +400,11 @@ export default function StudyPage() {
               ) : folders.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '32px 0' }}>
                   <div style={{ fontSize: '36px', marginBottom: '12px' }}>📚</div>
-                  <p style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>단어장이 없어요</p>
-                  <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>단어장을 먼저 만들어주세요</p>
+                  <p style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>{t.study.noWords}</p>
+                  <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>{t.study.noWordsDesc}</p>
                   <button onClick={() => { setShowFolderSheet(false); router.push('/vocabulary') }}
                     style={{ padding: '10px 24px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '20px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
-                    단어장 만들러 가기
+                    {t.vocab.createFolder}
                   </button>
                 </div>
               ) : (
@@ -426,7 +428,7 @@ export default function StudyPage() {
               background: document.documentElement.classList.contains('dark') ? 'rgba(255,255,255,0.1)' : 'rgba(120,120,128,0.14)',
               color: 'var(--color-text-primary)',
               fontSize: '16px', fontWeight: 600, cursor: 'pointer',
-            }}>취소</button>
+            }}>{t.common.cancel}</button>
           </div>
         </>
       )}
