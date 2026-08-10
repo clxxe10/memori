@@ -49,6 +49,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Search } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { usePagePadding } from '@/lib/responsive'
+import { useTranslation } from '@/lib/i18n'
 import SelectDropdown from '@/components/ui/SelectDropdown'
 import EmptyState from '@/components/ui/EmptyState'
 import { FolderSkeleton } from '@/components/ui/Skeleton'
@@ -68,6 +69,7 @@ type PublicFolder = {
 }
 
 function SearchPageContent() {
+  const { t } = useTranslation()
   const router = useRouter()
   const searchParams = useSearchParams()
   const myOnly = searchParams.get('my') === 'true'
@@ -206,10 +208,10 @@ function SearchPageContent() {
         {/* 헤더 */}
         <div style={{ marginBottom: '16px' }}>
           <h1 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.5px', margin: 0, marginBottom: '4px' }}>
-            {myOnly ? '내 공개 단어장' : '검색'}
+            {myOnly ? '내 공개 단어장' : t.search.title}
           </h1>
           <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', margin: 0 }}>
-            공개 단어장을 찾아 가져와요
+            {t.search.subtitle}
           </p>
         </div>
 
@@ -223,7 +225,7 @@ function SearchPageContent() {
           <Search size={16} color="var(--color-text-tertiary)" />
           <input
             type="text"
-            placeholder="단어장 이름 검색..."
+            placeholder={t.search.searchPlaceholder}
             value={query}
             onChange={e => setQuery(e.target.value)}
             style={{
@@ -293,7 +295,7 @@ function SearchPageContent() {
             )}
             {!query && (
               <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '12px' }}>
-                인기 단어장
+                {t.search.popular}
               </p>
             )}
             <div style={{
@@ -372,7 +374,7 @@ function SearchPageContent() {
                             opacity: importing === folder.id ? 0.6 : 1,
                           }}
                         >
-                          {importing === folder.id ? '...' : isImported ? '완료 ✓' : '가져오기'}
+                          {importing === folder.id ? '...' : isImported ? t.search.imported : t.search.import}
                         </button>
                       )}
                     </div>

@@ -3,19 +3,21 @@
 import { useRouter, usePathname } from 'next/navigation'
 import { Home, BookOpen, GraduationCap, Search, User } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
-const TABS = [
-  { path: '/home', icon: Home, label: '홈' },
-  { path: '/vocabulary', icon: BookOpen, label: '단어장' },
-  { path: '/study', icon: GraduationCap, label: '학습' },
-  { path: '/search', icon: Search, label: '검색' },
-  { path: '/profile', icon: User, label: '프로필' },
-]
+import { useTranslation } from '@/lib/i18n'
 
 export default function TabBar() {
+  const { t } = useTranslation()
   const router = useRouter()
   const pathname = usePathname()
   const [isDesktop, setIsDesktop] = useState(false)
+
+  const TABS = [
+    { path: '/home', icon: Home, label: t.tabs.home },
+    { path: '/vocabulary', icon: BookOpen, label: t.tabs.vocabulary },
+    { path: '/study', icon: GraduationCap, label: t.tabs.study },
+    { path: '/search', icon: Search, label: t.tabs.search },
+    { path: '/profile', icon: User, label: t.tabs.profile },
+  ]
 
   useEffect(() => {
     const check = () => {
