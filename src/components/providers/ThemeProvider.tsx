@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { AdMob } from '@capacitor-community/admob'
 import { applyMyColor } from '@/lib/colorUtils'
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -45,6 +46,20 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     }
     mediaQuery.addEventListener('change', handleChange)
     return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [])
+
+  useEffect(() => {
+    const initAdMob = async () => {
+      try {
+        await AdMob.initialize({
+          testingDevices: [],
+          initializeForTesting: false,
+        })
+      } catch (e) {
+        console.error('AdMob 초기화 실패:', e)
+      }
+    }
+    initAdMob()
   }, [])
 
   return <>{children}</>
