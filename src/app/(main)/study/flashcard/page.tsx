@@ -25,7 +25,7 @@ type Word = {
 }
 
 function FlashcardContent() {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const router = useRouter()
   const searchParams = useSearchParams()
   const isMemorySet = searchParams.get('memoryset') === 'true'
@@ -224,15 +224,15 @@ function FlashcardContent() {
 
   if (loading) return (
     <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
-      <p style={{ color: 'var(--color-text-secondary)' }}>불러오는 중...</p>
+      <p style={{ color: 'var(--color-text-secondary)' }}>{t.common.loading}</p>
     </main>
   )
 
   if (words.length === 0) return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', padding: '0 24px' }}>
       <div style={{ fontSize: '48px', marginBottom: '16px' }}>📚</div>
-      <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>단어가 없어요</p>
-      <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px' }}>단어장에 단어를 먼저 추가해주세요</p>
+      <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>{t.study.noWords}</p>
+      <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px' }}>{t.study.noWordsDesc}</p>
       <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>{t.study.goBack}</button>
     </main>
   )
@@ -331,7 +331,7 @@ function FlashcardContent() {
             <ArrowLeft size={22} color="var(--color-text-primary)" />
           </button>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>플래시카드</div>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{t.study.flashcard}</div>
             {folderName && <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>{folderName}</div>}
           </div>
           <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>{current + 1}/{words.length}</div>
@@ -437,13 +437,13 @@ function FlashcardContent() {
             </button>
 
             <div style={{ position: 'absolute', top: '16px', right: '14px', fontSize: '10px', color: 'var(--color-text-tertiary)' }}>
-              {flipped ? '탭해서 단어 보기' : '탭해서 뜻 보기'}
+              {flipped ? t.study.tapToSeeWord : t.study.tapToSeeMeaning}
             </div>
 
             {!flipped ? (
               <>
                 <span style={{ background: posStyle.bg, color: posStyle.color, borderRadius: '8px', padding: '3px 10px', fontSize: '11px', fontWeight: 600, marginBottom: '14px', display: 'inline-block' }}>
-                  {word.part_of_speech || '기타'}
+                  {word.part_of_speech || (lang === 'en' ? 'Other' : '기타')}
                 </span>
                 <div style={{ fontSize: '34px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-1px', marginBottom: '10px', lineHeight: 1.1, wordBreak: 'break-word' }}>
                   {word.word}
@@ -457,7 +457,7 @@ function FlashcardContent() {
                 <div style={{ fontSize: '13px', color: 'var(--color-text-tertiary)', marginBottom: '10px', fontWeight: 500 }}>{word.word}</div>
                 <div style={{ width: '36px', height: '2px', background: 'var(--color-track)', borderRadius: '2px', marginBottom: '12px' }} />
                 <span style={{ background: posStyle.bg, color: posStyle.color, borderRadius: '8px', padding: '3px 10px', fontSize: '11px', fontWeight: 600, marginBottom: '10px', display: 'inline-block' }}>
-                  {word.part_of_speech || '기타'}
+                  {word.part_of_speech || (lang === 'en' ? 'Other' : '기타')}
                 </span>
                 <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.5px', marginBottom: '8px', wordBreak: 'break-word' }}>
                   {word.meaning}
@@ -545,7 +545,7 @@ function FlashcardContent() {
 
 export default function FlashcardPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)' }}><p style={{ color: 'var(--color-text-secondary)' }}>불러오는 중...</p></div>}>
+    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)' }}><p style={{ color: 'var(--color-text-secondary)' }}>Loading...</p></div>}>
       <FlashcardContent />
     </Suspense>
   )

@@ -11,7 +11,7 @@ import { useTranslation } from '@/lib/i18n'
 
 export default function StudyPage() {
   const router = useRouter()
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const [tab, setTab] = useState<'favorites' | 'all'>('favorites')
   const [favorites, setFavorites] = useState<string[]>(['flashcard', 'blink', 'typing'])
   const [showFolderSheet, setShowFolderSheet] = useState(false)
@@ -29,7 +29,7 @@ export default function StudyPage() {
       desc: t.study.flashcardDesc,
       emoji: '🃏',
       color: 'rgba(28,28,30,0.09)',
-      badge: '추천',
+      badge: lang === 'en' ? 'Recommended' : '추천',
       badgeColor: '#1C1C1E',
       badgeBg: 'rgba(28,28,30,0.08)',
     },
@@ -87,7 +87,7 @@ export default function StudyPage() {
     },
     {
       id: 'listening',
-      name: '리스닝',
+      name: t.study.listening,
       desc: t.study.listeningDesc,
       emoji: '🎧',
       color: 'rgba(0,199,190,0.09)',
@@ -164,7 +164,7 @@ export default function StudyPage() {
     const { count } = await query
 
     if (!count || count === 0) {
-      alert('단어장에 단어가 없어요! 단어를 먼저 추가해주세요.')
+      alert(lang === 'en' ? 'No words in this vocabulary. Add words first.' : '단어장에 단어가 없어요! 단어를 먼저 추가해주세요.')
       return
     }
 
@@ -188,7 +188,7 @@ export default function StudyPage() {
             {t.study.title}
           </h1>
           <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', margin: 0 }}>
-            학습 모드를 선택하세요
+            {lang === 'en' ? 'Select a study mode' : '학습 모드를 선택하세요'}
           </p>
         </div>
 
@@ -337,10 +337,10 @@ export default function StudyPage() {
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <div style={{ fontSize: '40px', marginBottom: '12px' }}>⭐</div>
             <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '6px' }}>
-              즐겨찾기가 없어요
+              {lang === 'en' ? 'No favorites yet' : '즐겨찾기가 없어요'}
             </p>
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
-              모든 모드 탭에서 별을 눌러 추가하세요
+              {lang === 'en' ? 'Tap the star in All Modes to add favorites' : '모든 모드 탭에서 별을 눌러 추가하세요'}
             </p>
           </div>
         )}
@@ -378,20 +378,20 @@ export default function StudyPage() {
             maxHeight: '70vh', overflowY: 'auto' as const,
           }}>
             <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '6px', textAlign: 'center' }}>
-              {selectedMode === 'review' ? '복습 시작' : t.study.selectFolder}
+              {selectedMode === 'review' ? t.home.reviewStart : t.study.selectFolder}
             </h3>
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px', textAlign: 'center' }}>
-              {selectedMode === 'review' ? '어떤 단어를 복습할까요?' : t.study.selectFolderDesc}
+              {selectedMode === 'review' ? (lang === 'en' ? 'Which words to review?' : '어떤 단어를 복습할까요?') : t.study.selectFolderDesc}
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
               <button onClick={() => handleStart()}
                 style={{ width: '100%', background: 'rgba(28,28,30,0.06)', borderRadius: '16px', padding: '14px 16px', border: '1.5px solid rgba(28,28,30,0.15)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textAlign: 'left' as const }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                    {selectedMode === 'review' ? '전체 복습' : t.study.allWords}
+                    {selectedMode === 'review' ? (lang === 'en' ? 'Full Review' : '전체 복습') : t.study.allWords}
                   </div>
                   <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
-                    {selectedMode === 'review' ? '틀린 단어 전체를 복습해요' : t.study.allWordsDesc}
+                    {selectedMode === 'review' ? (lang === 'en' ? 'Review all incorrect words' : '틀린 단어 전체를 복습해요') : t.study.allWordsDesc}
                   </div>
                 </div>
               </button>
@@ -415,7 +415,7 @@ export default function StudyPage() {
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{folder.name}</div>
                       <div style={{ fontSize: '12px', color: (folder.word_count || 0) === 0 ? '#E24B4A' : 'var(--color-text-secondary)', marginTop: '2px' }}>
-                        {(folder.word_count || 0) === 0 ? '단어 없음' : `${folder.word_count}개 단어`}
+                        {(folder.word_count || 0) === 0 ? t.home.noWord : (lang === 'en' ? `${folder.word_count} words` : `${folder.word_count}개 단어`)}
                       </div>
                     </div>
                   </button>

@@ -22,7 +22,7 @@ type Word = {
 }
 
 function TypingContent() {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const router = useRouter()
   const searchParams = useSearchParams()
   const isMemorySet = searchParams.get('memoryset') === 'true'
@@ -115,21 +115,21 @@ function TypingContent() {
     }
   }
 
-  if (loading) return <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif' }}><p style={{ color: 'var(--color-text-secondary)' }}>불러오는 중...</p></main>
+  if (loading) return <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif' }}><p style={{ color: 'var(--color-text-secondary)' }}>{t.common.loading}</p></main>
 
   if (finished) return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif', padding: '0 24px' }}>
       <div style={{ fontSize: '56px', marginBottom: '16px' }}>🎉</div>
       <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>{t.study.complete}</h1>
-      <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '32px' }}>총 {words.length}개 풀었어요</p>
+      <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '32px' }}>{lang === 'en' ? `Solved ${words.length} questions` : `총 ${words.length}개 풀었어요`}</p>
       <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', width: '100%', maxWidth: '320px' }}>
         <div style={{ flex: 1, background: 'var(--color-correct-bg)', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
           <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-correct)' }}>{stats.correct}</div>
-          <div style={{ fontSize: '13px', color: 'var(--color-correct)', marginTop: '4px' }}>정답</div>
+          <div style={{ fontSize: '13px', color: 'var(--color-correct)', marginTop: '4px' }}>{t.study.correct}</div>
         </div>
         <div style={{ flex: 1, background: 'var(--color-incorrect-bg)', borderRadius: '16px', padding: '16px', textAlign: 'center' }}>
           <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-incorrect)' }}>{stats.wrong}</div>
-          <div style={{ fontSize: '13px', color: 'var(--color-incorrect)', marginTop: '4px' }}>오답</div>
+          <div style={{ fontSize: '13px', color: 'var(--color-incorrect)', marginTop: '4px' }}>{t.study.wrong}</div>
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', maxWidth: '320px' }}>
@@ -167,7 +167,7 @@ function TypingContent() {
 
   if (words.length === 0) return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif', padding: '0 24px' }}>
-      <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>단어가 없어요</p>
+      <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>{t.study.noWords}</p>
       <button onClick={() => router.back()} style={{ height: '50px', padding: '0 32px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>{t.study.goBack}</button>
     </main>
   )
@@ -185,7 +185,7 @@ function TypingContent() {
             <ArrowLeft size={22} color="var(--color-text-primary)" />
           </button>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>타이핑</div>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{t.study.typing}</div>
             {folderName && <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>{folderName}</div>}
           </div>
           <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>{current + 1}/{words.length}</div>
@@ -197,10 +197,10 @@ function TypingContent() {
 
         <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '16px' }}>
           <div style={{ background: 'var(--color-surface)', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.09)', padding: '32px 20px', textAlign: 'center' }}>
-            <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '10px' }}>뜻을 보고 단어를 입력하세요</div>
+            <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '10px' }}>{t.study.typeWord}</div>
             <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '10px' }}>{word.meaning}</div>
             <span style={{ background: posStyle.bg, color: posStyle.color, borderRadius: '6px', padding: '3px 10px', fontSize: '12px', fontWeight: 600 }}>
-              {word.part_of_speech || '기타'}
+              {word.part_of_speech || (lang === 'en' ? 'Other' : '기타')}
             </span>
           </div>
 
@@ -209,7 +209,7 @@ function TypingContent() {
               value={inputValue}
               onChange={e => { if (!result) setInputValue(e.target.value) }}
               onKeyDown={e => e.key === 'Enter' && !result && handleCheck()}
-              placeholder="영어 단어 입력..."
+              placeholder={t.study.typeWordPlaceholder}
               autoFocus
               style={{
                 width: '100%', height: '54px',
@@ -222,12 +222,12 @@ function TypingContent() {
             />
             {result === 'wrong' && (
               <div style={{ fontSize: '14px', color: 'var(--color-incorrect)', textAlign: 'center', marginBottom: '8px' }}>
-                정답: <strong>{word.word}</strong>
+                {lang === 'en' ? 'Answer:' : '정답:'} <strong>{word.word}</strong>
               </div>
             )}
             {result === 'correct' && (
               <div style={{ fontSize: '14px', color: 'var(--color-correct)', textAlign: 'center', marginBottom: '8px' }}>
-                정답이에요! 🎉
+                {t.study.correctCelebrate}
               </div>
             )}
           </div>
@@ -235,12 +235,12 @@ function TypingContent() {
           {!result ? (
             <button onClick={handleCheck} disabled={!inputValue.trim()}
               style={{ width: '100%', height: '52px', background: inputValue.trim() ? 'var(--color-neutral)' : 'var(--color-surface-2)', color: inputValue.trim() ? 'var(--color-neutral-contrast)' : 'var(--color-text-tertiary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: inputValue.trim() ? 'pointer' : 'not-allowed' }}>
-              확인
+              {t.study.confirm}
             </button>
           ) : (
             <button onClick={handleNext}
               style={{ width: '100%', height: '52px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
-              다음 →
+              {t.study.nextArrow}
             </button>
           )}
         </div>
@@ -252,7 +252,7 @@ function TypingContent() {
 
 export default function TypingPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)' }}><p style={{ color: 'var(--color-text-secondary)' }}>불러오는 중...</p></div>}>
+    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)' }}><p style={{ color: 'var(--color-text-secondary)' }}>Loading...</p></div>}>
       <TypingContent />
     </Suspense>
   )

@@ -12,15 +12,15 @@ interface Folder {
 }
 
 const MODES = ['flashcard', 'blink', 'quiz', 'typing']
-const MODE_NAMES: Record<string, string> = {
-  flashcard: '플래시카드',
-  blink: '깜빡이',
-  quiz: '퀴즈',
-  typing: '타이핑',
-}
 
 export default function MemorySetPage() {
   const { t } = useTranslation()
+  const MODE_NAMES: Record<string, string> = {
+    flashcard: t.study.flashcard,
+    blink: t.study.blink,
+    quiz: t.study.quiz,
+    typing: t.study.typing,
+  }
   const router = useRouter()
   const [folders, setFolders] = useState<Folder[]>([])
   const [loading, setLoading] = useState(true)
@@ -61,7 +61,7 @@ export default function MemorySetPage() {
             <svg width="10" height="17" viewBox="0 0 10 17" fill="none" aria-hidden="true">
               <path d="M8.5 1.5 1.5 8.5l7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <span>뒤로</span>
+            <span>{t.common.back}</span>
           </button>
           <h1 style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.5px', margin: '0 0 6px' }}>
             {t.study.memorySet}
