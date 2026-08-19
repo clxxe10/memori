@@ -9,7 +9,7 @@ import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
 
 export default function ProfilePasswordPage() {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const router = useRouter()
   const padding = usePagePadding()
   const [currentPassword, setCurrentPassword] = useState('')
@@ -29,7 +29,7 @@ export default function ProfilePasswordPage() {
 
   const handleChange = async () => {
     if (!currentPassword.trim()) {
-      showToast('현재 비밀번호를 입력해주세요')
+      showToast(lang === 'en' ? 'Enter current password' : '현재 비밀번호를 입력해주세요')
       return
     }
 
@@ -38,7 +38,7 @@ export default function ProfilePasswordPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user?.email) {
       setSaving(false)
-      showToast('현재 비밀번호가 올바르지 않아요', 'error')
+      showToast(lang === 'en' ? 'Incorrect current password' : '현재 비밀번호가 올바르지 않아요', 'error')
       return
     }
 
@@ -48,18 +48,18 @@ export default function ProfilePasswordPage() {
     })
     if (signInError) {
       setSaving(false)
-      showToast('현재 비밀번호가 올바르지 않아요', 'error')
+      showToast(lang === 'en' ? 'Incorrect current password' : '현재 비밀번호가 올바르지 않아요', 'error')
       return
     }
 
     if (password.length < 8) {
       setSaving(false)
-      showToast('8자 이상 입력해주세요', 'error')
+      showToast(lang === 'en' ? 'Must be at least 8 characters' : '8자 이상 입력해주세요', 'error')
       return
     }
     if (password !== confirmPassword) {
       setSaving(false)
-      showToast('비밀번호가 일치하지 않아요', 'error')
+      showToast(lang === 'en' ? 'Passwords do not match' : '비밀번호가 일치하지 않아요', 'error')
       return
     }
 
@@ -71,7 +71,7 @@ export default function ProfilePasswordPage() {
       return
     }
 
-    showToast('비밀번호가 변경되었어요')
+    showToast(lang === 'en' ? 'Password changed!' : '비밀번호가 변경되었어요')
     router.back()
   }
 
@@ -113,7 +113,7 @@ export default function ProfilePasswordPage() {
 
         {isEmailUser === false && (
           <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.5 }}>
-            소셜 로그인 계정은 비밀번호를 설정할 수 없어요
+            {lang === 'en' ? 'Social login accounts cannot set a password' : '소셜 로그인 계정은 비밀번호를 설정할 수 없어요'}
           </p>
         )}
 
@@ -121,7 +121,7 @@ export default function ProfilePasswordPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
           <div>
-            <label style={labelStyle}>현재 비밀번호</label>
+            <label style={labelStyle}>{lang === 'en' ? 'Current Password' : '현재 비밀번호'}</label>
             <input
               type="password"
               value={currentPassword}
@@ -132,7 +132,7 @@ export default function ProfilePasswordPage() {
           </div>
 
           <div>
-            <label style={labelStyle}>새 비밀번호</label>
+            <label style={labelStyle}>{lang === 'en' ? 'New Password' : '새 비밀번호'}</label>
             <input
               type="password"
               value={password}
@@ -143,7 +143,7 @@ export default function ProfilePasswordPage() {
           </div>
 
           <div>
-            <label style={labelStyle}>새 비밀번호 확인</label>
+            <label style={labelStyle}>{lang === 'en' ? 'Confirm Password' : '새 비밀번호 확인'}</label>
             <input
               type="password"
               value={confirmPassword}
@@ -151,8 +151,8 @@ export default function ProfilePasswordPage() {
               placeholder="새 비밀번호 다시 입력..."
               style={inputStyle}
             />
-            <p style={{ fontSize: '12px', color: 'var(--color-text-tertiary)', marginTop: '6px' }}>
-              8자 이상 입력해주세요
+              <p style={{ fontSize: '12px', color: 'var(--color-text-tertiary)', marginTop: '6px' }}>
+              {lang === 'en' ? 'Must be at least 8 characters' : '8자 이상 입력해주세요'}
             </p>
           </div>
 
@@ -169,7 +169,7 @@ export default function ProfilePasswordPage() {
               opacity: saving ? 0.6 : 1,
             }}
           >
-            {saving ? '변경 중...' : '변경하기'}
+            {saving ? (lang === 'en' ? 'Changing...' : '변경 중...') : (lang === 'en' ? 'Change Password' : '변경하기')}
           </button>
 
         </div>

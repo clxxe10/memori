@@ -12,7 +12,8 @@ import { useTranslation } from '@/lib/i18n'
 
 export default function HomePage() {
   const router = useRouter()
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
+  const MONTHS_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
   const [user, setUser] = useState<any>(null)
   const [reviewCount, setReviewCount] = useState(0)
   const [totalWords, setTotalWords] = useState(0)
@@ -183,7 +184,7 @@ export default function HomePage() {
   }, [calendarMonth])
 
   const nickname = user?.user_metadata?.nickname ||
-    user?.user_metadata?.full_name?.split(' ')[0] || '사용자'
+    user?.user_metadata?.full_name?.split(' ')[0] || (lang === 'en' ? 'User' : '사용자')
 
   const animatedProgress = animatedTotalWords > 0 ? Math.round((animatedMasteredWords / animatedTotalWords) * 100) : 0
 
@@ -216,7 +217,7 @@ export default function HomePage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div className="streak-badge">
               <span>🔥</span>
-              <span>{animatedStreakDays}일</span>
+              <span>{animatedStreakDays}{lang === 'en' ? 'd' : '일'}</span>
             </div>
             <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#E8EAF0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
               {user?.user_metadata?.avatar_url ? (
@@ -243,7 +244,7 @@ export default function HomePage() {
               <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '4px', margin: 0 }}>{t.home.reviewCard}</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginTop: '4px' }}>
                 <span style={{ fontSize: '58px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-1px', lineHeight: 1 }}>{animatedReviewCount}</span>
-                <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>개</span>
+                {lang !== 'en' && <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>개</span>}
               </div>
             </div>
             <button
@@ -258,7 +259,10 @@ export default function HomePage() {
             <div className="progress-fill" style={{ height: '5px', borderRadius: '5px', width: `${Math.min(animatedProgress, 100)}%` }} />
           </div>
           <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: 0 }}>
-            전체 {animatedTotalWords}개 중 {animatedMasteredWords}개 마스터 · {animatedProgress}%
+            {lang === 'en'
+              ? `${animatedMasteredWords} of ${animatedTotalWords} mastered · ${animatedProgress}%`
+              : `전체 ${animatedTotalWords}개 중 ${animatedMasteredWords}개 마스터 · ${animatedProgress}%`
+            }
           </p>
         </div>
 
@@ -323,7 +327,7 @@ export default function HomePage() {
               onClick={() => router.push('/vocabulary')}
               style={{ textAlign: 'center', padding: '16px 0', cursor: 'pointer' }}
             >
-              <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>단어장을 만들어보세요</p>
+              <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>{t.vocab.noFolders}</p>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -344,7 +348,7 @@ export default function HomePage() {
                       {folder.name}
                     </div>
                     <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '1px' }}>
-                      {folder.word_count}개 단어
+                      {lang === 'en' ? `${folder.word_count} words` : `${folder.word_count}개 단어`}
                     </div>
                   </div>
                   <ChevronRight size={14} color="var(--color-text-tertiary)" />
@@ -403,7 +407,7 @@ export default function HomePage() {
                     style={{ width: '24px', height: '24px', borderRadius: '8px', background: 'var(--color-surface-2)', border: 'none', cursor: 'pointer', fontSize: '12px', color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >‹</button>
                   <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
-                    {year}년 {month + 1}월
+                    {lang === 'en' ? `${MONTHS_EN[month]} ${year}` : `${year}년 ${month + 1}월`}
                   </span>
                   <button
                     onClick={() => setCalendarMonth(new Date(year, month + 1, 1))}
@@ -414,7 +418,7 @@ export default function HomePage() {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '3px', marginBottom: '4px', maxWidth: '600px', margin: '0 auto 4px' }}>
-                {['월', '화', '수', '목', '금', '토', '일'].map(d => (
+                {(lang === 'en' ? ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] : ['월','화','수','목','금','토','일']).map(d => (
                   <div key={d} style={{ textAlign: 'center', fontSize: '10px', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>{d}</div>
                 ))}
               </div>
@@ -465,8 +469,8 @@ export default function HomePage() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
                 {[
-                  { val: `${monthStudyDays}일`, lbl: t.home.studyDays },
-                  { val: `${monthTotalWords}개`, lbl: t.home.studyWords },
+                  { val: lang === 'en' ? `${monthStudyDays}d` : `${monthStudyDays}일`, lbl: t.home.studyDays },
+                  { val: lang === 'en' ? `${monthTotalWords}` : `${monthTotalWords}개`, lbl: t.home.studyWords },
                   { val: `${attendanceRate}%`, lbl: t.home.attendance },
                 ].map(s => (
                   <div key={s.lbl} style={{ background: 'var(--color-surface-2)', borderRadius: '10px', padding: '8px', textAlign: 'center' }}>
@@ -600,7 +604,7 @@ export default function HomePage() {
                   <div>
                     <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{f.name}</div>
                     <div style={{ fontSize: '12px', color: f.word_count === 0 ? '#E24B4A' : 'var(--color-text-secondary)' }}>
-                      {f.word_count === 0 ? t.home.noWord : `${f.word_count}개 단어`}
+                      {f.word_count === 0 ? t.home.noWord : (lang === 'en' ? `${f.word_count} words` : `${f.word_count}개 단어`)}
                     </div>
                   </div>
                 </button>

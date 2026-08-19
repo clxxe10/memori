@@ -21,7 +21,7 @@ import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
 
 export default function ProfileEditPage() {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const router = useRouter()
   const padding = usePagePadding()
   const fileRef = useRef<HTMLInputElement>(null)
@@ -64,7 +64,7 @@ export default function ProfileEditPage() {
 
       if (uploadError) {
         console.error('업로드 오류:', uploadError)
-        alert('사진 업로드에 실패했어요: ' + uploadError.message)
+        alert((lang === 'en' ? 'Photo upload failed: ' : '사진 업로드에 실패했어요: ') + uploadError.message)
         setUploading(false)
         return
       }
@@ -81,7 +81,7 @@ export default function ProfileEditPage() {
 
       if (updateError) {
         console.error('메타데이터 업데이트 오류:', updateError)
-        alert('프로필 업데이트에 실패했어요')
+        alert(lang === 'en' ? 'Profile update failed' : '프로필 업데이트에 실패했어요')
         setUploading(false)
         return
       }
@@ -191,11 +191,11 @@ export default function ProfileEditPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
           <div>
-            <label style={labelStyle}>닉네임</label>
+            <label style={labelStyle}>{lang === 'en' ? 'Nickname' : '닉네임'}</label>
             <input
               value={nickname}
               onChange={e => setNickname(e.target.value)}
-              placeholder="닉네임 입력..."
+              placeholder={lang === 'en' ? 'Enter nickname...' : '닉네임 입력...'}
               style={inputStyle}
             />
             <p style={{
@@ -203,19 +203,19 @@ export default function ProfileEditPage() {
               color: 'var(--color-text-tertiary)',
               marginTop: '6px',
             }}>
-              닉네임은 공개 단어장에 표시돼요
+              {lang === 'en' ? 'Shown on public vocabulary lists' : '닉네임은 공개 단어장에 표시돼요'}
             </p>
           </div>
 
           <div>
-            <label style={labelStyle}>이메일</label>
+            <label style={labelStyle}>{lang === 'en' ? 'Email' : '이메일'}</label>
             <input
               value={email}
               disabled
               style={{ ...inputStyle, opacity: 0.5, cursor: 'not-allowed' }}
             />
             <p style={{ fontSize: '12px', color: 'var(--color-text-tertiary)', marginTop: '6px' }}>
-              이메일은 변경할 수 없어요
+              {lang === 'en' ? 'Email cannot be changed' : '이메일은 변경할 수 없어요'}
             </p>
           </div>
 
@@ -232,7 +232,7 @@ export default function ProfileEditPage() {
               opacity: saving ? 0.6 : 1,
             }}
           >
-            {saving ? '저장 중...' : t.common.save}
+            {saving ? (lang === 'en' ? 'Saving...' : '저장 중...') : t.common.save}
           </button>
 
         </div>

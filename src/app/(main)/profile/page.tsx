@@ -68,7 +68,7 @@ export default function ProfilePage() {
         || user.user_metadata?.name
         || user.user_metadata?.preferred_username
         || user.email?.split('@')[0]
-        || '사용자'
+        || (lang === 'en' ? 'User' : '사용자')
       setNickname(name)
 
       const { data: words } = await supabase
@@ -210,7 +210,7 @@ export default function ProfilePage() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
             {[
               { label: t.profile.mastered, value: stats.mastered },
-              { label: t.profile.streak, value: `${stats.streak}일` },
+              { label: t.profile.streak, value: `${stats.streak}${lang === 'en' ? 'd' : '일'}` },
               { label: t.profile.total, value: stats.total },
             ].map(item => (
               <div key={item.label} style={{
@@ -566,7 +566,7 @@ export default function ProfilePage() {
             maxHeight: '80vh', overflowY: 'auto' as const,
           }}>
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.dailyGoal}</h3>
-            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>하루에 몇 개의 단어를 학습할까요?</p>
+            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>{t.profile.goalQuestion}</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '20px' }}>
               {[5, 10, 15, 20, 30, 50].map(n => (
                 <button
@@ -574,7 +574,7 @@ export default function ProfilePage() {
                   onClick={() => setDailyGoal(n)}
                   className={`goal-option${dailyGoal === n ? ' selected' : ''}`}
                 >
-                  {n}개
+                  {lang === 'en' ? n : `${n}개`}
                 </button>
               ))}
             </div>
@@ -674,12 +674,12 @@ export default function ProfilePage() {
         <AlertModal
           title={t.profile.deleteConfirm}
           description={t.profile.deleteDesc}
-          confirmText="탈퇴하기"
+          confirmText={t.profile.deleteAccount}
           isDestructive={true}
           onConfirm={async () => {
             try {
               const supabase = createClient()
-              if (!user) { alert('로그인 상태를 확인해주세요.'); return }
+              if (!user) { alert(t.alert.checkLogin); return }
               await supabase.from('words').delete().eq('user_id', user.id)
               await supabase.from('folders').delete().eq('user_id', user.id)
               await supabase.from('user_learning_stats').delete().eq('user_id', user.id)
@@ -699,7 +699,7 @@ export default function ProfilePage() {
               router.push('/onboarding')
             } catch (e) {
               console.error('탈퇴 오류:', e)
-              alert('탈퇴 처리 중 오류가 발생했어요.')
+              alert(t.alert.deleteAccountFailed)
             }
           }}
           onCancel={() => setShowDeleteSheet(false)}
