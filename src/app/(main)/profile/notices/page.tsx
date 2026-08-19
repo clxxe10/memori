@@ -4,21 +4,25 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
-
-const NOTICES = [
-  {
-    id: 1,
-    title: 'Memori 1.0 출시!',
-    date: '2026.05.29',
-    content: '안녕하세요! Memori가 정식 출시됐어요.\n사진 한 장으로 단어를 추출하고, 다양한 학습 모드로 효율적인 단어 암기를 경험해보세요.\n앞으로도 더 좋은 서비스로 찾아뵐게요 😊',
-    isNew: true,
-  },
-]
+import { useTranslation } from '@/lib/i18n'
 
 export default function NoticesPage() {
+  const { t, lang } = useTranslation()
   const router = useRouter()
   const [openNotice, setOpenNotice] = useState<number | null>(1)
   const padding = usePagePadding()
+
+  const NOTICES = [
+    {
+      id: 1,
+      title: lang === 'en' ? 'Memori 1.0 Launch!' : 'Memori 1.0 출시!',
+      date: '2026.05.29',
+      content: lang === 'en'
+        ? 'Welcome to Memori! Extract vocabulary from photos with AI, study with 8 different modes, and share word lists with others. Thank you for being an early user!'
+        : '안녕하세요! Memori가 정식 출시됐어요.\n사진 한 장으로 단어를 추출하고, 다양한 학습 모드로 효율적인 단어 암기를 경험해보세요.\n앞으로도 더 좋은 서비스로 찾아뵐게요 😊',
+      isNew: true,
+    },
+  ]
 
   return (
     <main style={{ minHeight: '100vh', backgroundColor: 'var(--color-bg)', paddingBottom: '40px', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
@@ -28,7 +32,7 @@ export default function NoticesPage() {
           <button onClick={() => router.back()} style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer' }}>
             <ArrowLeft size={22} color="var(--color-text-primary)" />
           </button>
-          <h1 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>공지사항</h1>
+          <h1 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>{t.profile.notices}</h1>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

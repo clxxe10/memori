@@ -3,26 +3,28 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Check } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n'
 
 type Plan = 'free' | 'monthly' | 'yearly'
 
 export default function PremiumPage() {
+  const { t, lang } = useTranslation()
   const router = useRouter()
   const [selectedPlan, setSelectedPlan] = useState<Plan>('yearly')
 
   const plans = [
     {
       id: 'free' as Plan,
-      name: '무료',
+      name: lang === 'en' ? 'Free' : '무료',
       price: '0',
       unit: '원',
-      desc: '광고 포함 · 기본 기능',
+      desc: lang === 'en' ? 'Ads included · Basic features' : '광고 포함 · 기본 기능',
       saving: null,
       badge: null,
     },
     {
       id: 'monthly' as Plan,
-      name: '월간 프리미엄',
+      name: lang === 'en' ? 'Monthly Premium' : '월간 프리미엄',
       price: '3,900',
       unit: '원/월',
       desc: '광고 제거 · 무제한 사용',
@@ -31,7 +33,7 @@ export default function PremiumPage() {
     },
     {
       id: 'yearly' as Plan,
-      name: '연간 프리미엄',
+      name: lang === 'en' ? 'Annual Premium' : '연간 프리미엄',
       price: '35,000',
       unit: '원/년',
       desc: '월 2,917원 · 가장 저렴해요',
@@ -82,7 +84,7 @@ export default function PremiumPage() {
           Memori Premium
         </h1>
         <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: 0 }}>
-          광고 없이, 제한 없이 학습해요
+          {t.profile.premiumDesc}
         </p>
       </div>
 
@@ -158,7 +160,7 @@ export default function PremiumPage() {
         {/* 혜택 */}
         <div style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '16px', border: '1px solid var(--color-border)', marginBottom: '20px' }}>
           <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '12px', letterSpacing: '0.3px' }}>
-            프리미엄 혜택
+            {lang === 'en' ? 'Premium Benefits' : '프리미엄 혜택'}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
             {benefits.map((b, i) => (
@@ -190,21 +192,21 @@ export default function PremiumPage() {
               fontSize: '16px', fontWeight: 800, cursor: 'pointer',
             }}
           >
-            {selectedPlan === 'free' ? '무료로 계속하기' :
-             selectedPlan === 'monthly' ? '월간 구독 시작하기' :
+            {selectedPlan === 'free' ? (lang === 'en' ? 'Continue for free' : '무료로 계속하기') :
+             selectedPlan === 'monthly' ? (lang === 'en' ? 'Start Monthly' : '월간 구독 시작하기') :
              '👑 연간으로 시작 · 25% 할인'}
           </button>
           <button
             onClick={() => router.back()}
             style={{ width: '100%', height: '44px', background: 'none', border: 'none', fontSize: '13px', color: 'var(--color-text-secondary)', cursor: 'pointer' }}
           >
-            나중에 할게요
+            {lang === 'en' ? 'Maybe later' : '나중에 할게요'}
           </button>
           <p
-            onClick={() => alert('준비 중이에요')}
+            onClick={() => alert(t.alert.preparing)}
             style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', textAlign: 'center', cursor: 'pointer' }}
           >
-            구매 복원
+            {lang === 'en' ? 'Restore Purchase' : '구매 복원'}
           </p>
         </div>
 
