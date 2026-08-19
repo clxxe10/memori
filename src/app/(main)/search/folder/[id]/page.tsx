@@ -44,6 +44,7 @@ import { ArrowLeft, Send, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { showToast } from '@/components/ui/Toast'
+import { useTranslation } from '@/lib/i18n'
 
 type Folder = {
   id: string
@@ -90,6 +91,7 @@ export default function PublicFolderPage() {
   const [submitting, setSubmitting] = useState(false)
   const [myNickname, setMyNickname] = useState('')
   const [showCommentSheet, setShowCommentSheet] = useState(false)
+  const { t } = useTranslation()
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -158,13 +160,13 @@ export default function PublicFolderPage() {
     if (isLiked) {
       const { error } = await supabase.from('folder_likes')
         .delete().eq('folder_id', folderId).eq('user_id', myUserId)
-      if (error) { alert('좋아요 처리에 실패했어요.'); return }
+      if (error) { alert(t.alert.likeFailed); return }
       setIsLiked(false)
       setLikeCount(p => p - 1)
     } else {
       const { error } = await supabase.from('folder_likes')
         .insert({ folder_id: folderId, user_id: myUserId })
-      if (error) { alert('좋아요 처리에 실패했어요.'); return }
+      if (error) { alert(t.alert.likeFailed); return }
       setIsLiked(true)
       setLikeCount(p => p + 1)
     }
@@ -188,7 +190,7 @@ export default function PublicFolderPage() {
       .select().single()
 
     if (folderError || !newFolder) {
-      alert('가져오기에 실패했어요.')
+      alert(t.alert.importFailed)
       setImporting(false)
       return
     }
@@ -224,7 +226,7 @@ export default function PublicFolderPage() {
       nickname: myNickname,
     }).select().single()
     if (error) {
-      alert('댓글 작성에 실패했어요.')
+      alert(t.alert.commentFailed)
       setSubmitting(false)
       return
     }
@@ -237,7 +239,7 @@ export default function PublicFolderPage() {
 
   if (loading) return (
     <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif' }}>
-      <p style={{ color: 'var(--color-text-secondary)' }}>불러오는 중...</p>
+      <p style={{ color: 'var(--color-text-secondary)' }}>{t.common.loading}</p>
     </main>
   )
 
@@ -285,7 +287,7 @@ export default function PublicFolderPage() {
 
         {/* 단어 미리보기 */}
         <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '10px' }}>
-          단어 미리보기
+          {t.vocab.word} {t.common.back}
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '20px' }}>
           {words.map(word => (
@@ -329,15 +331,15 @@ export default function PublicFolderPage() {
             type="button"
           >
             {importing ? (
-              '가져오는 중...'
+              t.common.loading
             ) : isImported ? (
-              '가져오기 완료 ✓'
+              t.search.imported + ' ✓'
             ) : (
               <>
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
                   <path d="M7 1v12M1 7h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
-                내 단어장에 가져오기
+                {t.search.import}
               </>
             )}
           </button>
@@ -393,7 +395,7 @@ export default function PublicFolderPage() {
                         style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-tertiary)', fontSize: '11px', padding: '0 4px', flexShrink: 0 }}
                         type="button"
                       >
-                        삭제
+                        {t.common.delete}
                       </button>
                     )}
                   </div>
@@ -406,7 +408,7 @@ export default function PublicFolderPage() {
                 value={commentText}
                 onChange={e => setCommentText(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleComment()}
-                placeholder="댓글을 남겨보세요..."
+                placeholder={t.search.searchPlaceholder}
                 style={{
                   flex: 1, height: '46px',
                   background: 'var(--color-surface-2)',

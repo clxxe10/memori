@@ -5,8 +5,10 @@ import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import { useTranslation } from '@/lib/i18n'
 
 export default function EditWordPage() {
+  const { t } = useTranslation()
   const router = useRouter()
   const params = useParams()
   const wordId = params.wordId as string
@@ -44,7 +46,7 @@ export default function EditWordPage() {
   }
 
   const handleDelete = async () => {
-    if (!confirm('이 단어를 삭제할까요?')) return
+    if (!confirm(t.alert.deleteFailed)) return
     const supabase = createClient()
     await supabase.from('words').delete().eq('id', wordId)
     router.back()
@@ -78,22 +80,22 @@ export default function EditWordPage() {
           <button onClick={() => router.back()} style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer' }}>
             <ArrowLeft size={22} color="var(--color-text-primary)" />
           </button>
-          <h1 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>단어 수정</h1>
+          <h1 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>{t.vocab.word} {t.common.edit}</h1>
         </div>
 
         {loading ? (
-          <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)', padding: '40px 0' }}>불러오는 중...</div>
+          <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)', padding: '40px 0' }}>{t.common.loading}</div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
             <div>
-              <label style={labelStyle}>단어</label>
+              <label style={labelStyle}>{t.vocab.word}</label>
               <input style={inputStyle} value={form.word}
                 onChange={e => setForm({...form, word: e.target.value})} placeholder="영어 단어" />
             </div>
 
             <div>
-              <label style={labelStyle}>뜻</label>
+              <label style={labelStyle}>{t.vocab.meaning}</label>
               <input style={inputStyle} value={form.meaning}
                 onChange={e => setForm({...form, meaning: e.target.value})} placeholder="한국어 뜻" />
             </div>
@@ -134,7 +136,7 @@ export default function EditWordPage() {
                 cursor: 'pointer', opacity: saving ? 0.6 : 1,
               }}
             >
-              {saving ? '저장 중...' : '저장하기'}
+              {saving ? t.vocab.saving : t.common.save}
             </button>
 
             <button
@@ -147,7 +149,7 @@ export default function EditWordPage() {
                 fontWeight: 600, cursor: 'pointer',
               }}
             >
-              단어 삭제
+              {t.vocab.word} {t.common.delete}
             </button>
 
           </div>
