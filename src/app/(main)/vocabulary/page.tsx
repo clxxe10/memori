@@ -43,7 +43,7 @@ type Folder = {
 
 export default function VocabularyPage() {
   const router = useRouter()
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const [folders, setFolders] = useState<Folder[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -151,7 +151,7 @@ export default function VocabularyPage() {
           .single()
 
         if (fallbackError) {
-          alert('단어장 생성에 실패했습니다: ' + fallbackError.message)
+          alert((lang === 'en' ? 'Failed to create vocabulary: ' : '단어장 생성에 실패했습니다: ') + fallbackError.message)
           return
         }
 
@@ -167,10 +167,10 @@ export default function VocabularyPage() {
         is_public: false,
       })
       setShowModal(false)
-      showToast('단어장이 만들어졌어요!')
+      showToast(lang === 'en' ? 'Vocabulary created!' : '단어장이 만들어졌어요!')
     } catch (e) {
       console.error(e)
-      alert('오류가 발생했습니다.')
+      alert(t.common.error)
     } finally {
       setCreating(false)
     }
@@ -202,7 +202,7 @@ export default function VocabularyPage() {
           >
             {t.vocab.title}
           </h1>
-          <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', margin: 0 }}>{folders.length}개의 폴더</p>
+          <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', margin: 0 }}>{lang === 'en' ? `${folders.length} vocabularies` : `${folders.length}개의 폴더`}</p>
         </div>
 
         <div
@@ -294,7 +294,7 @@ export default function VocabularyPage() {
                       </span>
                     </div>
                     {folder.description && <p style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{folder.description}</p>}
-                    <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '5px' }}>{total}개 단어</div>
+                    <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '5px' }}>{lang === 'en' ? `${total} words` : `${total}개 단어`}</div>
                     <div style={{ height: '3px', background: 'var(--color-surface-2)', borderRadius: '3px' }}>
                       <div style={{ height: '3px', background: 'var(--color-neutral)', borderRadius: '3px', width: `${percent}%` }} />
                     </div>
@@ -367,7 +367,7 @@ export default function VocabularyPage() {
             <div style={{ marginBottom: '16px' }}>
               <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>{t.vocab.folderName}</label>
               <input value={newFolder.name} onChange={e => setNewFolder(f => ({ ...f, name: e.target.value }))}
-                placeholder="예: 토익 필수 단어"
+                placeholder={lang === 'en' ? 'e.g. TOEIC Essential Words' : '예: 토익 필수 단어'}
                 style={{
                   width: '100%', height: '48px', padding: '0 16px', fontSize: '15px', borderRadius: '14px',
                   border: '1px solid var(--color-border)',
@@ -378,10 +378,10 @@ export default function VocabularyPage() {
 
             <div style={{ marginBottom: '16px' }}>
               <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>
-                {t.vocab.folderDesc} <span style={{ fontWeight: 400, color: 'var(--color-text-tertiary)' }}>(선택)</span>
+                {t.vocab.folderDesc} <span style={{ fontWeight: 400, color: 'var(--color-text-tertiary)' }}>{lang === 'en' ? '(optional)' : '(선택)'}</span>
               </label>
               <input value={newFolder.description} onChange={e => setNewFolder(f => ({ ...f, description: e.target.value }))}
-                placeholder="이 단어장에 대한 간단한 설명"
+                placeholder={lang === 'en' ? 'Brief description' : '이 단어장에 대한 간단한 설명'}
                 style={{
                   width: '100%', height: '48px', padding: '0 16px', fontSize: '14px', borderRadius: '14px',
                   border: '1px solid var(--color-border)',
@@ -396,13 +396,13 @@ export default function VocabularyPage() {
                 value={newFolder.category}
                 onChange={val => setNewFolder(f => ({ ...f, category: val }))}
                 options={[
-                  { value: '수능', label: '수능' },
-                  { value: '토익', label: '토익' },
-                  { value: '일상', label: '일상' },
-                  { value: '비즈니스', label: '비즈니스' },
-                  { value: '기타', label: '기타' },
+                  { value: '수능', label: lang === 'en' ? 'CSAT' : '수능' },
+                  { value: '토익', label: lang === 'en' ? 'TOEIC' : '토익' },
+                  { value: '일상', label: lang === 'en' ? 'Daily' : '일상' },
+                  { value: '비즈니스', label: lang === 'en' ? 'Business' : '비즈니스' },
+                  { value: '기타', label: lang === 'en' ? 'Other' : '기타' },
                 ]}
-                placeholder="카테고리 선택"
+                placeholder={lang === 'en' ? 'Select category' : '카테고리 선택'}
               />
             </div>
 

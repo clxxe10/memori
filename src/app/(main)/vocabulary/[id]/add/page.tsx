@@ -12,7 +12,7 @@ import { useKeyboard } from '@/hooks/useKeyboard'
 import { useTranslation } from '@/lib/i18n'
 
 export default function AddWordPage() {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const router = useRouter()
   const params = useParams()
   const folderId = params.id as string
@@ -78,7 +78,7 @@ export default function AddWordPage() {
         .maybeSingle()
 
       if (existing) {
-        showToast('이미 있는 단어예요', 'error')
+        showToast(lang === 'en' ? 'Word already exists' : '이미 있는 단어예요', 'error')
         setIsSaving(false)
         return
       }
@@ -98,10 +98,10 @@ export default function AddWordPage() {
         .from('folders')
         .update({ language: detectedLang })
         .eq('id', folderId)
-      showToast('단어가 추가됐어요!')
+      showToast(lang === 'en' ? 'Word added!' : '단어가 추가됐어요!')
       router.back()
     } catch {
-      setError('저장에 실패했어요.')
+      setError(t.alert.saveFailed)
       setIsSaving(false)
     }
   }
@@ -137,7 +137,7 @@ export default function AddWordPage() {
           >
             <ArrowLeft size={22} color="var(--color-text-primary)" />
           </button>
-          <h1 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>단어 추가</h1>
+          <h1 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>{t.vocab.addWord}</h1>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -145,7 +145,7 @@ export default function AddWordPage() {
             <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>{t.vocab.word}</p>
             <input
               style={inputStyle}
-              placeholder="영어 단어"
+              placeholder={lang === 'en' ? 'English word' : '영어 단어'}
               value={word}
               onChange={(e) => {
                 setWord(e.target.value)
@@ -158,7 +158,7 @@ export default function AddWordPage() {
             <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>{t.vocab.meaning}</p>
             <input
               style={inputStyle}
-              placeholder="한국어 뜻"
+              placeholder={lang === 'en' ? 'Korean meaning' : '한국어 뜻'}
               value={meaning}
               onChange={(e) => {
                 setMeaning(e.target.value)
@@ -203,18 +203,18 @@ export default function AddWordPage() {
                 gap: '10px',
               }}
             >
-              <p style={{ fontSize: '12px', fontWeight: 700, color: '#2563EB', margin: 0 }}>AI 분석 결과</p>
+              <p style={{ fontSize: '12px', fontWeight: 700, color: '#2563EB', margin: 0 }}>{lang === 'en' ? 'AI Analysis' : 'AI 분석 결과'}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', width: '60px' }}>품사</span>
+                  <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', width: '60px' }}>{lang === 'en' ? 'Part of Speech' : '품사'}</span>
                   <span style={{ fontSize: '14px', color: 'var(--color-text-primary)', fontWeight: 600 }}>{generated.part_of_speech}</span>
                 </div>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', width: '60px' }}>발음</span>
+                  <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', width: '60px' }}>{lang === 'en' ? 'Pronunciation' : '발음'}</span>
                   <span style={{ fontSize: '14px', color: 'var(--color-text-primary)', fontWeight: 600 }}>{generated.pronunciation}</span>
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', width: '60px', paddingTop: '2px' }}>예문</span>
+                  <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', width: '60px', paddingTop: '2px' }}>{lang === 'en' ? 'Example' : '예문'}</span>
                   <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)', fontStyle: 'italic', flex: 1 }}>{generated.example}</span>
                 </div>
               </div>
@@ -253,7 +253,7 @@ export default function AddWordPage() {
               opacity: isSaving ? 0.6 : 1,
             }}
           >
-            {isSaving ? '저장 중...' : t.common.save}
+            {isSaving ? t.vocab.saving : t.common.save}
           </button>
         </div>
       </div>

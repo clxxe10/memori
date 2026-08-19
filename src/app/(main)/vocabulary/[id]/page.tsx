@@ -35,10 +35,11 @@ type Folder = {
   is_public?: boolean
 }
 
-const FILTERS = ['전체', '북마크', '어려워요', '미학습']
+const FILTERS_KO = ['전체', '북마크', '어려워요', '미학습']
+const FILTERS_EN = ['All', 'Bookmarks', 'Hard', 'New']
 
 function WordCard({ word, onDelete, children }: { word: Word; onDelete: () => void; children: ReactNode }) {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const [swipeX, setSwipeX] = useState(0)
   const [confirming, setConfirming] = useState(false)
 
@@ -59,7 +60,7 @@ function WordCard({ word, onDelete, children }: { word: Word; onDelete: () => vo
         gap: '12px',
       }}>
         <span style={{ color: 'white', fontSize: '14px', fontWeight: 600 }}>
-          이 단어를 삭제할까요?
+          {lang === 'en' ? 'Delete this word?' : '이 단어를 삭제할까요?'}
         </span>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button onClick={() => setConfirming(false)} style={{
@@ -71,7 +72,7 @@ function WordCard({ word, onDelete, children }: { word: Word; onDelete: () => vo
             padding: '8px 14px', borderRadius: '10px',
             border: 'none', background: 'white',
             color: '#E85454', fontSize: '13px', fontWeight: 700, cursor: 'pointer',
-          }}>삭제</button>
+          }}>{t.common.delete}</button>
         </div>
       </div>
     )
@@ -90,12 +91,12 @@ export default function VocabularyDetailPage() {
   const folderId = params.id as string
   const padding = usePagePadding()
   const bp = useBreakpoint()
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
 
   const [folder, setFolder] = useState<Folder | null>(null)
   const [words, setWords] = useState<Word[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeFilter, setActiveFilter] = useState('전체')
+  const [activeFilter, setActiveFilter] = useState(0) // 0=전체, 1=북마크, 2=어려워요, 3=미학습
   const [showAddSheet, setShowAddSheet] = useState(false)
   const [showEditSheet, setShowEditSheet] = useState(false)
   const [editForm, setEditForm] = useState({
@@ -133,10 +134,12 @@ export default function VocabularyDetailPage() {
     return () => window.removeEventListener('focus', handleFocus)
   }, [folderId])
 
+  const FILTERS = lang === 'en' ? FILTERS_EN : FILTERS_KO
+
   const filtered = words.filter(w => {
-    if (activeFilter === '북마크') return w.is_bookmarked
-    if (activeFilter === '어려워요') return w.difficulty === 'hard'
-    if (activeFilter === '미학습') return w.correct_count === 0
+    if (activeFilter === 1) return w.is_bookmarked
+    if (activeFilter === 2) return w.difficulty === 'hard'
+    if (activeFilter === 3) return w.correct_count === 0
     return true
   })
 
@@ -153,7 +156,7 @@ export default function VocabularyDetailPage() {
   }
 
   const handleFolderDelete = async () => {
-    if (!confirm('단어장을 삭제할까요? 단어도 모두 삭제돼요.')) return
+    if (!confirm(lang === 'en' ? 'Delete this vocabulary? All words will be deleted.' : '단어장을 삭제할까요? 단어도 모두 삭제돼요.')) return
     const supabase = createClient()
     await supabase.from('words').delete().eq('folder_id', folderId)
     await supabase.from('folders').delete().eq('id', folderId)
@@ -163,16 +166,16 @@ export default function VocabularyDetailPage() {
   const toggleBookmark = async (word: Word) => {
     const supabase = createClient()
     const { error } = await supabase.from('words').update({ is_bookmarked: !word.is_bookmarked }).eq('id', word.id)
-    if (error) { alert('업데이트에 실패했어요.'); return }
+    if (error) { alert(t.alert.saveFailed); return }
     setWords(prev => prev.map(w => w.id === word.id ? { ...w, is_bookmarked: !w.is_bookmarked } : w))
   }
 
   const handleDeleteWord = async (wordId: string) => {
     const supabase = createClient()
     const { error } = await supabase.from('words').delete().eq('id', wordId)
-    if (error) { alert('삭제에 실패했어요.'); return }
+    if (error) { alert(t.alert.deleteFailed); return }
     setWords(prev => prev.filter(w => w.id !== wordId))
-    showToast('삭제되었습니다', 'success')
+    showToast(lang === 'en' ? 'Deleted' : '삭제되었습니다', 'success')
   }
 
   const handleSpeak = (text: string) => {
@@ -241,9 +244,9 @@ export default function VocabularyDetailPage() {
   }
 
   const getDiffStyle = (diff: string | null) => {
-    if (diff === 'hard') return { bg: 'rgba(226,75,74,0.10)', color: '#C0392B', label: '어려워요' }
-    if (diff === 'easy') return { bg: 'rgba(52,199,89,0.10)', color: '#1A7F3C', label: '잘 알아요' }
-    return { bg: 'rgba(142,142,147,0.10)', color: 'var(--color-text-secondary)', label: '보통' }
+    if (diff === 'hard') return { bg: 'rgba(226,75,74,0.10)', color: '#C0392B', label: lang === 'en' ? 'Hard' : '어려워요' }
+    if (diff === 'easy') return { bg: 'rgba(52,199,89,0.10)', color: '#1A7F3C', label: lang === 'en' ? 'Easy' : '잘 알아요' }
+    return { bg: 'rgba(142,142,147,0.10)', color: 'var(--color-text-secondary)', label: lang === 'en' ? 'Normal' : '보통' }
   }
 
   return (
@@ -269,7 +272,7 @@ export default function VocabularyDetailPage() {
             {folder?.description && (
               <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '2px 0 0' }}>{folder.description}</p>
             )}
-            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: 0 }}>{words.length}개 단어</p>
+            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: 0 }}>{lang === 'en' ? `${words.length} words` : `${words.length}개 단어`}</p>
           </div>
           <button
             onClick={() => setShowEditSheet(true)}
@@ -281,11 +284,11 @@ export default function VocabularyDetailPage() {
 
         {/* 필터 칩 */}
         <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', overflowX: 'auto', paddingBottom: '2px' }}>
-          {FILTERS.map(f => (
+          {FILTERS.map((f, i) => (
             <button
               key={f}
-              onClick={() => setActiveFilter(f)}
-              className={`filter-tab${activeFilter === f ? ' selected' : ''}`}
+              onClick={() => setActiveFilter(i)}
+              className={`filter-tab${activeFilter === i ? ' selected' : ''}`}
             >
               {f}
             </button>
@@ -305,7 +308,7 @@ export default function VocabularyDetailPage() {
           <EmptyState
             icon="✏️"
             title={t.vocab.noWordsInFolder}
-            desc="직접 입력하거나 사진으로 단어를 추가해봐요"
+            desc={lang === 'en' ? 'Add words manually or by photo' : '직접 입력하거나 사진으로 단어를 추가해봐요'}
             actionLabel={t.vocab.addWord}
             onAction={() => router.push(`/vocabulary/${folderId}/add`)}
           />
@@ -455,12 +458,12 @@ export default function VocabularyDetailPage() {
             maxHeight: '85vh', overflowY: 'auto',
           }}>
             <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 16px' }} />
-            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>단어장 편집</h3>
+            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{lang === 'en' ? 'Edit Vocabulary' : '단어장 편집'}</h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
               <div>
-                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>단어장 이름</p>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>{lang === 'en' ? 'Name' : '단어장 이름'}</p>
                 <input
                   value={editForm.name}
                   onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
@@ -469,28 +472,28 @@ export default function VocabularyDetailPage() {
               </div>
 
               <div>
-                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>설명 <span style={{ fontWeight: 400, color: 'var(--color-text-tertiary)' }}>(선택)</span></p>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>{lang === 'en' ? 'Description' : '설명'} <span style={{ fontWeight: 400, color: 'var(--color-text-tertiary)' }}>{lang === 'en' ? '(optional)' : '(선택)'}</span></p>
                 <input
                   value={editForm.description}
                   onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
-                  placeholder="이 단어장에 대한 간단한 설명"
+                  placeholder={lang === 'en' ? 'Brief description' : '이 단어장에 대한 간단한 설명'}
                   style={{ width: '100%', height: '46px', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: '12px', padding: '0 14px', fontSize: '14px', color: 'var(--color-text-primary)', outline: 'none', boxSizing: 'border-box' }}
                 />
               </div>
 
               <div>
-                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>카테고리</p>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>{lang === 'en' ? 'Category' : '카테고리'}</p>
                 <SelectDropdown
                   value={editForm.category}
                   onChange={val => setEditForm(f => ({ ...f, category: val }))}
                   options={[
-                    { value: '수능', label: '수능' },
-                    { value: '토익', label: '토익' },
-                    { value: '일상', label: '일상' },
-                    { value: '비즈니스', label: '비즈니스' },
-                    { value: '기타', label: '기타' },
+                    { value: '수능', label: lang === 'en' ? 'CSAT' : '수능' },
+                    { value: '토익', label: lang === 'en' ? 'TOEIC' : '토익' },
+                    { value: '일상', label: lang === 'en' ? 'Daily' : '일상' },
+                    { value: '비즈니스', label: lang === 'en' ? 'Business' : '비즈니스' },
+                    { value: '기타', label: lang === 'en' ? 'Other' : '기타' },
                   ]}
-                  placeholder="카테고리 선택"
+                  placeholder={lang === 'en' ? 'Select category' : '카테고리 선택'}
                 />
               </div>
 
@@ -507,12 +510,12 @@ export default function VocabularyDetailPage() {
 
               <button onClick={handleEditSave}
                 style={{ width: '100%', height: '50px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
-                저장하기
+                {t.common.save}
               </button>
 
               <button onClick={handleFolderDelete}
                 style={{ width: '100%', height: '50px', background: 'rgba(226,75,74,0.08)', color: '#E24B4A', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>
-                단어장 삭제
+                {lang === 'en' ? 'Delete Vocabulary' : '단어장 삭제'}
               </button>
 
             </div>
