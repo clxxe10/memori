@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from '@/lib/i18n'
 
 type Option = { value: string; label: string; flag?: string }
 
@@ -16,9 +17,11 @@ type Props = {
 }
 
 export default function SelectDropdown({
-  value, onChange, options, placeholder = '선택',
+  value, onChange, options, placeholder,
   multiple = false, selectedValues = [], onMultiChange,
 }: Props) {
+  const { t, lang } = useTranslation()
+  const defaultPlaceholder = placeholder ?? (lang === 'en' ? 'Select' : '선택')
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -39,10 +42,10 @@ export default function SelectDropdown({
   }, [])
 
   const displayValue = multiple
-    ? selectedValues.length === 0 ? placeholder
+    ? selectedValues.length === 0 ? defaultPlaceholder
       : selectedValues.length === 1 ? selectedValues[0]
-      : `${selectedValues[0]} 외 ${selectedValues.length - 1}개`
-    : value || placeholder
+      : lang === 'en' ? `${selectedValues[0]} +${selectedValues.length - 1} more` : `${selectedValues[0]} 외 ${selectedValues.length - 1}개`
+    : value || defaultPlaceholder
 
   const handleSelect = (val: string) => {
     if (multiple && onMultiChange) {

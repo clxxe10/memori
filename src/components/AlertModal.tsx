@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useTranslation } from '@/lib/i18n'
 
 interface Props {
   title: string
@@ -15,11 +16,12 @@ export default function AlertModal({
   title,
   description,
   confirmText,
-  cancelText = '취소',
+  cancelText,
   isDestructive = false,
   onConfirm,
   onCancel,
 }: Props) {
+  const { t } = useTranslation()
   const [isDark, setIsDark] = useState(false)
 
   useEffect(() => {
@@ -103,7 +105,7 @@ export default function AlertModal({
               cursor: 'pointer',
             }}
           >
-            {cancelText}
+            {cancelText ?? t.common.cancel}
           </button>
         </div>
       </div>

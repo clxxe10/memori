@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name }: Props) {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const [mode, setMode] = useState<'select' | 'signup' | 'login'>('select')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -47,25 +47,25 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
   const handleEmailSignup = async () => {
     setError('')
     if (emailStep === 'email') {
-      if (!email.trim() || !email.includes('@')) { setError('올바른 이메일을 입력해주세요'); return }
+      if (!email.trim() || !email.includes('@')) { setError(t.alert.emailInvalid); return }
       setEmailStep('password'); return
     }
-    if (password.length < 6) { setError('비밀번호는 6자 이상이에요'); return }
+    if (password.length < 6) { setError(t.alert.passwordShort); return }
     setLoading(true)
     try {
       const supabase = createClient()
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email, password,
-        options: { data: { full_name: name || '사용자' } }
+        options: { data: { full_name: name || (lang === 'en' ? 'User' : '사용자') } }
       })
       if (signUpError) {
         if (signUpError.message.includes('already registered') || signUpError.message.includes('already exists')) {
-          setError('이미 가입된 이메일이에요. 로그인해주세요.')
+          setError(t.alert.emailExists)
         } else { setError(signUpError.message) }
         return
       }
       if (signUpData.user && signUpData.user.identities && signUpData.user.identities.length === 0) {
-        setError('이미 가입된 이메일이에요. 로그인해주세요.')
+        setError(t.alert.emailExists)
         return
       }
       onNext()
@@ -75,15 +75,15 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
   const handleEmailLogin = async () => {
     setError('')
     if (emailStep === 'email') {
-      if (!email.trim() || !email.includes('@')) { setError('올바른 이메일을 입력해주세요'); return }
+      if (!email.trim() || !email.includes('@')) { setError(t.alert.emailInvalid); return }
       setEmailStep('password'); return
     }
-    if (password.length < 6) { setError('비밀번호는 6자 이상이에요'); return }
+    if (password.length < 6) { setError(t.alert.passwordShort); return }
     setLoading(true)
     try {
       const supabase = createClient()
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-      if (signInError) { setError('이메일 또는 비밀번호가 올바르지 않아요'); return }
+      if (signInError) { setError(t.alert.loginFailed); return }
       onLogin()
     } finally { setLoading(false) }
   }
