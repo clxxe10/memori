@@ -230,37 +230,39 @@ export default function ProfilePage() {
         </div>
 
         {/* Memori+ 배너 */}
-        <div onClick={() => router.push('/profile/premium')} style={{
-          background: 'var(--color-surface)',
-          borderRadius: '22px', padding: '16px',
-          marginBottom: '24px', cursor: 'pointer',
-          display: 'flex', alignItems: 'center', gap: '14px',
-          border: '0.5px solid var(--color-border)',
-          position: 'relative', overflow: 'hidden',
-        }}>
-          <div className="memori-plus-icon-box" style={{
-            width: '42px', height: '42px', borderRadius: '12px',
-            background: 'linear-gradient(135deg, #1C1C1E 0%, #3A3A3C 100%)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
+        {false && (
+          <div onClick={() => router.push('/profile/premium')} style={{
+            background: 'var(--color-surface)',
+            borderRadius: '22px', padding: '16px',
+            marginBottom: '24px', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: '14px',
+            border: '0.5px solid var(--color-border)',
+            position: 'relative', overflow: 'hidden',
           }}>
-            <span style={{ fontSize: '20px', color: '#FFFFFF', lineHeight: 1 }}>✦</span>
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '2px' }}>
-              Memori+
+            <div className="memori-plus-icon-box" style={{
+              width: '42px', height: '42px', borderRadius: '12px',
+              background: 'linear-gradient(135deg, #1C1C1E 0%, #3A3A3C 100%)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <span style={{ fontSize: '20px', color: '#FFFFFF', lineHeight: 1 }}>✦</span>
             </div>
-            <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
-              {t.profile.premiumDesc}
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '2px' }}>
+                Memori+
+              </div>
+              <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+                {t.profile.premiumDesc}
+              </div>
             </div>
+            <button style={{
+              background: 'var(--color-text-primary)', color: 'var(--color-bg)',
+              border: 'none', borderRadius: '9999px',
+              padding: '8px 16px', fontSize: '13px', fontWeight: 600,
+              cursor: 'pointer', flexShrink: 0,
+            }}>{t.profile.upgrade}</button>
           </div>
-          <button style={{
-            background: 'var(--color-text-primary)', color: 'var(--color-bg)',
-            border: 'none', borderRadius: '9999px',
-            padding: '8px 16px', fontSize: '13px', fontWeight: 600,
-            cursor: 'pointer', flexShrink: 0,
-          }}>{t.profile.upgrade}</button>
-        </div>
+        )}
 
         {/* 내 계정 */}
         <p style={groupTitleStyle}>{t.profile.myAccount}</p>
