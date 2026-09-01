@@ -359,6 +359,16 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
           )}
         </div>
 
+        <button onClick={() => onLogin()} style={{
+          background: 'none', border: 'none',
+          cursor: 'pointer', fontSize: '13px',
+          color: tertiaryColor, width: '100%',
+          textAlign: 'center' as const,
+          padding: '8px 0', marginBottom: '8px',
+        }}>
+          {lang === 'en' ? 'Browse without account' : '로그인 없이 둘러보기'}
+        </button>
+
         {/* 약관 동의 */}
         <div className="s2-footer-anim" style={{
           marginTop: 'auto', paddingTop: '20px',
