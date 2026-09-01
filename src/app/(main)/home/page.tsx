@@ -196,6 +196,26 @@ export default function HomePage() {
     return m > 0 ? `${h}h ${m}m` : `${h}h`
   }
 
+  if (!loading && !user) return (
+    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', padding: '0 24px', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
+      <div style={{ fontSize: '56px', marginBottom: '16px' }}>📚</div>
+      <h2 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px', textAlign: 'center', letterSpacing: '-0.4px' }}>
+        {lang === 'en' ? 'Sign in to get started' : '로그인하고 시작해요'}
+      </h2>
+      <p style={{ fontSize: '15px', color: 'var(--color-text-secondary)', marginBottom: '32px', textAlign: 'center', lineHeight: 1.5 }}>
+        {lang === 'en' ? 'Create vocabulary lists and study with AI' : 'AI로 단어장을 만들고 학습해요'}
+      </p>
+      <button onClick={() => router.push('/onboarding')} style={{
+        width: '100%', maxWidth: '320px', height: '52px',
+        background: 'var(--color-my)', color: 'var(--color-my-contrast)',
+        border: 'none', borderRadius: '9999px',
+        fontSize: '16px', fontWeight: 700, cursor: 'pointer',
+      }}>
+        {lang === 'en' ? 'Sign In' : '로그인하기'}
+      </button>
+    </main>
+  )
+
   return (
     <main style={{
       minHeight: '100vh',

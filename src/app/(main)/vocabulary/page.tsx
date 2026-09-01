@@ -45,6 +45,7 @@ export default function VocabularyPage() {
   const router = useRouter()
   const { t, lang } = useTranslation()
   const [folders, setFolders] = useState<Folder[]>([])
+  const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
@@ -61,6 +62,7 @@ export default function VocabularyPage() {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setLoading(false); return }
+    setUser(user)
 
     const { data: folderData } = await supabase
       .from('folders')
@@ -177,6 +179,26 @@ export default function VocabularyPage() {
   }
 
   const filtered = folders.filter((f) => f.name.toLowerCase().includes(search.toLowerCase()))
+
+  if (!loading && !user) return (
+    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', padding: '0 24px', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
+      <div style={{ fontSize: '56px', marginBottom: '16px' }}>📖</div>
+      <h2 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px', textAlign: 'center', letterSpacing: '-0.4px' }}>
+        {lang === 'en' ? 'Sign in to create vocabulary' : '로그인하고 단어장을 만들어요'}
+      </h2>
+      <p style={{ fontSize: '15px', color: 'var(--color-text-secondary)', marginBottom: '32px', textAlign: 'center', lineHeight: 1.5 }}>
+        {lang === 'en' ? 'Save and manage your vocabulary lists' : '나만의 단어장을 저장하고 관리해요'}
+      </p>
+      <button onClick={() => router.push('/onboarding')} style={{
+        width: '100%', maxWidth: '320px', height: '52px',
+        background: 'var(--color-my)', color: 'var(--color-my-contrast)',
+        border: 'none', borderRadius: '9999px',
+        fontSize: '16px', fontWeight: 700, cursor: 'pointer',
+      }}>
+        {lang === 'en' ? 'Sign In' : '로그인하기'}
+      </button>
+    </main>
+  )
 
   return (
     <main

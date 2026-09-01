@@ -17,6 +17,8 @@ export default function StudyPage() {
   const [showFolderSheet, setShowFolderSheet] = useState(false)
   const [selectedMode, setSelectedMode] = useState<string | null>(null)
   const [folders, setFolders] = useState<Array<{ id: string; name: string; icon: string; word_count?: number; color?: string }>>([])
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
   const [loadingFolders, setLoadingFolders] = useState(false)
   const [helpMode, setHelpMode] = useState<string | null>(null)
   const pagePadding = usePagePadding()
@@ -101,6 +103,16 @@ export default function StudyPage() {
   }, [])
 
   useEffect(() => {
+    const checkUser = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) setUser(user)
+      setLoading(false)
+    }
+    checkUser()
+  }, [])
+
+  useEffect(() => {
     const fetchFolders = async () => {
       setLoadingFolders(true)
       const supabase = createClient()
@@ -172,6 +184,26 @@ export default function StudyPage() {
     const queryStr = folderId ? `?folderId=${folderId}` : ''
     router.push(`/study/${selectedMode}${queryStr}`)
   }
+
+  if (!loading && !user) return (
+    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', padding: '0 24px', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
+      <div style={{ fontSize: '56px', marginBottom: '16px' }}>🎓</div>
+      <h2 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px', textAlign: 'center', letterSpacing: '-0.4px' }}>
+        {lang === 'en' ? 'Sign in to study' : '로그인하고 학습해요'}
+      </h2>
+      <p style={{ fontSize: '15px', color: 'var(--color-text-secondary)', marginBottom: '32px', textAlign: 'center', lineHeight: 1.5 }}>
+        {lang === 'en' ? 'Study with 8 different modes' : '8가지 학습 모드로 단어를 익혀요'}
+      </p>
+      <button onClick={() => router.push('/onboarding')} style={{
+        width: '100%', maxWidth: '320px', height: '52px',
+        background: 'var(--color-my)', color: 'var(--color-my-contrast)',
+        border: 'none', borderRadius: '9999px',
+        fontSize: '16px', fontWeight: 700, cursor: 'pointer',
+      }}>
+        {lang === 'en' ? 'Sign In' : '로그인하기'}
+      </button>
+    </main>
+  )
 
   return (
     <main style={{
