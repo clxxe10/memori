@@ -384,8 +384,8 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
           </div>
           <p style={{ fontSize: '13px', color: tertiaryColor, margin: 0, lineHeight: 1.4 }}>
             {t.onboarding.termsNotice.split(/(\{terms\}|\{privacy\})/).map((part, i) => {
-              if (part === '{terms}') return <span key={i} style={{ textDecoration: 'underline' }}>{t.onboarding.terms}</span>
-              if (part === '{privacy}') return <span key={i} style={{ textDecoration: 'underline' }}>{t.onboarding.privacy}</span>
+              if (part === '{terms}') return <span key={i} style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={() => window.open('https://memori-seven.vercel.app/terms', '_blank')}>{t.onboarding.terms}</span>
+              if (part === '{privacy}') return <span key={i} style={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={() => window.open('https://memori-seven.vercel.app/privacy', '_blank')}>{t.onboarding.privacy}</span>
               return <span key={i}>{part}</span>
             })}
           </p>
