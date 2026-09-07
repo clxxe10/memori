@@ -52,11 +52,20 @@ export default function NoticesPage() {
                 </div>
                 <span style={{ fontSize: '16px', color: 'var(--color-text-tertiary)' }}>{openNotice === notice.id ? '−' : '+'}</span>
               </div>
-              {openNotice === notice.id && (
-                <div style={{ padding: '0 16px 16px', fontSize: '14px', color: 'var(--color-text-secondary)', lineHeight: 1.7, borderTop: '1px solid var(--color-border)', whiteSpace: 'pre-line' }}>
-                  {notice.content}
-                </div>
-              )}
+              <div style={{
+                padding: '0 16px 16px',
+                fontSize: '14px',
+                color: 'var(--color-text-secondary)',
+                lineHeight: 1.7,
+                borderTop: '1px solid var(--color-border)',
+                whiteSpace: 'pre-line',
+                overflow: 'hidden',
+                transition: 'max-height 0.3s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s ease',
+                maxHeight: openNotice === notice.id ? '500px' : '0px',
+                opacity: openNotice === notice.id ? 1 : 0,
+              }}>
+                {notice.content}
+              </div>
             </div>
           ))}
         </div>

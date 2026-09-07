@@ -54,6 +54,7 @@ export default function AlertModal({
         background: dimBg,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif',
+        animation: 'fadeIn 0.2s ease both',
       }}
     >
       <div
@@ -68,6 +69,7 @@ export default function AlertModal({
           borderRadius: '28px',
           padding: '30px 24px 20px',
           textAlign: 'center' as const,
+          animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
         }}
       >
         <h3 style={{ fontSize: '20px', fontWeight: 800, color: titleColor, margin: '0 0 8px' }}>

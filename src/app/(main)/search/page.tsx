@@ -302,6 +302,7 @@ function SearchPageContent() {
               display: 'grid',
               gridTemplateColumns: '1fr',
               gap: '8px',
+              animation: 'pageEnter 0.2s ease both',
             }}>
               {filtered.map(folder => {
                 const isImported = importedIds.has(folder.id)
