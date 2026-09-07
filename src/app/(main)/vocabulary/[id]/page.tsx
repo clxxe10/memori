@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, useRef, type ReactNode } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Bookmark, Camera, Pencil, Plus, Volume2, Settings } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -42,6 +42,7 @@ function WordCard({ word, onDelete, children }: { word: Word; onDelete: () => vo
   const { t, lang } = useTranslation()
   const [swipeX, setSwipeX] = useState(0)
   const [confirming, setConfirming] = useState(false)
+  const startX = useRef(0)
 
   const swipeHandlers = useSwipe({
     onSwipeLeft: () => {
@@ -79,8 +80,34 @@ function WordCard({ word, onDelete, children }: { word: Word; onDelete: () => vo
   }
 
   return (
-    <div {...swipeHandlers}>
-      {children}
+    <div style={{ position: 'relative' }}>
+      <div style={{
+        position: 'absolute', inset: 0,
+        borderRadius: '16px',
+        background: 'rgba(255,59,48,0.12)',
+        display: 'flex', alignItems: 'center',
+        justifyContent: 'flex-end',
+        paddingRight: '20px',
+        opacity: Math.min(1, Math.abs(swipeX) / 80),
+      }}>
+        <span style={{ fontSize: '20px' }}>🗑️</span>
+      </div>
+      <div
+        onTouchStart={(e) => {
+          startX.current = e.touches[0].clientX
+          swipeHandlers.onTouchStart(e)
+        }}
+        onTouchMove={(e) => {
+          setSwipeX(e.touches[0].clientX - startX.current)
+        }}
+        onTouchEnd={(e) => {
+          swipeHandlers.onTouchEnd(e)
+          setSwipeX(0)
+        }}
+        style={{ position: 'relative', zIndex: 1, transform: `translateX(${Math.min(0, swipeX)}px)`, transition: swipeX === 0 ? 'transform 0.2s ease' : 'none' }}
+      >
+        {children}
+      </div>
     </div>
   )
 }

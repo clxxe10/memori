@@ -42,7 +42,8 @@ function FlashcardContent() {
   const [folderName, setFolderName] = useState('')
   const [cardAnim, setCardAnim] = useState('')
   const [exitDirection, setExitDirection] = useState<'left' | 'right' | null>(null)
-  const [dragX, setDragX] = useState(0)
+  const [swipeX, setSwipeX] = useState(0)
+  const [dragging, setDragging] = useState(false)
   const dragStartX = useRef(0)
   useEffect(() => {
     const style = document.createElement('style')
@@ -383,16 +384,18 @@ function FlashcardContent() {
             {...swipeHandlers}
             onTouchStart={(e) => {
               dragStartX.current = e.touches[0].clientX
+              setDragging(true)
               swipeHandlers.onTouchStart(e)
             }}
             onTouchMove={(e) => {
               if (exitDirection) return
               const dx = e.touches[0].clientX - dragStartX.current
-              setDragX(dx)
+              setSwipeX(dx)
             }}
             onTouchEnd={(e) => {
+              setDragging(false)
               swipeHandlers.onTouchEnd(e)
-              setDragX(0)
+              setSwipeX(0)
             }}
             className={cardAnim}
             onClick={() => {
@@ -421,15 +424,31 @@ function FlashcardContent() {
                 ? 'translateX(-150%) rotate(-20deg)'
                 : exitDirection === 'right'
                 ? 'translateX(150%) rotate(20deg)'
-                : `translateX(${dragX}px) rotate(${dragX / 20}deg)`,
-              opacity: exitDirection ? 0 : 1,
+                : dragging
+                ? `translateX(${swipeX}px) rotate(${swipeX * 0.05}deg)`
+                : 'translateX(0) rotate(0)',
+              opacity: exitDirection ? 0 : dragging ? Math.max(0.7, 1 - Math.abs(swipeX) / 300) : 1,
               transition: exitDirection
                 ? 'all 0.45s ease-in'
-                : dragX !== 0
-                ? 'none'
-                : 'transform 0.2s ease-out',
+                : dragging ? 'none' : 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)',
             }}
           >
+            {Math.abs(swipeX) > 30 && (
+              <div style={{
+                position: 'absolute', top: '20px',
+                left: swipeX > 0 ? '20px' : 'auto',
+                right: swipeX < 0 ? '20px' : 'auto',
+                padding: '6px 16px',
+                borderRadius: '9999px',
+                background: swipeX > 0 ? 'rgba(52,199,89,0.2)' : 'rgba(255,59,48,0.2)',
+                border: `2px solid ${swipeX > 0 ? '#34C759' : '#FF3B30'}`,
+                color: swipeX > 0 ? '#34C759' : '#FF3B30',
+                fontSize: '14px', fontWeight: 700,
+                opacity: Math.min(1, Math.abs(swipeX) / 100),
+              }}>
+                {swipeX > 0 ? t.study.know : t.study.dontKnow}
+              </div>
+            )}
             <button
               onClick={e => { e.stopPropagation(); handleSpeak(word.word) }}
               style={{ position: 'absolute', top: '14px', left: '14px', width: '30px', height: '30px', borderRadius: '50%', background: 'var(--color-bg)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}

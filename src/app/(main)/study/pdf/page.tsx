@@ -265,7 +265,7 @@ export default function PDFPage() {
 
         {/* STEP 1: 단어장 선택 */}
         {step === 'folder' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+          <div key={step} style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px', animation: 'pageEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both' }}>
             {folders.map(folder => (
               <div
                 key={folder.id}
@@ -285,7 +285,7 @@ export default function PDFPage() {
         )}
 
         {step === 'format' && (
-          <>
+          <div key={step} style={{ animation: 'pageEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both' }}>
             <div style={{ marginBottom: '16px' }}>
               <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '10px' }}>시험 형식</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -324,12 +324,12 @@ export default function PDFPage() {
             >
               {t.common.next}
             </button>
-          </>
+          </div>
         )}
 
         {/* STEP 2: 단어 선택 */}
         {step === 'words' && (
-          <>
+          <div key={step} style={{ animation: 'pageEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
               <span style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>{selectedCount}개 선택됨</span>
               <button onClick={toggleAll} style={{ background: 'none', border: 'none', fontSize: '13px', color: 'var(--color-text-primary)', fontWeight: 600, cursor: 'pointer' }}>
@@ -388,12 +388,12 @@ export default function PDFPage() {
                 다음 ({selectedCount}개)
               </button>
             </div>
-          </>
+          </div>
         )}
 
         {/* STEP 3: 미리보기 */}
         {step === 'preview' && (
-          <>
+          <div key={step} style={{ animation: 'pageEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both' }}>
             <div style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '16px', border: '1px solid var(--color-border)', marginBottom: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
               <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)', textAlign: 'center', marginBottom: '12px' }}>
                 {selectedFolder?.name}
@@ -452,12 +452,12 @@ export default function PDFPage() {
                 </div>
               </div>
             )}
-          </>
+          </div>
         )}
 
         {/* STEP 4: 완료 */}
         {step === 'done' && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '20px' }}>
+          <div key={step} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '20px', animation: 'pageEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both' }}>
             <div style={{ fontSize: '56px', marginBottom: '16px' }}>✅</div>
             <h2 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>{t.study.pdfReady}</h2>
             <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '32px', textAlign: 'center' }}>
