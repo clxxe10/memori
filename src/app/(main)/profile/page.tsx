@@ -413,6 +413,7 @@ export default function ProfilePage() {
             borderRadius: '26px',
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
+            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.theme}</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -459,6 +460,7 @@ export default function ProfilePage() {
             borderRadius: '26px',
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
+            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.myColor}</h3>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', padding: '14px 16px', background: 'var(--color-surface-2)', borderRadius: '14px' }}>
@@ -539,6 +541,7 @@ export default function ProfilePage() {
             borderRadius: '26px',
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
+            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.language}</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
@@ -605,6 +608,7 @@ export default function ProfilePage() {
             borderRadius: '26px',
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
+            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.dailyGoal}</h3>
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>{t.profile.goalQuestion}</p>
@@ -657,6 +661,7 @@ export default function ProfilePage() {
             borderRadius: '26px',
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
+            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.notifications}</h3>
 

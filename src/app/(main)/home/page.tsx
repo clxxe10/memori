@@ -618,6 +618,7 @@ export default function HomePage() {
             borderRadius: '26px',
             padding: '24px 20px 20px',
             maxHeight: '70vh', overflowY: 'auto' as const,
+            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
             <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '6px', textAlign: 'center' }}>단어장 선택</h3>
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px', textAlign: 'center' }}>{t.study.selectFolderDesc}</p>

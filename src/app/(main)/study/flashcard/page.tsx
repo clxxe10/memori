@@ -545,8 +545,9 @@ function FlashcardContent() {
 }
 
 export default function FlashcardPage() {
+  const { t } = useTranslation()
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)' }}><p style={{ color: 'var(--color-text-secondary)' }}>Loading...</p></div>}>
+    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)' }}><p style={{ color: 'var(--color-text-secondary)' }}>{t.common.loading}</p></div>}>
       <FlashcardContent />
     </Suspense>
   )

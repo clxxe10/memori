@@ -417,8 +417,9 @@ function ReviewContent() {
 }
 
 export default function ReviewPage() {
+  const { t } = useTranslation()
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)' }}><p style={{ color: 'var(--color-text-secondary)' }}>불러오는 중...</p></div>}>
+    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)' }}><p style={{ color: 'var(--color-text-secondary)' }}>{t.common.loading}</p></div>}>
       <ReviewContent />
     </Suspense>
   )

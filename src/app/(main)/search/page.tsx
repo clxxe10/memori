@@ -393,10 +393,11 @@ function SearchPageContent() {
 }
 
 export default function SearchPage() {
+  const { t } = useTranslation()
   return (
     <Suspense fallback={
       <main style={{ minHeight: '100vh', backgroundColor: 'var(--color-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: 'var(--color-text-secondary)' }}>불러오는 중...</p>
+        <p style={{ color: 'var(--color-text-secondary)' }}>{t.common.loading}</p>
       </main>
     }>
       <SearchPageContent />

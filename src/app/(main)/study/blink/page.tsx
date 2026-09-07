@@ -230,10 +230,11 @@ function BlinkContent() {
 }
 
 export default function BlinkPage() {
+  const { t } = useTranslation()
   return (
     <Suspense fallback={
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-        <div style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>불러오는 중...</div>
+        <div style={{ fontSize: '14px', color: 'var(--color-text-secondary)' }}>{t.common.loading}</div>
       </div>
     }>
       <BlinkContent />

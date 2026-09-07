@@ -20,6 +20,7 @@ export default function StudyPage() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [loadingFolders, setLoadingFolders] = useState(false)
+  const [isStarting, setIsStarting] = useState(false)
   const [helpMode, setHelpMode] = useState<string | null>(null)
   const pagePadding = usePagePadding()
   const bp = useBreakpoint()
@@ -162,27 +163,31 @@ export default function StudyPage() {
 
   const handleStart = async (folderId?: string) => {
     if (!selectedMode) return
+    setIsStarting(true)
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
 
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+      let query = supabase
+        .from('words')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+      if (folderId) query = query.eq('folder_id', folderId)
 
-    let query = supabase
-      .from('words')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-    if (folderId) query = query.eq('folder_id', folderId)
+      const { count } = await query
 
-    const { count } = await query
+      if (!count || count === 0) {
+        alert(lang === 'en' ? 'No words in this vocabulary. Add words first.' : '단어장에 단어가 없어요! 단어를 먼저 추가해주세요.')
+        return
+      }
 
-    if (!count || count === 0) {
-      alert(lang === 'en' ? 'No words in this vocabulary. Add words first.' : '단어장에 단어가 없어요! 단어를 먼저 추가해주세요.')
-      return
+      setShowFolderSheet(false)
+      const queryStr = folderId ? `?folderId=${folderId}` : ''
+      router.push(`/study/${selectedMode}${queryStr}`)
+    } finally {
+      setIsStarting(false)
     }
-
-    setShowFolderSheet(false)
-    const queryStr = folderId ? `?folderId=${folderId}` : ''
-    router.push(`/study/${selectedMode}${queryStr}`)
   }
 
   if (loading) return (
@@ -424,6 +429,7 @@ export default function StudyPage() {
             borderRadius: '26px',
             padding: '24px 20px 20px',
             maxHeight: '70vh', overflowY: 'auto' as const,
+            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
             <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '6px', textAlign: 'center' }}>
               {selectedMode === 'review' ? t.home.reviewStart : t.study.selectFolder}
@@ -433,7 +439,8 @@ export default function StudyPage() {
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
               <button onClick={() => handleStart()}
-                style={{ width: '100%', background: 'rgba(28,28,30,0.06)', borderRadius: '16px', padding: '14px 16px', border: '1.5px solid rgba(28,28,30,0.15)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textAlign: 'left' as const }}>
+                disabled={isStarting}
+                style={{ width: '100%', background: 'rgba(28,28,30,0.06)', borderRadius: '16px', padding: '14px 16px', border: '1.5px solid rgba(28,28,30,0.15)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textAlign: 'left' as const, opacity: isStarting ? 0.5 : 1 }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
                     {selectedMode === 'review' ? (lang === 'en' ? 'Full Review' : '전체 복습') : t.study.allWords}
@@ -459,7 +466,8 @@ export default function StudyPage() {
                 folders.map(folder => (
                   <button key={folder.id}
                     onClick={() => (folder.word_count || 0) > 0 ? handleStart(folder.id) : undefined}
-                    style={{ width: '100%', background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '12px', cursor: (folder.word_count || 0) === 0 ? 'not-allowed' : 'pointer', textAlign: 'left' as const, opacity: (folder.word_count || 0) === 0 ? 0.4 : 1 }}>
+                    disabled={isStarting}
+                    style={{ width: '100%', background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '12px', cursor: (folder.word_count || 0) === 0 ? 'not-allowed' : 'pointer', textAlign: 'left' as const, opacity: isStarting ? 0.5 : ((folder.word_count || 0) === 0 ? 0.4 : 1) }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{folder.name}</div>
                       <div style={{ fontSize: '12px', color: (folder.word_count || 0) === 0 ? '#E24B4A' : 'var(--color-text-secondary)', marginTop: '2px' }}>

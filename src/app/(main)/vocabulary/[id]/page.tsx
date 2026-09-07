@@ -462,6 +462,7 @@ export default function VocabularyDetailPage() {
             background: 'var(--color-surface)', borderRadius: '24px 24px 0 0',
             padding: '12px 20px 120px', zIndex: 50,
             maxHeight: '85vh', overflowY: 'auto',
+            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
             <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 16px' }} />
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{lang === 'en' ? 'Edit Vocabulary' : '단어장 편집'}</h3>
@@ -551,6 +552,7 @@ export default function VocabularyDetailPage() {
               : '1px solid rgba(0,0,0,0.04)',
             borderRadius: '26px',
             padding: '24px 20px 20px',
+            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
             <p style={{ fontSize: '20px', fontWeight: 800, margin: '0 0 16px', color: 'var(--color-text-primary)', textAlign: 'center' }}>
               {t.vocab.addWord}

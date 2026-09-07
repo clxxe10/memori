@@ -394,6 +394,7 @@ export default function VocabularyPage() {
             borderRadius: '26px',
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
+            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
               <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>{t.vocab.newFolder}</h2>
