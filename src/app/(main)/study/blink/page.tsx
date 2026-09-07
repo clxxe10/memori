@@ -80,6 +80,7 @@ function BlinkContent() {
       display: 'flex', flexDirection: 'column',
       background: 'var(--color-bg)',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+      animation: 'pageEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
     }}>
       {/* 헤더 */}
       <div style={{

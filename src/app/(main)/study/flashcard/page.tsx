@@ -309,6 +309,7 @@ function FlashcardContent() {
       flexDirection: 'column',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
       overflow: 'hidden',
+      animation: 'pageEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
     }}>
       <div style={{
         display: 'flex',

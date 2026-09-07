@@ -8,7 +8,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       <main style={{ minHeight: '100vh' }}>
-        <div key={pathname} className="page-enter">
+        <div style={{
+          flex: 1,
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          animation: 'pageEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
+        }}>
           {children}
         </div>
         <ToastContainer />
