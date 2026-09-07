@@ -99,6 +99,7 @@ export default function VocabularyDetailPage() {
   const [activeFilter, setActiveFilter] = useState(0) // 0=전체, 1=북마크, 2=어려워요, 3=미학습
   const [showAddSheet, setShowAddSheet] = useState(false)
   const [showEditSheet, setShowEditSheet] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const [editForm, setEditForm] = useState({
     name: '',
     description: '',
@@ -144,15 +145,20 @@ export default function VocabularyDetailPage() {
   })
 
   const handleEditSave = async () => {
-    const supabase = createClient()
-    await supabase.from('folders').update({
-      name: editForm.name,
-      description: editForm.description.trim() || null,
-      category: editForm.category,
-      is_public: editForm.is_public,
-    }).eq('id', folderId)
-    setFolder(prev => prev ? { ...prev, ...editForm } : prev)
-    setShowEditSheet(false)
+    setIsSaving(true)
+    try {
+      const supabase = createClient()
+      await supabase.from('folders').update({
+        name: editForm.name,
+        description: editForm.description.trim() || null,
+        category: editForm.category,
+        is_public: editForm.is_public,
+      }).eq('id', folderId)
+      setFolder(prev => prev ? { ...prev, ...editForm } : prev)
+      setShowEditSheet(false)
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handleFolderDelete = async () => {
@@ -508,9 +514,9 @@ export default function VocabularyDetailPage() {
                 </div>
               </div>
 
-              <button onClick={handleEditSave}
+              <button onClick={handleEditSave} disabled={isSaving}
                 style={{ width: '100%', height: '50px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
-                {t.common.save}
+                {isSaving ? (lang === 'en' ? 'Saving...' : '저장 중...') : t.common.save}
               </button>
 
               <button onClick={handleFolderDelete}

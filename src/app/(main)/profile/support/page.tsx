@@ -28,6 +28,7 @@ export default function SupportPage() {
   const [content, setContent] = useState('')
   const [contactEmail, setContactEmail] = useState('')
   const [sent, setSent] = useState(false)
+  const [isSending, setIsSending] = useState(false)
   const padding = usePagePadding()
 
   const FAQ_LIST = lang === 'en' ? [
@@ -63,6 +64,7 @@ export default function SupportPage() {
     if (!content.trim()) return
     if (!contactEmail.trim()) { alert('답변받을 이메일을 입력해주세요'); return }
 
+    setIsSending(true)
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
@@ -87,6 +89,8 @@ export default function SupportPage() {
     } catch (e) {
       console.error(e)
       alert('오류가 발생했어요.')
+    } finally {
+      setIsSending(false)
     }
   }
 
@@ -173,10 +177,10 @@ export default function SupportPage() {
             />
             <button
               onClick={handleSend}
-              disabled={!content.trim()}
+              disabled={!content.trim() || isSending}
               style={{ width: '100%', height: '52px', background: content.trim() ? 'var(--color-neutral)' : 'var(--color-surface-2)', color: content.trim() ? 'var(--color-neutral-contrast)' : 'var(--color-text-tertiary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: content.trim() ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <Send size={16} />
-              {lang === 'en' ? 'Send' : '문의 보내기'}
+              {isSending ? (lang === 'en' ? 'Sending...' : '전송 중...') : (lang === 'en' ? 'Send' : '문의 보내기')}
             </button>
           </div>
         )}
