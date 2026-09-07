@@ -216,6 +216,23 @@ export default function HomePage() {
     </main>
   )
 
+  if (loading) return (
+    <main style={{ minHeight: '100vh', background: 'var(--color-bg)', padding: '60px 20px 100px', fontFamily: '-apple-system, sans-serif' }}>
+      <div style={{ height: '28px', width: '160px', borderRadius: '8px', background: 'var(--color-surface-2)', marginBottom: '8px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
+      <div style={{ height: '20px', width: '120px', borderRadius: '8px', background: 'var(--color-surface-2)', marginBottom: '32px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
+      <div style={{ height: '120px', borderRadius: '20px', background: 'var(--color-surface-2)', marginBottom: '16px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
+      <div style={{ height: '80px', borderRadius: '20px', background: 'var(--color-surface-2)', marginBottom: '16px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
+      <div style={{ height: '80px', borderRadius: '20px', background: 'var(--color-surface-2)', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
+      <style>{`
+        @keyframes skeleton-pulse {
+          0% { opacity: 1; }
+          50% { opacity: 0.4; }
+          100% { opacity: 1; }
+        }
+      `}</style>
+    </main>
+  )
+
   return (
     <main style={{
       minHeight: '100vh',

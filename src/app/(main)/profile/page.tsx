@@ -160,6 +160,23 @@ export default function ProfilePage() {
     cursor: 'pointer',
   })
 
+  if (loading) return (
+    <main style={{ minHeight: '100vh', background: 'var(--color-bg)', padding: '60px 20px 100px', fontFamily: '-apple-system, sans-serif' }}>
+      <div style={{ height: '80px', width: '80px', borderRadius: '50%', background: 'var(--color-surface-2)', margin: '0 auto 16px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
+      <div style={{ height: '24px', width: '120px', borderRadius: '8px', background: 'var(--color-surface-2)', margin: '0 auto 8px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
+      <div style={{ height: '16px', width: '180px', borderRadius: '8px', background: 'var(--color-surface-2)', margin: '0 auto 32px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
+      <div style={{ height: '100px', borderRadius: '20px', background: 'var(--color-surface-2)', marginBottom: '16px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
+      <div style={{ height: '200px', borderRadius: '20px', background: 'var(--color-surface-2)', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
+      <style>{`
+        @keyframes skeleton-pulse {
+          0% { opacity: 1; }
+          50% { opacity: 0.4; }
+          100% { opacity: 1; }
+        }
+      `}</style>
+    </main>
+  )
+
   if (!loading && !user) return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', padding: '0 24px', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
       <div style={{ fontSize: '56px', marginBottom: '16px' }}>👤</div>

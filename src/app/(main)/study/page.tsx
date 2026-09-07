@@ -185,6 +185,22 @@ export default function StudyPage() {
     router.push(`/study/${selectedMode}${queryStr}`)
   }
 
+  if (loading) return (
+    <main style={{ minHeight: '100vh', background: 'var(--color-bg)', padding: '60px 20px 100px', fontFamily: '-apple-system, sans-serif' }}>
+      <div style={{ height: '28px', width: '80px', borderRadius: '8px', background: 'var(--color-surface-2)', marginBottom: '24px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
+      {[1,2,3,4].map(i => (
+        <div key={i} style={{ height: '80px', borderRadius: '16px', background: 'var(--color-surface-2)', marginBottom: '12px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
+      ))}
+      <style>{`
+        @keyframes skeleton-pulse {
+          0% { opacity: 1; }
+          50% { opacity: 0.4; }
+          100% { opacity: 1; }
+        }
+      `}</style>
+    </main>
+  )
+
   if (!loading && !user) return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', padding: '0 24px', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
       <div style={{ fontSize: '56px', marginBottom: '16px' }}>🎓</div>
