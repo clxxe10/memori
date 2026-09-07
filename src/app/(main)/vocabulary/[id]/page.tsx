@@ -108,24 +108,30 @@ export default function VocabularyDetailPage() {
   })
 
   const fetchWords = async () => {
-    const supabase = createClient()
-    const { data: folderData } = await supabase.from('folders').select('*').eq('id', folderId).single()
-    if (folderData) {
-      setFolder(folderData)
-      setEditForm({
-        name: folderData.name || '',
-        description: folderData.description || '',
-        category: folderData.category || '',
-        is_public: folderData.is_public || false,
-      })
+    try {
+      const supabase = createClient()
+      const { data: folderData } = await supabase.from('folders').select('*').eq('id', folderId).single()
+      if (folderData) {
+        setFolder(folderData)
+        setEditForm({
+          name: folderData.name || '',
+          description: folderData.description || '',
+          category: folderData.category || '',
+          is_public: folderData.is_public || false,
+        })
+      }
+      const { data: wordData } = await supabase
+        .from('words')
+        .select('*')
+        .eq('folder_id', folderId)
+        .order('created_at', { ascending: true })
+      setWords(wordData || [])
+    } catch (e) {
+      console.error('단어 로딩 오류:', e)
+      alert(t.common.error)
+    } finally {
+      setLoading(false)
     }
-    const { data: wordData } = await supabase
-      .from('words')
-      .select('*')
-      .eq('folder_id', folderId)
-      .order('created_at', { ascending: true })
-    setWords(wordData || [])
-    setLoading(false)
   }
 
   useEffect(() => {

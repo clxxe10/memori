@@ -14,7 +14,7 @@ interface Folder {
 const MODES = ['flashcard', 'blink', 'quiz', 'typing']
 
 export default function MemorySetPage() {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const MODE_NAMES: Record<string, string> = {
     flashcard: t.study.flashcard,
     blink: t.study.blink,
@@ -109,7 +109,24 @@ export default function MemorySetPage() {
         {loading ? (
           <p style={{ color: 'var(--color-text-tertiary)', textAlign: 'center', padding: '40px 0' }}>{t.common.loading}</p>
         ) : folders.length === 0 ? (
-          <p style={{ color: 'var(--color-text-tertiary)', textAlign: 'center', padding: '40px 0' }}>{t.study.noWords}</p>
+          <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+            <div style={{ fontSize: '48px', marginBottom: '12px' }}>📚</div>
+            <p style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '8px' }}>
+              {t.study.noWords}
+            </p>
+            <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px' }}>
+              {t.study.noWordsDesc}
+            </p>
+            <button onClick={() => router.push('/vocabulary')} style={{
+              padding: '12px 24px',
+              background: 'var(--color-my)',
+              color: 'var(--color-my-contrast)',
+              border: 'none', borderRadius: '9999px',
+              fontSize: '14px', fontWeight: 600, cursor: 'pointer',
+            }}>
+              {lang === 'en' ? 'Go to Vocabulary' : '단어장 만들러 가기'}
+            </button>
+          </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {folders.map(folder => (

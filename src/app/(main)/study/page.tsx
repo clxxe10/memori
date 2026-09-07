@@ -167,7 +167,10 @@ export default function StudyPage() {
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      if (!user) {
+        router.push('/onboarding')
+        return
+      }
 
       let query = supabase
         .from('words')

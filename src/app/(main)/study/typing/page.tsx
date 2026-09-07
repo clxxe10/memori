@@ -195,7 +195,7 @@ function TypingContent() {
           <div style={{ height: '4px', background: 'var(--color-neutral)', borderRadius: '4px', width: `${progress}%`, transition: 'width 0.3s ease' }} />
         </div>
 
-        <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '16px' }}>
+        <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '16px', position: 'sticky', bottom: 0 }}>
           <div style={{ background: 'var(--color-surface)', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.09)', padding: '32px 20px', textAlign: 'center' }}>
             <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '10px' }}>{t.study.typeWord}</div>
             <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '10px' }}>{word.meaning}</div>
@@ -204,7 +204,7 @@ function TypingContent() {
             </span>
           </div>
 
-          <div>
+          <div style={{ paddingBottom: 'max(20px, calc(env(safe-area-inset-bottom) + 80px))' }}>
             <input
               value={inputValue}
               onChange={e => { if (!result) setInputValue(e.target.value) }}
