@@ -494,11 +494,14 @@ export default function VocabularyDetailPage() {
         <>
           <div
             onClick={() => setShowEditSheet(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 49 }}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 49 }}
           />
           <div style={{
             position: 'fixed', bottom: 0, left: 0, right: 0,
-            background: 'var(--color-surface)', borderRadius: '24px 24px 0 0',
+            background: 'var(--color-surface)',
+            borderRadius: '24px 24px 0 0',
+            borderTop: '1px solid var(--color-border)',
+            boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12)',
             padding: '12px 20px 120px', zIndex: 50,
             maxHeight: '85vh', overflowY: 'auto',
             animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
@@ -573,23 +576,15 @@ export default function VocabularyDetailPage() {
         <>
           <div onClick={() => setShowAddSheet(false)} style={{
             position: 'fixed', inset: 0, zIndex: 200,
-            background: document.documentElement.classList.contains('dark') ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.16)',
+            background: 'rgba(0,0,0,0.4)',
           }} />
           <div style={{
             position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
             width: '320px', zIndex: 201,
-            background: document.documentElement.classList.contains('dark')
-              ? 'linear-gradient(165deg, rgba(70,68,80,0.5), rgba(20,18,26,0.55))'
-              : '#FEFEFF',
-            backdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
-            WebkitBackdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
-            boxShadow: document.documentElement.classList.contains('dark')
-              ? 'inset 0 1.5px 0 rgba(255,255,255,0.16), 0 24px 48px rgba(0,0,0,0.6)'
-              : '0 24px 48px rgba(31,38,60,0.18), 0 2px 8px rgba(31,38,60,0.06)',
-            border: document.documentElement.classList.contains('dark')
-              ? '1px solid rgba(255,255,255,0.12)'
-              : '1px solid rgba(0,0,0,0.04)',
-            borderRadius: '26px',
+            background: 'var(--color-surface)',
+            boxShadow: '0 16px 40px rgba(0, 0, 0, 0.14)',
+            border: '1px solid var(--color-border)',
+            borderRadius: '24px',
             padding: '24px 20px 20px',
             animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
@@ -640,7 +635,7 @@ export default function VocabularyDetailPage() {
             <button onClick={() => setShowAddSheet(false)} style={{
               width: '100%', padding: '14px',
               borderRadius: '9999px', border: 'none',
-              background: document.documentElement.classList.contains('dark') ? 'rgba(255,255,255,0.1)' : 'rgba(120,120,128,0.14)',
+              background: 'var(--color-surface-2)',
               color: 'var(--color-text-primary)',
               fontSize: '16px', fontWeight: 600, cursor: 'pointer',
             }}>{t.common.cancel}</button>

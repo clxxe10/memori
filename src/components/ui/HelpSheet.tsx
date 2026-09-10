@@ -165,32 +165,23 @@ export default function HelpSheet({ mode, onClose }: Props) {
   const content = HELP_CONTENT[mode]
   if (!content) return null
 
-  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
-
   return (
     <>
       <div onClick={onClose} style={{
         position: 'fixed', inset: 0, zIndex: 999,
-        background: isDark ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.16)',
+        background: 'rgba(0,0,0,0.4)',
       }} />
       <div style={{
         position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
         width: '320px', zIndex: 1000,
-        background: isDark
-          ? 'linear-gradient(165deg, rgba(70,68,80,0.5), rgba(20,18,26,0.55))'
-          : '#FEFEFF',
-        backdropFilter: isDark ? 'blur(28px)' : 'none',
-        WebkitBackdropFilter: isDark ? 'blur(28px)' : 'none',
-        boxShadow: isDark
-          ? 'inset 0 1.5px 0 rgba(255,255,255,0.16), 0 24px 48px rgba(0,0,0,0.6)'
-          : '0 24px 48px rgba(31,38,60,0.18), 0 2px 8px rgba(31,38,60,0.06)',
-        border: isDark
-          ? '1px solid rgba(255,255,255,0.12)'
-          : '1px solid rgba(0,0,0,0.04)',
-        borderRadius: '26px',
+        background: 'var(--color-surface)',
+        boxShadow: '0 16px 40px rgba(0, 0, 0, 0.14)',
+        border: '1px solid var(--color-border)',
+        borderRadius: '24px',
         padding: '24px 20px 20px',
         maxHeight: '75vh', overflowY: 'auto' as const,
         fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+        animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
           <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
@@ -219,9 +210,9 @@ export default function HelpSheet({ mode, onClose }: Props) {
         </div>
 
         <div style={{
-          background: isDark ? 'rgba(255,255,255,0.06)' : 'var(--color-surface-2)',
+          background: 'var(--color-surface-2)',
           borderRadius: '14px', padding: '14px 16px',
-          border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid var(--color-border)',
+          border: '1px solid var(--color-border)',
         }}>
           <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '10px', letterSpacing: '0.3px' }}>
             {lang === 'en' ? '💡 Tips' : '💡 꿀팁'}

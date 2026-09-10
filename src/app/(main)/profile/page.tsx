@@ -394,23 +394,15 @@ export default function ProfilePage() {
         <>
           <div onClick={() => setShowThemeSheet(false)} style={{
             position: 'fixed', inset: 0, zIndex: 200,
-            background: document.documentElement.classList.contains('dark') ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.16)',
+            background: 'rgba(0,0,0,0.4)',
           }} />
           <div style={{
             position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
             width: '320px', zIndex: 201,
-            background: document.documentElement.classList.contains('dark')
-              ? 'linear-gradient(165deg, rgba(70,68,80,0.5), rgba(20,18,26,0.55))'
-              : '#FEFEFF',
-            backdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
-            WebkitBackdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
-            boxShadow: document.documentElement.classList.contains('dark')
-              ? 'inset 0 1.5px 0 rgba(255,255,255,0.16), 0 24px 48px rgba(0,0,0,0.6)'
-              : '0 24px 48px rgba(31,38,60,0.18)',
-            border: document.documentElement.classList.contains('dark')
-              ? '1px solid rgba(255,255,255,0.12)'
-              : '1px solid rgba(0,0,0,0.04)',
-            borderRadius: '26px',
+            background: 'var(--color-surface)',
+            boxShadow: '0 16px 40px rgba(0, 0, 0, 0.14)',
+            border: '1px solid var(--color-border)',
+            borderRadius: '24px',
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
             animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
@@ -441,23 +433,15 @@ export default function ProfilePage() {
         <>
           <div onClick={() => setShowColorSheet(false)} style={{
             position: 'fixed', inset: 0, zIndex: 200,
-            background: document.documentElement.classList.contains('dark') ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.16)',
+            background: 'rgba(0,0,0,0.4)',
           }} />
           <div style={{
             position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
             width: '320px', zIndex: 201,
-            background: document.documentElement.classList.contains('dark')
-              ? 'linear-gradient(165deg, rgba(70,68,80,0.5), rgba(20,18,26,0.55))'
-              : '#FEFEFF',
-            backdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
-            WebkitBackdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
-            boxShadow: document.documentElement.classList.contains('dark')
-              ? 'inset 0 1.5px 0 rgba(255,255,255,0.16), 0 24px 48px rgba(0,0,0,0.6)'
-              : '0 24px 48px rgba(31,38,60,0.18)',
-            border: document.documentElement.classList.contains('dark')
-              ? '1px solid rgba(255,255,255,0.12)'
-              : '1px solid rgba(0,0,0,0.04)',
-            borderRadius: '26px',
+            background: 'var(--color-surface)',
+            boxShadow: '0 16px 40px rgba(0, 0, 0, 0.14)',
+            border: '1px solid var(--color-border)',
+            borderRadius: '24px',
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
             animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
@@ -522,23 +506,15 @@ export default function ProfilePage() {
         <>
           <div onClick={() => setShowLangSheet(false)} style={{
             position: 'fixed', inset: 0, zIndex: 200,
-            background: document.documentElement.classList.contains('dark') ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.16)',
+            background: 'rgba(0,0,0,0.4)',
           }} />
           <div style={{
             position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
             width: '320px', zIndex: 201,
-            background: document.documentElement.classList.contains('dark')
-              ? 'linear-gradient(165deg, rgba(70,68,80,0.5), rgba(20,18,26,0.55))'
-              : '#FEFEFF',
-            backdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
-            WebkitBackdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
-            boxShadow: document.documentElement.classList.contains('dark')
-              ? 'inset 0 1.5px 0 rgba(255,255,255,0.16), 0 24px 48px rgba(0,0,0,0.6)'
-              : '0 24px 48px rgba(31,38,60,0.18)',
-            border: document.documentElement.classList.contains('dark')
-              ? '1px solid rgba(255,255,255,0.12)'
-              : '1px solid rgba(0,0,0,0.04)',
-            borderRadius: '26px',
+            background: 'var(--color-surface)',
+            boxShadow: '0 16px 40px rgba(0, 0, 0, 0.14)',
+            border: '1px solid var(--color-border)',
+            borderRadius: '24px',
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
             animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
@@ -560,19 +536,19 @@ export default function ProfilePage() {
                     padding: '14px 16px',
                     borderRadius: '14px',
                     cursor: 'pointer',
-                    border: `1.5px solid ${(language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en') ? 'var(--color-my)' : 'var(--color-border)'}`,
-                    background: (language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en') ? 'var(--color-my)' : document.documentElement.classList.contains('dark') ? 'rgba(120,120,128,0.24)' : '#F5F5F7',
+                    background: (language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en') ? 'var(--color-text-primary)' : 'var(--color-surface-2)',
+                    border: `1.5px solid ${(language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en') ? 'var(--color-text-primary)' : 'var(--color-border)'}`,
                   }}
                 >
                   <span style={{
                     fontSize: '15px',
                     fontWeight: 600,
-                    color: (language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en') ? 'var(--color-my-contrast)' : 'var(--color-text-primary)',
+                    color: (language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en') ? 'var(--color-bg)' : 'var(--color-text-primary)',
                   }}>
                     {language}
                   </span>
                   {((language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en')) &&
-                    <Check size={18} color="var(--color-my-contrast)" />
+                    <Check size={18} color="var(--color-bg)" />
                   }
                 </div>
               ))}
@@ -589,23 +565,15 @@ export default function ProfilePage() {
         <>
           <div onClick={() => setShowGoalSheet(false)} style={{
             position: 'fixed', inset: 0, zIndex: 200,
-            background: document.documentElement.classList.contains('dark') ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.16)',
+            background: 'rgba(0,0,0,0.4)',
           }} />
           <div style={{
             position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
             width: '320px', zIndex: 201,
-            background: document.documentElement.classList.contains('dark')
-              ? 'linear-gradient(165deg, rgba(70,68,80,0.5), rgba(20,18,26,0.55))'
-              : '#FEFEFF',
-            backdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
-            WebkitBackdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
-            boxShadow: document.documentElement.classList.contains('dark')
-              ? 'inset 0 1.5px 0 rgba(255,255,255,0.16), 0 24px 48px rgba(0,0,0,0.6)'
-              : '0 24px 48px rgba(31,38,60,0.18)',
-            border: document.documentElement.classList.contains('dark')
-              ? '1px solid rgba(255,255,255,0.12)'
-              : '1px solid rgba(0,0,0,0.04)',
-            borderRadius: '26px',
+            background: 'var(--color-surface)',
+            boxShadow: '0 16px 40px rgba(0, 0, 0, 0.14)',
+            border: '1px solid var(--color-border)',
+            borderRadius: '24px',
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
             animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
@@ -642,23 +610,15 @@ export default function ProfilePage() {
         <>
           <div onClick={() => setShowNotifSheet(false)} style={{
             position: 'fixed', inset: 0, zIndex: 200,
-            background: document.documentElement.classList.contains('dark') ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.16)',
+            background: 'rgba(0,0,0,0.4)',
           }} />
           <div style={{
             position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
             width: '320px', zIndex: 201,
-            background: document.documentElement.classList.contains('dark')
-              ? 'linear-gradient(165deg, rgba(70,68,80,0.5), rgba(20,18,26,0.55))'
-              : '#FEFEFF',
-            backdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
-            WebkitBackdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
-            boxShadow: document.documentElement.classList.contains('dark')
-              ? 'inset 0 1.5px 0 rgba(255,255,255,0.16), 0 24px 48px rgba(0,0,0,0.6)'
-              : '0 24px 48px rgba(31,38,60,0.18)',
-            border: document.documentElement.classList.contains('dark')
-              ? '1px solid rgba(255,255,255,0.12)'
-              : '1px solid rgba(0,0,0,0.04)',
-            borderRadius: '26px',
+            background: 'var(--color-surface)',
+            boxShadow: '0 16px 40px rgba(0, 0, 0, 0.14)',
+            border: '1px solid var(--color-border)',
+            borderRadius: '24px',
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
             animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',

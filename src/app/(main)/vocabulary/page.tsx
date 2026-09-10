@@ -377,23 +377,15 @@ export default function VocabularyPage() {
         <>
           <div onClick={() => setShowModal(false)} style={{
             position: 'fixed', inset: 0, zIndex: 200,
-            background: document.documentElement.classList.contains('dark') ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.16)',
+            background: 'rgba(0,0,0,0.4)',
           }} />
           <div style={{
             position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
             width: '320px', zIndex: 201,
-            background: document.documentElement.classList.contains('dark')
-              ? 'linear-gradient(165deg, rgba(70,68,80,0.5), rgba(20,18,26,0.55))'
-              : '#FEFEFF',
-            backdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
-            WebkitBackdropFilter: document.documentElement.classList.contains('dark') ? 'blur(28px)' : 'none',
-            boxShadow: document.documentElement.classList.contains('dark')
-              ? 'inset 0 1.5px 0 rgba(255,255,255,0.16), 0 24px 48px rgba(0,0,0,0.6)'
-              : '0 24px 48px rgba(31,38,60,0.18), 0 2px 8px rgba(31,38,60,0.06)',
-            border: document.documentElement.classList.contains('dark')
-              ? '1px solid rgba(255,255,255,0.12)'
-              : '1px solid rgba(0,0,0,0.04)',
-            borderRadius: '26px',
+            background: 'var(--color-surface)',
+            boxShadow: '0 16px 40px rgba(0, 0, 0, 0.14)',
+            border: '1px solid var(--color-border)',
+            borderRadius: '24px',
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
             animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
@@ -412,7 +404,7 @@ export default function VocabularyPage() {
                 style={{
                   width: '100%', height: '48px', padding: '0 16px', fontSize: '15px', borderRadius: '14px',
                   border: '1px solid var(--color-border)',
-                  background: document.documentElement.classList.contains('dark') ? 'rgba(120,120,128,0.24)' : '#F5F5F7',
+                  background: 'var(--color-surface-2)',
                   color: 'var(--color-text-primary)', outline: 'none', boxSizing: 'border-box' as const,
                 }} />
             </div>
@@ -426,7 +418,7 @@ export default function VocabularyPage() {
                 style={{
                   width: '100%', height: '48px', padding: '0 16px', fontSize: '14px', borderRadius: '14px',
                   border: '1px solid var(--color-border)',
-                  background: document.documentElement.classList.contains('dark') ? 'rgba(120,120,128,0.24)' : '#F5F5F7',
+                  background: 'var(--color-surface-2)',
                   color: 'var(--color-text-primary)', outline: 'none', boxSizing: 'border-box' as const,
                 }} />
             </div>
@@ -448,9 +440,10 @@ export default function VocabularyPage() {
             </div>
 
             <div style={{
-              background: document.documentElement.classList.contains('dark') ? 'rgba(120,120,128,0.24)' : '#F5F5F7',
+              background: 'var(--color-surface-2)',
               borderRadius: '14px', padding: '14px 16px', marginBottom: '20px',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              border: '1px solid var(--color-border)',
             }}>
               <div>
                 <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>{t.vocab.isPublic}</p>
@@ -470,15 +463,10 @@ export default function VocabularyPage() {
 
             <button onClick={handleCreate} disabled={creating || !newFolder.name.trim()} style={{
               width: '100%', padding: '16px',
-              background: document.documentElement.classList.contains('dark')
-                ? 'linear-gradient(180deg, #FFFFFF 0%, #EDEDF0 100%)'
-                : 'linear-gradient(180deg, #333335 0%, #1C1C1E 55%, #0E0E0F 100%)',
-              color: document.documentElement.classList.contains('dark') ? '#000000' : '#FFFFFF',
+              background: 'var(--color-text-primary)',
+              color: 'var(--color-bg)',
               border: 'none', borderRadius: '9999px',
               fontSize: '16px', fontWeight: 700, cursor: 'pointer',
-              boxShadow: document.documentElement.classList.contains('dark')
-                ? 'inset 0 1.5px 0 rgba(255,255,255,0.95), 0 12px 24px rgba(0,0,0,0.45)'
-                : 'inset 0 1.5px 0 rgba(255,255,255,0.25), 0 12px 24px rgba(0,0,0,0.25)',
               opacity: (creating || !newFolder.name.trim()) ? 0.5 : 1,
             }}>
               {creating ? t.vocab.creating : t.vocab.createFolder}

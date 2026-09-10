@@ -411,33 +411,33 @@ button:active {
 }
 
 .setting-option.selected {
-  background: rgba(120, 120, 128, 0.12) !important;
+  background: var(--color-text-primary) !important;
   border-radius: 12px;
-  border: 1.5px solid transparent;
-  color: #1C1C1E;
+  border: 1.5px solid var(--color-text-primary);
+  color: var(--color-bg);
   font-weight: 700;
 }
 
 .setting-option.selected .check-icon {
-  color: #1C1C1E;
+  color: var(--color-bg);
 }
 
 .dark .setting-option.selected {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.35);
-  color: #FFFFFF;
+  background: var(--color-text-primary) !important;
+  border: 1.5px solid var(--color-text-primary);
+  color: var(--color-bg);
 }
 
 .dark .setting-option.selected .check-icon {
-  color: #FFFFFF;
+  color: var(--color-bg);
 }
 
 .goal-option {
   width: calc(33% - 7px);
   height: 52px;
   border-radius: 14px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-2);
   color: var(--color-text-primary);
   font-size: 16px;
   font-weight: 600;
@@ -449,22 +449,22 @@ button:active {
 }
 
 .goal-option.selected {
-  background: rgba(120, 120, 128, 0.12) !important;
-  border: 1.5px solid #1C1C1E;
+  background: var(--color-text-primary) !important;
+  border: 1.5px solid var(--color-text-primary);
   font-weight: 700;
-  color: #1C1C1E;
+  color: var(--color-bg);
 }
 
 .dark .goal-option {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #FFFFFF;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
 }
 
 .dark .goal-option.selected {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border: 1.5px solid #FFFFFF;
-  color: #FFFFFF;
+  background: var(--color-text-primary) !important;
+  border: 1.5px solid var(--color-text-primary);
+  color: var(--color-bg);
 }
 
 .chip-selected {
