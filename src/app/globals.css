@@ -15,6 +15,7 @@
   --color-my-rgb: 28, 28, 30;
   --color-my-light: rgba(28, 28, 30, 0.08);
   --color-my-contrast: #FFFFFF;
+  --color-my-contrast-rgb: 255, 255, 255;
   --color-neutral: #1C1C1E;
   --color-neutral-contrast: #FFFFFF;
   --color-neutral-soft: rgba(120, 120, 128, 0.12);

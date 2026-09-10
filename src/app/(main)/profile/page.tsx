@@ -226,23 +226,23 @@ export default function ProfilePage() {
           >
             <div style={{
               width: '64px', height: '64px', borderRadius: '50%',
-              background: 'rgba(255,255,255,0.2)',
-              border: '1.5px solid rgba(255,255,255,0.8)',
+              background: 'rgba(var(--color-my-contrast-rgb), 0.2)',
+              border: '1.5px solid rgba(var(--color-my-contrast-rgb), 0.8)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '24px', fontWeight: 800, color: '#FFFFFF',
+              fontSize: '24px', fontWeight: 800, color: 'var(--color-my-contrast)',
               flexShrink: 0,
             }}>
               {nickname.charAt(0).toUpperCase()}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: '22px', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.3px' }}>
+              <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--color-my-contrast)', letterSpacing: '-0.3px' }}>
                 {nickname}
               </div>
-              <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.75)', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div style={{ fontSize: '14px', color: 'rgba(var(--color-my-contrast-rgb), 0.75)', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {user?.email}
               </div>
             </div>
-            <ChevronRight size={18} color="rgba(255,255,255,0.7)" />
+            <ChevronRight size={18} color="rgba(var(--color-my-contrast-rgb), 0.7)" />
           </div>
 
           {/* 하단: 통계 3개 */}
@@ -253,14 +253,14 @@ export default function ProfilePage() {
               { label: t.profile.total, value: stats.total },
             ].map(item => (
               <div key={item.label} style={{
-                background: 'rgba(255,255,255,0.14)',
+                background: 'rgba(var(--color-my-contrast-rgb), 0.14)',
                 borderRadius: '14px', padding: '12px 10px',
                 textAlign: 'center',
               }}>
-                <div style={{ fontSize: '22px', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.5px' }}>
+                <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--color-my-contrast)', letterSpacing: '-0.5px' }}>
                   {item.value}
                 </div>
-                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', marginTop: '2px' }}>
+                <div style={{ fontSize: '11px', color: 'rgba(var(--color-my-contrast-rgb), 0.7)', marginTop: '2px' }}>
                   {item.label}
                 </div>
               </div>

@@ -21,10 +21,12 @@ export function hexToRgb(hex: string): string {
 
 export function applyMyColor(color: string) {
   const rgb = hexToRgb(color)
+  const contrast = getContrastColor(color)
   const root = document.documentElement
   root.style.setProperty('--color-my', color)
   root.style.setProperty('--color-my-rgb', rgb)
-  root.style.setProperty('--color-my-contrast', getContrastColor(color))
+  root.style.setProperty('--color-my-contrast', contrast)
+  root.style.setProperty('--color-my-contrast-rgb', hexToRgb(contrast))
   const isDark = root.classList.contains('dark')
   root.style.setProperty('--color-my-light', `rgba(${rgb}, ${isDark ? 0.15 : 0.08})`)
 }
