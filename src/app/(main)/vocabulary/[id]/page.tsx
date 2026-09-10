@@ -178,16 +178,22 @@ export default function VocabularyDetailPage() {
   })
 
   const handleEditSave = async () => {
+    const trimmedName = editForm.name.trim()
+    if (!trimmedName) {
+      alert(lang === 'en' ? 'Please enter a vocabulary name.' : '단어장 이름을 입력해주세요.')
+      return
+    }
     setIsSaving(true)
     try {
       const supabase = createClient()
       await supabase.from('folders').update({
-        name: editForm.name,
+        name: trimmedName,
         description: editForm.description.trim() || null,
         category: editForm.category,
         is_public: editForm.is_public,
       }).eq('id', folderId)
-      setFolder(prev => prev ? { ...prev, ...editForm } : prev)
+      setFolder(prev => prev ? { ...prev, ...editForm, name: trimmedName } : prev)
+      setEditForm(f => ({ ...f, name: trimmedName }))
       setShowEditSheet(false)
     } finally {
       setIsSaving(false)
@@ -306,7 +312,7 @@ export default function VocabularyDetailPage() {
           </button>
           <div style={{ flex: 1 }}>
             <h1 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.4px', margin: 0 }}>
-              {folder?.name}
+              {folder?.name?.trim() || (lang === 'en' ? 'Untitled' : '이름 없음')}
             </h1>
             {folder?.description && (
               <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '2px 0 0' }}>{folder.description}</p>
@@ -548,8 +554,8 @@ export default function VocabularyDetailPage() {
                 </div>
               </div>
 
-              <button onClick={handleEditSave} disabled={isSaving}
-                style={{ width: '100%', height: '50px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
+              <button onClick={handleEditSave} disabled={isSaving || !editForm.name.trim()}
+                style={{ width: '100%', height: '50px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', opacity: (isSaving || !editForm.name.trim()) ? 0.5 : 1 }}>
                 {isSaving ? (lang === 'en' ? 'Saving...' : '저장 중...') : t.common.save}
               </button>
 

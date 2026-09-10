@@ -382,7 +382,7 @@ export default function HomePage() {
                 >
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {folder.name}
+                      {folder.name?.trim() || (lang === 'en' ? 'Untitled' : '이름 없음')}
                     </div>
                     <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '1px' }}>
                       {lang === 'en' ? `${folder.word_count} words` : `${folder.word_count}개 단어`}

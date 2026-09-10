@@ -1,18 +1,21 @@
 'use client'
 import TabBar from '@/components/layout/TabBar'
 import ToastContainer from '@/components/ui/Toast'
-import { usePathname } from 'next/navigation'
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
   return (
     <>
       <main style={{ minHeight: '100vh' }}>
+        {/*
+          pageEnter(transform) 금지: transform이 있는 조상은 position:fixed 자손의
+          containing block이 되어 FAB/모달이 뷰포트 대신 스크롤 영역에 붙음.
+          opacity-only pageFadeIn 사용.
+        */}
         <div style={{
-          flex: 1,
+          width: '100%',
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
-          animation: 'pageEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
+          animation: 'pageFadeIn 0.25s ease both',
         }}>
           {children}
         </div>

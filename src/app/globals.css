@@ -127,6 +127,15 @@ button:active {
   opacity: 0.8;
 }
 
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes pageEnter {
   from {
     opacity: 0;
