@@ -217,7 +217,7 @@ export default function HomePage() {
   )
 
   if (loading) return (
-    <main style={{ minHeight: '100vh', background: 'var(--color-bg)', padding: '60px 20px 100px', fontFamily: '-apple-system, sans-serif' }}>
+    <main style={{ minHeight: '100vh', background: 'var(--color-bg)', padding: 'max(80px, calc(env(safe-area-inset-top) + 28px)) 20px 100px', fontFamily: '-apple-system, sans-serif' }}>
       <div style={{ height: '28px', width: '160px', borderRadius: '8px', background: 'var(--color-surface-2)', marginBottom: '8px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
       <div style={{ height: '20px', width: '120px', borderRadius: '8px', background: 'var(--color-surface-2)', marginBottom: '32px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
       <div style={{ height: '120px', borderRadius: '20px', background: 'var(--color-surface-2)', marginBottom: '16px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
@@ -241,7 +241,12 @@ export default function HomePage() {
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
       <PullToRefresh onRefresh={async () => { await fetchData() }}>
-      <div style={{ maxWidth: bp === 'mobile' ? '100%' : '720px', margin: '0 auto', padding: pagePadding }}>
+      <div style={{
+        maxWidth: bp === 'mobile' ? '100%' : '720px',
+        margin: '0 auto',
+        padding: pagePadding,
+        paddingTop: 'max(80px, calc(env(safe-area-inset-top) + 28px))',
+      }}>
 
         {/* 상단 인사말 */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
@@ -254,7 +259,7 @@ export default function HomePage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div className="streak-badge">
               <span>🔥</span>
-              <span>{animatedStreakDays}{lang === 'en' ? 'd' : '일'}</span>
+              <span>{animatedStreakDays}</span>
             </div>
             <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#E8EAF0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
               {user?.user_metadata?.avatar_url ? (
