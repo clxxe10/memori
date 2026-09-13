@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { applyMyColor } from '@/lib/colorUtils'
 import { useTranslation } from '@/lib/i18n'
+import { onboardingColorCta, onboardingCtaRow } from '@/lib/onboardingBtnStyles'
 
 export default function Slide4({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
   const { t } = useTranslation()
@@ -187,23 +188,8 @@ export default function Slide4({ onNext, onBack }: { onNext: () => void; onBack:
         </div>
 
         {/* 하단 버튼 */}
-        <div style={{ paddingTop: '20px' }}>
-          <button onClick={handleNext} disabled={saving} style={{
-            width: '100%', padding: '17px',
-            background: myColor,
-            color: (() => {
-              const hex = myColor.replace('#', '')
-              const r = parseInt(hex.substring(0, 2), 16)
-              const g = parseInt(hex.substring(2, 4), 16)
-              const b = parseInt(hex.substring(4, 6), 16)
-              return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.65 ? '#000000' : '#FFFFFF'
-            })(),
-            borderRadius: '9999px', border: 'none',
-            boxShadow: `inset 0 1.5px 0 rgba(255,255,255,0.3), inset 0 -3px 6px rgba(0,0,0,0.15), 0 12px 24px rgba(0,0,0,0.2)`,
-            cursor: 'pointer', fontSize: '17px', fontWeight: 700,
-            opacity: saving ? 0.7 : 1,
-            transition: 'background 200ms ease',
-          }}>
+        <div style={{ ...onboardingCtaRow, paddingTop: '20px' }}>
+          <button onClick={handleNext} disabled={saving} style={onboardingColorCta(myColor, saving)}>
             {saving ? t.onboarding.saving : t.common.next}
           </button>
         </div>

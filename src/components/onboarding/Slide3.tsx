@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useTranslation } from '@/lib/i18n'
+import { onboardingCtaRow, onboardingInkCta } from '@/lib/onboardingBtnStyles'
 
 interface Props {
   onNext: () => void
@@ -53,13 +54,6 @@ export default function Slide3({ onNext, onBack }: Props) {
     ? 'inset 0 1px 1px rgba(255,255,255,0.12), inset 0 -2px 3px rgba(0,0,0,0.2), 0 4px 10px rgba(0,0,0,0.3)'
     : 'inset 0 1px 1px rgba(255,255,255,0.9), inset 0 -2px 3px rgba(0,0,0,0.06), 0 4px 10px rgba(0,0,0,0.08)'
   const backBorder = isDark ? '1px solid rgba(255,255,255,0.16)' : '1px solid rgba(255,255,255,0.6)'
-  const ctaBg = isDark
-    ? 'linear-gradient(180deg, #FFFFFF 0%, #EDEDF0 100%)'
-    : 'linear-gradient(180deg, #333335 0%, #1C1C1E 55%, #0E0E0F 100%)'
-  const ctaColor = isDark ? '#1C1C1E' : '#FFFFFF'
-  const ctaShadow = isDark
-    ? 'inset 0 1.5px 0 rgba(255,255,255,0.95), inset 0 -3px 6px rgba(0,0,0,0.05), 0 12px 24px rgba(0,0,0,0.45)'
-    : 'inset 0 1.5px 0 rgba(255,255,255,0.25), inset 0 -6px 10px rgba(0,0,0,0.3), 0 12px 24px rgba(0,0,0,0.25)'
   const dividerColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(60,60,67,0.06)'
   const featureBg = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(120,120,128,0.08)'
 
@@ -150,14 +144,10 @@ export default function Slide3({ onNext, onBack }: Props) {
         </div>
 
         {/* 하단 버튼 */}
-        <div style={{ paddingTop: '20px' }}>
-          <button onClick={onNext} style={{
-            width: '100%', padding: '17px',
-            background: ctaBg, color: ctaColor,
-            borderRadius: '9999px', border: 'none',
-            boxShadow: ctaShadow,
-            cursor: 'pointer', fontSize: '17px', fontWeight: 700,
-          }}>{t.common.next}</button>
+        <div style={{ ...onboardingCtaRow, paddingTop: '20px' }}>
+          <button onClick={onNext} style={onboardingInkCta(isDark)}>
+            {t.common.next}
+          </button>
         </div>
       </div>
     </div>

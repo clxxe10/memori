@@ -2,6 +2,12 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useTranslation } from '@/lib/i18n'
+import {
+  onboardingGoogleCta,
+  onboardingInkCta,
+  onboardingKakaoCta,
+  onboardingSecondaryCta,
+} from '@/lib/onboardingBtnStyles'
 
 interface Props {
   onNext: () => void
@@ -129,28 +135,7 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
   const inputShadow = isDark ? 'inset 0 1px 2px rgba(0,0,0,0.3)' : 'inset 0 1px 2px rgba(0,0,0,0.04)'
   const inputBorder = isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.7)'
 
-  // CTA 버튼
-  const ctaBg = isDark
-    ? 'linear-gradient(180deg, #FFFFFF 0%, #EDEDF0 100%)'
-    : 'linear-gradient(180deg, #333335 0%, #1C1C1E 55%, #0E0E0F 100%)'
-  const ctaColor = isDark ? '#1C1C1E' : '#FFFFFF'
-  const ctaShadow = isDark
-    ? 'inset 0 1.5px 0 rgba(255,255,255,0.95), inset 0 -3px 6px rgba(0,0,0,0.05), 0 12px 24px rgba(0,0,0,0.45)'
-    : 'inset 0 1.5px 0 rgba(255,255,255,0.25), inset 0 -6px 10px rgba(0,0,0,0.3), 0 12px 24px rgba(0,0,0,0.25)'
-  const ctaBorder = isDark ? '1px solid rgba(0,0,0,0.1)' : '1px solid rgba(0,0,0,0.15)'
-
-  // Google 버튼
-  const googleBg = isDark
-    ? 'linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.05))'
-    : 'linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.55))'
-  const googleShadow = isDark
-    ? 'inset 0 1.5px 0 rgba(255,255,255,0.2), inset 0 -2px 4px rgba(0,0,0,0.2), 0 6px 14px rgba(0,0,0,0.3)'
-    : 'inset 0 1.5px 0 rgba(255,255,255,0.95), inset 0 -2px 4px rgba(0,0,0,0.03), 0 6px 14px rgba(0,0,0,0.06)'
-  const googleBorder = isDark ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(255,255,255,0.7)'
-
-  // 카카오 (라이트/다크 동일)
-  const kakaoShadow = 'inset 0 1.5px 0 rgba(255,255,255,0.6), inset 0 -3px 6px rgba(0,0,0,0.08), 0 8px 18px rgba(254,229,0,0.25)'
-  const kakaoBorder = '1px solid rgba(0,0,0,0.05)'
+  // CTA / OAuth buttons use shared onboardingBtnStyles
 
   // 뒤로가기
   const backBg = isDark
@@ -255,23 +240,13 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
         }}>
           {mode === 'select' ? (
             <>
-              <button onClick={() => setMode('signup')} style={{
-                width: '100%', padding: '17px',
-                background: ctaBg, color: ctaColor,
-                borderRadius: '9999px', border: ctaBorder,
-                boxShadow: ctaShadow,
-                cursor: 'pointer', fontSize: '17px', fontWeight: 700,
-                textAlign: 'center' as const,
-              }}>{t.onboarding.newUser}</button>
+              <button onClick={() => setMode('signup')} style={onboardingInkCta(isDark)}>
+                {t.onboarding.newUser}
+              </button>
 
-              <button onClick={() => setMode('login')} style={{
-                width: '100%', padding: '17px',
-                background: googleBg, color: titleColor,
-                borderRadius: '9999px', border: googleBorder,
-                boxShadow: googleShadow,
-                cursor: 'pointer', fontSize: '17px', fontWeight: 600,
-                textAlign: 'center' as const,
-              }}>{t.onboarding.existingUser}</button>
+              <button onClick={() => setMode('login')} style={onboardingSecondaryCta(isDark)}>
+                {t.onboarding.existingUser}
+              </button>
             </>
           ) : (
             <>
@@ -304,14 +279,8 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
               <button
                 onClick={mode === 'signup' ? handleEmailSignup : handleEmailLogin}
                 disabled={loading}
-                style={{
-                  width: '100%', padding: '17px',
-                  background: ctaBg, color: ctaColor,
-                  borderRadius: '9999px', border: ctaBorder,
-                  boxShadow: ctaShadow,
-                  cursor: 'pointer', fontSize: '17px', fontWeight: 700,
-                  opacity: loading ? 0.7 : 1,
-                }}>
+                style={onboardingInkCta(isDark, loading)}
+              >
                 {loading ? t.onboarding.processing : (emailStep === 'email' ? t.onboarding.continueEmail : (mode === 'signup' ? t.onboarding.signup : t.onboarding.login))}
               </button>
 
@@ -319,28 +288,13 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
                 <>
                   {false && (
                     <>
-                      <button onClick={handleGoogle} style={{
-                        width: '100%', padding: '17px',
-                        background: googleBg, color: titleColor,
-                        borderRadius: '9999px', border: googleBorder,
-                        boxShadow: googleShadow,
-                        cursor: 'pointer', fontSize: '16px', fontWeight: 600,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-                      }}>
+                      <button onClick={handleGoogle} style={onboardingGoogleCta(isDark)}>
                         <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                         {t.onboarding.continueGoogle}
                       </button>
 
-                      <button onClick={handleKakao} style={{
-                        width: '100%', padding: '17px',
-                        background: 'linear-gradient(180deg, #FFE94D 0%, #FEE500 55%, #F5D800 100%)',
-                        color: '#1C1C1E',
-                        borderRadius: '9999px', border: kakaoBorder,
-                        boxShadow: kakaoShadow,
-                        cursor: 'pointer', fontSize: '16px', fontWeight: 600,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-                      }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="#1C1C1E"><path d="M12 3C6.48 3 2 6.58 2 10.94c0 2.8 1.86 5.27 4.66 6.67-.15.53-.96 3.39-.99 3.6 0 0-.02.17.09.24.11.06.24.01.24.01.32-.04 3.7-2.44 4.28-2.86.55.08 1.13.12 1.72.12 5.52 0 10-3.58 10-7.78C22 6.58 17.52 3 12 3z"/></svg>
+                      <button onClick={handleKakao} style={onboardingKakaoCta}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="#191919"><path d="M12 3C6.48 3 2 6.58 2 10.94c0 2.8 1.86 5.27 4.66 6.67-.15.53-.96 3.39-.99 3.6 0 0-.02.17.09.24.11.06.24.01.24.01.32-.04 3.7-2.44 4.28-2.86.55.08 1.13.12 1.72.12 5.52 0 10-3.58 10-7.78C22 6.58 17.52 3 12 3z"/></svg>
                         {t.onboarding.continueKakao}
                       </button>
                     </>

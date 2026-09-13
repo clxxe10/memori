@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useTranslation } from '@/lib/i18n'
+import { onboardingDisabledCta, onboardingInkCta } from '@/lib/onboardingBtnStyles'
 
 interface Props {
   onNext: () => void
@@ -59,13 +60,6 @@ export default function Slide2Name({ onNext, onBack, name, setName }: Props) {
     ? 'inset 0 1px 1px rgba(255,255,255,0.12), inset 0 -2px 3px rgba(0,0,0,0.2), 0 4px 10px rgba(0,0,0,0.3)'
     : 'inset 0 1px 1px rgba(255,255,255,0.9), inset 0 -2px 3px rgba(0,0,0,0.06), 0 4px 10px rgba(0,0,0,0.08)'
   const backBorder = isDark ? '1px solid rgba(255,255,255,0.16)' : '1px solid rgba(255,255,255,0.6)'
-  const ctaBg = isDark
-    ? 'linear-gradient(180deg, #FFFFFF 0%, #EDEDF0 100%)'
-    : 'linear-gradient(180deg, #333335 0%, #1C1C1E 55%, #0E0E0F 100%)'
-  const ctaColor = isDark ? '#1C1C1E' : '#FFFFFF'
-  const ctaShadow = isDark
-    ? 'inset 0 1.5px 0 rgba(255,255,255,0.95), inset 0 -3px 6px rgba(0,0,0,0.05), 0 12px 24px rgba(0,0,0,0.45)'
-    : 'inset 0 1.5px 0 rgba(255,255,255,0.25), inset 0 -6px 10px rgba(0,0,0,0.3), 0 12px 24px rgba(0,0,0,0.25)'
 
   return (
     <div style={{
@@ -147,16 +141,8 @@ export default function Slide2Name({ onNext, onBack, name, setName }: Props) {
               }
               onNext()
             }}
-            style={{
-              width: '100%', padding: '17px',
-              background: name.trim() ? ctaBg : (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'),
-              color: name.trim() ? ctaColor : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'),
-              borderRadius: '9999px', border: 'none',
-              boxShadow: name.trim() ? ctaShadow : 'none',
-              cursor: name.trim() ? 'pointer' : 'default',
-              fontSize: '17px', fontWeight: 700,
-              transition: 'all 300ms ease',
-            }}>
+            style={name.trim() ? onboardingInkCta(isDark) : onboardingDisabledCta(isDark)}
+          >
             {t.common.next}
           </button>
         </div>

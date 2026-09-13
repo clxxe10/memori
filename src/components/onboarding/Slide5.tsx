@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useTranslation } from '@/lib/i18n'
+import { onboardingInkCta } from '@/lib/onboardingBtnStyles'
 
 export default function Slide5({ onFinish }: { onFinish: () => void }) {
   const { t } = useTranslation()
@@ -45,13 +46,6 @@ export default function Slide5({ onFinish }: { onFinish: () => void }) {
     ? 'inset 0 1.5px 0 rgba(255,255,255,0.14), inset 0 -1px 2px rgba(0,0,0,0.3), 0 20px 40px rgba(0,0,0,0.5)'
     : 'inset 0 1.5px 0 rgba(255,255,255,0.9), inset 0 -1px 2px rgba(0,0,0,0.04), 0 20px 40px rgba(31,38,60,0.1)'
   const panelBorder = isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.6)'
-  const ctaBg = isDark
-    ? 'linear-gradient(180deg, #FFFFFF 0%, #EDEDF0 100%)'
-    : 'linear-gradient(180deg, #333335 0%, #1C1C1E 55%, #0E0E0F 100%)'
-  const ctaColor = isDark ? '#1C1C1E' : '#FFFFFF'
-  const ctaShadow = isDark
-    ? 'inset 0 1.5px 0 rgba(255,255,255,0.95), inset 0 -3px 6px rgba(0,0,0,0.05), 0 12px 24px rgba(0,0,0,0.45)'
-    : 'inset 0 1.5px 0 rgba(255,255,255,0.25), inset 0 -6px 10px rgba(0,0,0,0.3), 0 12px 24px rgba(0,0,0,0.25)'
 
   return (
     <div style={{
@@ -113,14 +107,10 @@ export default function Slide5({ onFinish }: { onFinish: () => void }) {
         </div>
 
         {/* 버튼들 */}
-        <div style={{ width: '100%', maxWidth: '340px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <button onClick={onFinish} style={{
-            width: '100%', padding: '17px',
-            background: ctaBg, color: ctaColor,
-            borderRadius: '9999px', border: 'none',
-            boxShadow: ctaShadow,
-            cursor: 'pointer', fontSize: '17px', fontWeight: 700,
-          }}>{t.onboarding.start}</button>
+        <div style={{ width: '100%', maxWidth: 300, display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
+          <button onClick={onFinish} style={onboardingInkCta(isDark)}>
+            {t.onboarding.start}
+          </button>
 
           <button onClick={onFinish} style={{
             width: '100%', padding: '14px',

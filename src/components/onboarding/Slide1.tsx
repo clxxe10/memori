@@ -1,6 +1,7 @@
 'use client'
 import { useEffect } from 'react'
 import { useTranslation } from '@/lib/i18n'
+import { onboardingCtaRow, onboardingNeutralCta } from '@/lib/onboardingBtnStyles'
 
 export default function Slide1({ onNext }: { onNext: () => void }) {
   const { t } = useTranslation()
@@ -92,23 +93,21 @@ export default function Slide1({ onNext }: { onNext: () => void }) {
         </div>
 
         {/* 시작하기 버튼 */}
-        <button
+        <div
           className="s1-btn"
-          onClick={onNext}
           style={{
+            ...onboardingCtaRow,
             position: 'absolute',
             bottom: 'max(52px, calc(env(safe-area-inset-bottom) + 32px))',
-            left: '28px', right: '28px',
-            height: '52px', borderRadius: '9999px',
-            background: 'var(--color-neutral)',
-            color: 'var(--color-neutral-contrast)',
-            border: 'none', cursor: 'pointer',
-            fontSize: '16px', fontWeight: 600,
-            letterSpacing: '-0.2px',
+            left: '28px',
+            right: '28px',
+            width: 'auto',
           }}
         >
-          {t.onboarding.getStarted}
-        </button>
+          <button onClick={onNext} style={onboardingNeutralCta}>
+            {t.onboarding.getStarted}
+          </button>
+        </div>
       </div>
     </div>
   )
