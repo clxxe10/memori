@@ -7,6 +7,8 @@ import { createClient } from '@/lib/supabase/client'
 import { canUsePdfExtract, incrementPdfCount } from '@/lib/premium'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
+import { ADMOB_REWARD_PDF_EXAM } from '@/lib/adConfig'
+import { AdMob, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob'
 
 type Folder = {
   id: string
@@ -538,11 +540,22 @@ export default function PDFPage() {
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
-                onClick={() => {
-                  alert('광고 시청 완료! (AdMob 연동 후 실제 광고 표시)')
-                  incrementPdfCount()
-                  setShowPdfGate(false)
-                  generatePDF()
+                onClick={async () => {
+                  try {
+                    const options = { adId: ADMOB_REWARD_PDF_EXAM }
+                    await AdMob.prepareRewardVideoAd(options)
+
+                    AdMob.addListener(RewardAdPluginEvents.Rewarded, async (_reward: AdMobRewardItem) => {
+                      incrementPdfCount()
+                      setShowPdfGate(false)
+                      generatePDF()
+                    })
+
+                    await AdMob.showRewardVideoAd()
+                  } catch (e) {
+                    console.error('광고 로드 실패:', e)
+                    alert('광고를 불러오지 못했어요. 잠시 후 다시 시도해주세요.')
+                  }
                 }}
                 style={{
                   width: '100%',

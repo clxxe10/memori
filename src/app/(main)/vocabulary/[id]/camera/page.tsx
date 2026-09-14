@@ -10,6 +10,7 @@ import { showToast } from '@/components/ui/Toast'
 import { canUsePhotoExtract, incrementExtractCount } from '@/lib/premium'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
+import { ADMOB_REWARD_PHOTO_EXTRACT } from '@/lib/adConfig'
 import { AdMob, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob'
 
 export default function CameraPage() {
@@ -550,7 +551,7 @@ export default function CameraPage() {
                 onClick={async () => {
                   try {
                     const options = {
-                      adId: 'ca-app-pub-6562435784605266/6131326867',
+                      adId: ADMOB_REWARD_PHOTO_EXTRACT,
                     }
                     await AdMob.prepareRewardVideoAd(options)
 
