@@ -141,6 +141,13 @@ export default function HomePage() {
   }, [calendarMonth])
 
   useEffect(() => {
+    const done = localStorage.getItem('tutorial_done')
+    if (!done) {
+      router.push('/tutorial')
+    }
+  }, [])
+
+  useEffect(() => {
     fetchData()
   }, [])
 

@@ -366,6 +366,19 @@ export default function ProfilePage() {
             <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{t.profile.notices}</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
+          <div onClick={() => {
+            localStorage.removeItem('tutorial_done')
+            router.push('/tutorial')
+          }} style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '14px 0', cursor: 'pointer',
+            borderBottom: '0.5px solid var(--color-border)',
+          }}>
+            <span style={{ fontSize: '15px', color: 'var(--color-text-primary)' }}>
+              {lang === 'en' ? 'View Tutorial Again' : '튜토리얼 다시 보기'}
+            </span>
+            <span style={{ color: 'var(--color-text-tertiary)', fontSize: '16px' }}>›</span>
+          </div>
         </div>
 
         {/* 로그아웃 - 별도 카드 */}
