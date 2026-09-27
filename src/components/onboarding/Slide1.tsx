@@ -1,11 +1,26 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from '@/lib/i18n'
-import { onboardingCtaRow, onboardingNeutralCta } from '@/lib/onboardingBtnStyles'
+import {
+  onboardingCtaRow,
+  onboardingPageBg,
+  onboardingPrimaryCta,
+  onboardingSecondaryText,
+  onboardingText,
+} from '@/lib/onboardingBtnStyles'
 
 export default function Slide1({ onNext }: { onNext: () => void }) {
   const { t } = useTranslation()
+  const [isDark, setIsDark] = useState(false)
+
   useEffect(() => {
+    const checkDark = () => {
+      const savedTheme = localStorage.getItem('app_theme') || '시스템'
+      if (savedTheme === '다크') setIsDark(true)
+      else if (savedTheme === '라이트') setIsDark(false)
+      else setIsDark(window.matchMedia('(prefers-color-scheme: dark)').matches)
+    }
+    checkDark()
     const style = document.createElement('style')
     style.textContent = `
       @keyframes slide1IconIn {
@@ -31,83 +46,62 @@ export default function Slide1({ onNext }: { onNext: () => void }) {
       position: 'fixed', inset: 0,
       display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center',
-      background: 'linear-gradient(165deg, #FFFFFF 0%, #F7F9FC 45%, #F2F4F9 100%)',
-      padding: '40px 28px',
+      background: onboardingPageBg(isDark),
+      gap: '24px',
+      padding: '40px 36px',
       fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif',
       paddingTop: 'env(safe-area-inset-top)',
       paddingBottom: 'env(safe-area-inset-bottom)',
     }}>
-      <style>{`
-        @media (prefers-color-scheme: dark) {
-          .s1-bg { background: linear-gradient(165deg, #000000 0%, #0A0A0C 45%, #111114 100%) !important; }
-          .s1-title-text { color: #FFFFFF !important; }
-          .s1-sub-text { color: rgba(235,235,245,0.6) !important; }
-        }
-      `}</style>
+      <img
+        src="/icons/icon-180.png"
+        alt="Memori"
+        className="s1-icon"
+        style={{
+          width: '84px', height: '84px',
+          borderRadius: '22.37%',
+        }}
+      />
 
-      <div className="s1-bg" style={{
-        position: 'fixed', inset: 0,
-        background: 'linear-gradient(165deg, #FFFFFF 0%, #F7F9FC 45%, #F2F4F9 100%)',
-        display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center',
-        gap: '24px', padding: '40px 36px',
-        paddingTop: 'env(safe-area-inset-top)',
-        paddingBottom: 'env(safe-area-inset-bottom)',
-      }}>
-        {/* 앱 아이콘 */}
-        <img
-          src="/icons/icon-180.png"
-          alt="Memori"
-          className="s1-icon"
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+        <h1
+          className="s1-title"
           style={{
-            width: '84px', height: '84px',
-            borderRadius: '22.37%',
-            boxShadow: '0 10px 28px rgba(0,0,0,0.16)',
-          }}
-        />
-
-        {/* 텍스트 */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-          <h1
-            className="s1-title s1-title-text"
-            style={{
-              fontSize: '30px', fontWeight: 700,
-              letterSpacing: '-0.5px', lineHeight: 1.2,
-              textAlign: 'center', margin: 0,
-              color: '#0B0B0C',
-            }}
-          >
-            {t.onboarding.welcome}
-          </h1>
-          <p
-            className="s1-sub s1-sub-text"
-            style={{
-              fontSize: '15px', fontWeight: 500,
-              letterSpacing: '-0.2px', lineHeight: 1.5,
-              textAlign: 'center', margin: 0,
-              color: 'rgba(60,60,67,0.55)',
-            }}
-          >
-            {t.onboarding.tagline}
-          </p>
-        </div>
-
-        {/* 시작하기 버튼 */}
-        <div
-          className="s1-btn"
-          style={{
-            ...onboardingCtaRow,
-            position: 'absolute',
-            bottom: 'max(52px, calc(env(safe-area-inset-bottom) + 32px))',
-            left: '28px',
-            right: '28px',
-            width: 'auto',
+            fontSize: '30px', fontWeight: 700,
+            letterSpacing: '-0.5px', lineHeight: 1.2,
+            textAlign: 'center', margin: 0,
+            color: onboardingText(isDark),
           }}
         >
-          <button onClick={onNext} style={onboardingNeutralCta}>
-            {t.onboarding.getStarted}
-          </button>
-        </div>
+          {t.onboarding.welcome}
+        </h1>
+        <p
+          className="s1-sub"
+          style={{
+            fontSize: '15px', fontWeight: 500,
+            letterSpacing: '-0.2px', lineHeight: 1.5,
+            textAlign: 'center', margin: 0,
+            color: onboardingSecondaryText(isDark),
+          }}
+        >
+          {t.onboarding.tagline}
+        </p>
+      </div>
+
+      <div
+        className="s1-btn"
+        style={{
+          ...onboardingCtaRow,
+          position: 'absolute',
+          bottom: 'max(52px, calc(env(safe-area-inset-bottom) + 32px))',
+          left: '28px',
+          right: '28px',
+          width: 'auto',
+        }}
+      >
+        <button onClick={onNext} style={onboardingPrimaryCta(isDark)}>
+          {t.onboarding.getStarted}
+        </button>
       </div>
     </div>
   )

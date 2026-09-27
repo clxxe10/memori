@@ -2,7 +2,17 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useTranslation } from '@/lib/i18n'
-import { onboardingDisabledCta, onboardingInkCta } from '@/lib/onboardingBtnStyles'
+import {
+  onboardingBackBtn,
+  onboardingDisabledCta,
+  onboardingInput,
+  onboardingPageBg,
+  onboardingPrimaryCta,
+  onboardingProgressFill,
+  onboardingProgressTrack,
+  onboardingSecondaryText,
+  onboardingText,
+} from '@/lib/onboardingBtnStyles'
 
 interface Props {
   onNext: () => void
@@ -12,8 +22,9 @@ interface Props {
 }
 
 export default function Slide2Name({ onNext, onBack, name, setName }: Props) {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const [isDark, setIsDark] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
     const checkDark = () => {
@@ -36,101 +47,59 @@ export default function Slide2Name({ onNext, onBack, name, setName }: Props) {
     return () => { document.head.removeChild(style) }
   }, [])
 
-  const bg = isDark
-    ? 'linear-gradient(160deg, #27242F 0%, #161420 30%, #0B0B11 65%, #000000 100%)'
-    : 'linear-gradient(160deg, #FFFFFF 0%, #ECEDF4 35%, #E1E5EF 65%, #D3D9EB 100%)'
-  const titleColor = isDark ? '#FFFFFF' : '#1C1C1E'
-  const subColor = isDark ? 'rgba(235,235,245,0.6)' : 'rgba(60,60,67,0.6)'
-  const panelBg = isDark
-    ? 'linear-gradient(165deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03))'
-    : 'linear-gradient(165deg, rgba(255,255,255,0.75), rgba(255,255,255,0.35))'
-  const panelShadow = isDark
-    ? 'inset 0 1.5px 0 rgba(255,255,255,0.14), inset 0 -1px 2px rgba(0,0,0,0.3), 0 20px 40px rgba(0,0,0,0.5)'
-    : 'inset 0 1.5px 0 rgba(255,255,255,0.9), inset 0 -1px 2px rgba(0,0,0,0.04), 0 20px 40px rgba(31,38,60,0.1)'
-  const panelBorder = isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.6)'
-  const inputBg = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.5)'
-  const inputShadow = isDark ? 'inset 0 1px 2px rgba(0,0,0,0.3)' : 'inset 0 1px 2px rgba(0,0,0,0.04)'
-  const inputBorder = isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(255,255,255,0.7)'
-  const trackBg = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'
-  const trackFill = isDark ? 'linear-gradient(90deg, #fff, #C7C7CC)' : 'linear-gradient(90deg, #1C1C1E, #48484A)'
-  const backBg = isDark
-    ? 'linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.08))'
-    : 'linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.5))'
-  const backShadow = isDark
-    ? 'inset 0 1px 1px rgba(255,255,255,0.12), inset 0 -2px 3px rgba(0,0,0,0.2), 0 4px 10px rgba(0,0,0,0.3)'
-    : 'inset 0 1px 1px rgba(255,255,255,0.9), inset 0 -2px 3px rgba(0,0,0,0.06), 0 4px 10px rgba(0,0,0,0.08)'
-  const backBorder = isDark ? '1px solid rgba(255,255,255,0.16)' : '1px solid rgba(255,255,255,0.6)'
-
   return (
     <div style={{
       position: 'fixed', inset: 0,
-      background: bg,
+      background: onboardingPageBg(isDark),
       fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif',
       overflow: 'hidden',
       display: 'flex', flexDirection: 'column',
     }}>
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column',
-        justifyContent: 'center',
+        height: '100%',
         paddingTop: 'max(66px, calc(env(safe-area-inset-top) + 20px))',
-        paddingBottom: 'max(24px, calc(env(safe-area-inset-bottom) + 16px))',
+        paddingBottom: 'max(48px, calc(env(safe-area-inset-bottom) + 40px))',
         paddingLeft: '20px', paddingRight: '20px',
         position: 'relative', zIndex: 1,
       }}>
-        {/* 네비게이션 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '0' }}>
-          <button onClick={onBack} style={{
-            width: '34px', height: '34px', borderRadius: '50%',
-            background: backBg, border: backBorder, boxShadow: backShadow,
-            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: isDark ? 'rgba(255,255,255,0.8)' : '#1C1C1E', flexShrink: 0,
-          }}>
+          <button onClick={onBack} style={onboardingBackBtn(isDark)}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
-          <div style={{
-            flex: 1, height: '6px', borderRadius: '9999px',
-            background: trackBg, boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06)', overflow: 'hidden',
-          }}>
-            <div style={{ width: '50%', height: '100%', borderRadius: '9999px', background: trackFill }} />
+          <div style={onboardingProgressTrack(isDark)}>
+            <div style={onboardingProgressFill(isDark, '66%')} />
           </div>
         </div>
 
-        {/* 타이틀 */}
-        <div className="s2n-title-anim" style={{ marginBottom: '28px', marginTop: 'auto' }}>
-          <h1 style={{ fontSize: '36px', fontWeight: 800, color: titleColor, letterSpacing: '-0.8px', margin: '0 0 10px', lineHeight: 1.15 }}>
+        <div className="s2n-title-anim" style={{ marginBottom: '28px', marginTop: '28px' }}>
+          <h1 style={{ fontSize: '32px', fontWeight: 800, color: onboardingText(isDark), letterSpacing: '-0.8px', margin: '0 0 10px', lineHeight: 1.15 }}>
             {t.onboarding.nickname}
           </h1>
-          <p style={{ fontSize: '17px', color: subColor, margin: 0, lineHeight: 1.4 }}>
+          <p style={{ fontSize: '16px', color: onboardingSecondaryText(isDark), margin: 0, lineHeight: 1.4 }}>
             {t.onboarding.nicknameDesc}
           </p>
         </div>
 
-        {/* 글라스 카드 */}
+        <div style={{ flex: 1 }} />
+
         <div className="s2n-card-anim" style={{
-          background: panelBg, borderRadius: '32px',
-          border: panelBorder, boxShadow: panelShadow,
-          padding: '20px',
-          display: 'flex', flexDirection: 'column', gap: '12px',
-          marginBottom: 'auto',
+          display: 'flex', flexDirection: 'column',
+          gap: '12px',
+          width: '100%',
         }}>
           <input
             type="text"
             placeholder={t.onboarding.nicknamePlaceholder}
             value={name}
             onChange={e => setName(e.target.value)}
-            style={{
-              width: '100%', padding: '17px 20px',
-              borderRadius: '9999px', fontSize: '16px',
-              border: inputBorder, background: inputBg,
-              color: titleColor, outline: 'none',
-              boxShadow: inputShadow,
-              boxSizing: 'border-box' as const,
-            }}
+            style={onboardingInput(isDark)}
           />
 
           <button
             onClick={async () => {
               if (!name.trim()) return
+              setIsSaving(true)
               try {
                 const supabase = createClient()
                 await supabase.auth.updateUser({
@@ -138,12 +107,15 @@ export default function Slide2Name({ onNext, onBack, name, setName }: Props) {
                 })
               } catch (e) {
                 console.error('닉네임 저장 실패:', e)
+              } finally {
+                setIsSaving(false)
+                onNext()
               }
-              onNext()
             }}
-            style={name.trim() ? onboardingInkCta(isDark) : onboardingDisabledCta(isDark)}
+            disabled={!name.trim() || isSaving}
+            style={name.trim() ? onboardingPrimaryCta(isDark) : onboardingDisabledCta(isDark)}
           >
-            {t.common.next}
+            {isSaving ? (lang === 'en' ? 'Saving...' : '저장 중...') : t.common.next}
           </button>
         </div>
       </div>

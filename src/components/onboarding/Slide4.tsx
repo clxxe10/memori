@@ -48,7 +48,7 @@ export default function Slide4({ onNext, onBack }: { onNext: () => void; onBack:
       localStorage.setItem('app_my_color', myColor)
       applyMyColor(myColor)
     } catch (e) {
-      console.error(e)
+      console.error('설정 저장 실패:', e)
     } finally {
       setSaving(false)
       onNext()

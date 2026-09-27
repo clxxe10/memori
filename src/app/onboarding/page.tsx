@@ -12,7 +12,7 @@ function OnboardingContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const initialStep = Number(searchParams.get('step')) || 1
-  const [step, setStep] = useState(initialStep)
+  const [step, setStep] = useState(Math.min(initialStep, 6))
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
 
@@ -46,7 +46,14 @@ function OnboardingContent() {
           setName={setName}
         />
       )}
-      {step === 3 && <Slide2Name onNext={() => setStep(4)} onBack={() => setStep(2)} name={name} setName={setName} />}
+      {step === 3 && (
+        <Slide2Name
+          onNext={() => setStep(4)}
+          onBack={() => setStep(2)}
+          name={name}
+          setName={setName}
+        />
+      )}
       {step === 4 && <Slide3 onNext={() => setStep(5)} onBack={() => setStep(3)} />}
       {step === 5 && <Slide4 onNext={() => setStep(6)} onBack={() => setStep(4)} />}
       {step === 6 && <Slide5 onFinish={handleFinish} />}
