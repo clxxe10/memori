@@ -158,26 +158,30 @@ export default function HomePage() {
 
   useEffect(() => {
     const fetchMonthData = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
 
-      const year = calendarMonth.getFullYear()
-      const month = calendarMonth.getMonth()
-      const firstDay = new Date(year, month, 1).toISOString().split('T')[0]
-      const lastDay = new Date(year, month + 1, 0).toISOString().split('T')[0]
+        const year = calendarMonth.getFullYear()
+        const month = calendarMonth.getMonth()
+        const firstDay = new Date(year, month, 1).toISOString().split('T')[0]
+        const lastDay = new Date(year, month + 1, 0).toISOString().split('T')[0]
 
-      const { data: monthData } = await supabase
-        .from('user_daily_study')
-        .select('study_date, words_studied')
-        .eq('user_id', user.id)
-        .gte('study_date', firstDay)
-        .lte('study_date', lastDay)
+        const { data: monthData } = await supabase
+          .from('user_daily_study')
+          .select('study_date, words_studied')
+          .eq('user_id', user.id)
+          .gte('study_date', firstDay)
+          .lte('study_date', lastDay)
 
-      if (monthData) {
-        const dataMap: Record<string, number> = {}
-        monthData.forEach(d => { dataMap[d.study_date] = d.words_studied || 0 })
-        setMonthlyData(dataMap)
+        if (monthData) {
+          const dataMap: Record<string, number> = {}
+          monthData.forEach(d => { dataMap[d.study_date] = d.words_studied || 0 })
+          setMonthlyData(dataMap)
+        }
+      } catch (e) {
+        console.error('월별 데이터 로딩 오류:', e)
       }
     }
     fetchMonthData()
@@ -527,21 +531,25 @@ export default function HomePage() {
 
         <div
           onClick={async () => {
-            const supabase = createClient()
-            const { data: { user } } = await supabase.auth.getUser()
-            if (!user) return
-            const { data } = await supabase
-              .from('folders').select('*').eq('user_id', user.id)
-              .order('created_at', { ascending: false })
-            if (data) {
-              const withCount = await Promise.all(data.map(async f => {
-                const { count } = await supabase.from('words')
-                  .select('*', { count: 'exact', head: true }).eq('folder_id', f.id)
-                return { ...f, word_count: count || 0 }
-              }))
-              setSpeedFolders(withCount)
+            try {
+              const supabase = createClient()
+              const { data: { user } } = await supabase.auth.getUser()
+              if (!user) return
+              const { data } = await supabase
+                .from('folders').select('*').eq('user_id', user.id)
+                .order('created_at', { ascending: false })
+              if (data) {
+                const withCount = await Promise.all(data.map(async f => {
+                  const { count } = await supabase.from('words')
+                    .select('*', { count: 'exact', head: true }).eq('folder_id', f.id)
+                  return { ...f, word_count: count || 0 }
+                }))
+                setSpeedFolders(withCount)
+              }
+              setShowSpeedSheet(true)
+            } catch (e) {
+              console.error('스피드 폴더 로딩 오류:', e)
             }
-            setShowSpeedSheet(true)
           }}
           style={{
             background: 'var(--color-surface)',

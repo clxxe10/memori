@@ -127,6 +127,7 @@ export default function VocabularyDetailPage() {
   const [showAddSheet, setShowAddSheet] = useState(false)
   const [showEditSheet, setShowEditSheet] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [editForm, setEditForm] = useState({
     name: '',
     description: '',
@@ -195,6 +196,9 @@ export default function VocabularyDetailPage() {
       setFolder(prev => prev ? { ...prev, ...editForm, name: trimmedName } : prev)
       setEditForm(f => ({ ...f, name: trimmedName }))
       setShowEditSheet(false)
+    } catch (e) {
+      console.error('저장 오류:', e)
+      alert(t.alert.saveFailed)
     } finally {
       setIsSaving(false)
     }
@@ -202,10 +206,18 @@ export default function VocabularyDetailPage() {
 
   const handleFolderDelete = async () => {
     if (!confirm(lang === 'en' ? 'Delete this vocabulary? All words will be deleted.' : '단어장을 삭제할까요? 단어도 모두 삭제돼요.')) return
-    const supabase = createClient()
-    await supabase.from('words').delete().eq('folder_id', folderId)
-    await supabase.from('folders').delete().eq('id', folderId)
-    router.back()
+    setIsDeleting(true)
+    try {
+      const supabase = createClient()
+      await supabase.from('words').delete().eq('folder_id', folderId)
+      await supabase.from('folders').delete().eq('id', folderId)
+      router.back()
+    } catch (e) {
+      console.error('삭제 오류:', e)
+      alert(t.alert.deleteFailed)
+    } finally {
+      setIsDeleting(false)
+    }
   }
 
   const toggleBookmark = async (word: Word) => {
@@ -562,7 +574,7 @@ export default function VocabularyDetailPage() {
                 {isSaving ? (lang === 'en' ? 'Saving...' : '저장 중...') : t.common.save}
               </button>
 
-              <button onClick={handleFolderDelete}
+              <button onClick={handleFolderDelete} disabled={isDeleting}
                 style={{ width: '100%', height: '50px', background: 'rgba(226,75,74,0.08)', color: '#E24B4A', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>
                 {lang === 'en' ? 'Delete Vocabulary' : '단어장 삭제'}
               </button>

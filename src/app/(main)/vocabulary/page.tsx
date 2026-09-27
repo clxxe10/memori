@@ -59,32 +59,38 @@ export default function VocabularyPage() {
   })
 
   const fetchFolders = async () => {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { setLoading(false); return }
-    setUser(user)
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setLoading(false); return }
+      setUser(user)
 
-    const { data: folderData } = await supabase
-      .from('folders')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
+      const { data: folderData } = await supabase
+        .from('folders')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
 
-    if (!folderData) { setLoading(false); return }
+      if (!folderData) { setLoading(false); return }
 
-    const foldersWithCount = await Promise.all(
-      folderData.map(async (folder) => {
-        const { data: wordData } = await supabase
-          .from('words')
-          .select('correct_count')
-          .eq('folder_id', folder.id)
-        const total = wordData?.length || 0
-        const mastered = wordData?.filter(w => (w.correct_count || 0) >= 1).length || 0
-        return { ...folder, word_count: total, mastered_count: mastered }
-      })
-    )
-    setFolders(foldersWithCount)
-    setLoading(false)
+      const foldersWithCount = await Promise.all(
+        folderData.map(async (folder) => {
+          const { data: wordData } = await supabase
+            .from('words')
+            .select('correct_count')
+            .eq('folder_id', folder.id)
+          const total = wordData?.length || 0
+          const mastered = wordData?.filter(w => (w.correct_count || 0) >= 1).length || 0
+          return { ...folder, word_count: total, mastered_count: mastered }
+        })
+      )
+      setFolders(foldersWithCount)
+      setLoading(false)
+    } catch (e) {
+      console.error('폴더 로딩 오류:', e)
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => {

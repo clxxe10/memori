@@ -39,6 +39,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const fetchData = async () => {
+      try {
       const supabase = createClient()
       let user = null
 
@@ -95,6 +96,11 @@ export default function ProfilePage() {
       if (savedNotif !== null) setNotificationEnabled(savedNotif === 'true')
       if (savedNotifTime) setNotificationTime(savedNotifTime)
       setLoading(false)
+      } catch (e) {
+        console.error('프로필 로딩 오류:', e)
+      } finally {
+        setLoading(false)
+      }
     }
     fetchData()
   }, [])
@@ -134,9 +140,13 @@ export default function ProfilePage() {
   }
 
   const handleLogout = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/onboarding')
+    try {
+      const supabase = createClient()
+      await supabase.auth.signOut()
+      router.push('/onboarding')
+    } catch (e) {
+      console.error('로그아웃 오류:', e)
+    }
   }
 
   const groupTitleStyle = {

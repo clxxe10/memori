@@ -116,25 +116,31 @@ export default function StudyPage() {
   useEffect(() => {
     const fetchFolders = async () => {
       setLoadingFolders(true)
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      const { data: folderData } = await supabase
-        .from('folders').select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-      if (!folderData) { setLoadingFolders(false); return }
-      const foldersWithCount = await Promise.all(
-        folderData.map(async (folder) => {
-          const { count } = await supabase
-            .from('words')
-            .select('*', { count: 'exact', head: true })
-            .eq('folder_id', folder.id)
-          return { ...folder, word_count: count || 0 }
-        })
-      )
-      setFolders(foldersWithCount)
-      setLoadingFolders(false)
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) { setLoadingFolders(false); return }
+        const { data: folderData } = await supabase
+          .from('folders').select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+        if (!folderData) { setLoadingFolders(false); return }
+        const foldersWithCount = await Promise.all(
+          folderData.map(async (folder) => {
+            const { count } = await supabase
+              .from('words')
+              .select('*', { count: 'exact', head: true })
+              .eq('folder_id', folder.id)
+            return { ...folder, word_count: count || 0 }
+          })
+        )
+        setFolders(foldersWithCount)
+        setLoadingFolders(false)
+      } catch (e) {
+        console.error('폴더 로딩 오류:', e)
+      } finally {
+        setLoadingFolders(false)
+      }
     }
     fetchFolders()
   }, [])

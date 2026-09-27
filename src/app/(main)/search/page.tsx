@@ -69,7 +69,7 @@ type PublicFolder = {
 }
 
 function SearchPageContent() {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const router = useRouter()
   const searchParams = useSearchParams()
   const myOnly = searchParams.get('my') === 'true'
@@ -84,48 +84,54 @@ function SearchPageContent() {
   const pagePadding = usePagePadding()
 
   const fetchPublicFolders = useCallback(async () => {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) setMyUserId(user.id)
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) setMyUserId(user.id)
 
-    const { data: folderData } = await supabase
-      .from('folders')
-      .select('*')
-      .eq('is_public', true)
+      const { data: folderData } = await supabase
+        .from('folders')
+        .select('*')
+        .eq('is_public', true)
 
-    if (!folderData) {
-      setLoading(false)
-      return
-    }
+      if (!folderData) {
+        setLoading(false)
+        return
+      }
 
-    const foldersWithCount = await Promise.all(
-      folderData.map(async (folder) => {
-        const { count: wordCount } = await supabase
-          .from('words')
-          .select('*', { count: 'exact', head: true })
-          .eq('folder_id', folder.id)
+      const foldersWithCount = await Promise.all(
+        folderData.map(async (folder) => {
+          const { count: wordCount } = await supabase
+            .from('words')
+            .select('*', { count: 'exact', head: true })
+            .eq('folder_id', folder.id)
 
-        const { count: likeCount } = await supabase
-          .from('folder_likes')
-          .select('*', { count: 'exact', head: true })
-          .eq('folder_id', folder.id)
+          const { count: likeCount } = await supabase
+            .from('folder_likes')
+            .select('*', { count: 'exact', head: true })
+            .eq('folder_id', folder.id)
 
-        return {
-          ...folder,
-          word_count: wordCount || 0,
-          like_count: likeCount || 0,
-        }
+          return {
+            ...folder,
+            word_count: wordCount || 0,
+            like_count: likeCount || 0,
+          }
+        })
+      )
+
+      const sorted = foldersWithCount.sort((a, b) => {
+        const scoreA = (a.like_count * 2) + (a.word_count * 0.1)
+        const scoreB = (b.like_count * 2) + (b.word_count * 0.1)
+        return scoreB - scoreA
       })
-    )
 
-    const sorted = foldersWithCount.sort((a, b) => {
-      const scoreA = (a.like_count * 2) + (a.word_count * 0.1)
-      const scoreB = (b.like_count * 2) + (b.word_count * 0.1)
-      return scoreB - scoreA
-    })
-
-    setFolders(sorted)
-    setLoading(false)
+      setFolders(sorted)
+      setLoading(false)
+    } catch (e) {
+      console.error('공개 폴더 로딩 오류:', e)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   useEffect(() => {
@@ -150,7 +156,7 @@ function SearchPageContent() {
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      if (!user) { alert(lang === 'en' ? 'Please sign in to import.' : '로그인이 필요해요.'); return }
 
       const { data: newFolder } = await supabase
         .from('folders')
@@ -189,7 +195,8 @@ function SearchPageContent() {
 
       setImportedIds(prev => new Set([...prev, folder.id]))
     } catch (e) {
-      console.error(e)
+      console.error('가져오기 오류:', e)
+      alert(t.alert.importFailed)
     } finally {
       setImporting(null)
     }
