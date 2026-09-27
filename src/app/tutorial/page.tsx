@@ -42,7 +42,9 @@ export default function TutorialPage() {
   }, [])
 
   const finish = () => {
-    localStorage.setItem('tutorial_done', '1')
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('tutorial_done', '1')
+    }
     router.push('/home')
   }
 
@@ -99,6 +101,8 @@ export default function TutorialPage() {
       onClick={next}
       style={{
         position: 'fixed', inset: 0, zIndex: 9999,
+        maxWidth: '392px',
+        margin: '0 auto',
         fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
         overflow: 'hidden',
         cursor: 'pointer',
