@@ -12,6 +12,7 @@
     "@anthropic-ai/sdk": "^0.99.0",
     "@capacitor-community/admob": "^8.0.0",
     "@capacitor-community/apple-sign-in": "^7.1.0",
+    "@capacitor/browser": "^8.0.4",
     "@capacitor/cli": "^8.4.0",
     "@capacitor/core": "^8.4.0",
     "@capacitor/ios": "^8.4.0",
