@@ -24,14 +24,14 @@ export function incrementExtractCount(): void {
   localStorage.setItem(`extract_${today}`, String(getTodayExtractCount() + 1))
 }
 
-// PDF 추출 총 횟수 (평생 1회 무료)
-export function getTotalPdfCount(): number {
-  return Number(localStorage.getItem('pdf_extract_total') || 0)
+export function getTodayPdfCount(): number {
+  const today = new Date().toISOString().split('T')[0]
+  return Number(localStorage.getItem(`pdf_extract_${today}`) || 0)
 }
 
-// PDF 추출 횟수 증가
 export function incrementPdfCount(): void {
-  localStorage.setItem('pdf_extract_total', String(getTotalPdfCount() + 1))
+  const today = new Date().toISOString().split('T')[0]
+  localStorage.setItem(`pdf_extract_${today}`, String(getTodayPdfCount() + 1))
 }
 
 // 사진 추출 가능 여부
@@ -44,7 +44,7 @@ export async function canUsePhotoExtract(): Promise<{
   const premium = await isPremium()
   if (premium) return { canUse: true, isPremiumUser: true, needAd: false, remaining: 999 }
   const count = getTodayExtractCount()
-  if (count === 0) return { canUse: true, isPremiumUser: false, needAd: false, remaining: 1 }
+  if (count < 3) return { canUse: true, isPremiumUser: false, needAd: false, remaining: 3 - count }
   return { canUse: false, isPremiumUser: false, needAd: true, remaining: 0 }
 }
 
@@ -56,7 +56,7 @@ export async function canUsePdfExtract(): Promise<{
 }> {
   const premium = await isPremium()
   if (premium) return { canUse: true, isPremiumUser: true, needAd: false }
-  const count = getTotalPdfCount()
-  if (count === 0) return { canUse: true, isPremiumUser: false, needAd: false }
+  const count = getTodayPdfCount()
+  if (count < 1) return { canUse: true, isPremiumUser: false, needAd: false }
   return { canUse: false, isPremiumUser: false, needAd: true }
 }
