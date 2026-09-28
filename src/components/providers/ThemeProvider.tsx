@@ -52,8 +52,8 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     const initAdMob = async () => {
       try {
         await AdMob.initialize({
-          testingDevices: [],
-          initializeForTesting: false,
+          testingDevices: ['EMULATOR'],
+          initializeForTesting: true,
         })
       } catch (e) {
         console.error('AdMob 초기화 실패:', e)
