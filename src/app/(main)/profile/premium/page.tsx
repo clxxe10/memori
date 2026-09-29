@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Check } from 'lucide-react'
+import { Ban, Camera, Check, FileText } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
 import { getOfferings, purchasePackage, restorePurchases } from '@/lib/revenuecat'
 
@@ -14,6 +14,7 @@ export default function PremiumPage() {
   const [selectedPlan, setSelectedPlan] = useState<Plan>('yearly')
   const [offerings, setOfferings] = useState<any>(null)
   const [isPurchasing, setIsPurchasing] = useState(false)
+  const [isDark, setIsDark] = useState(false)
 
   useEffect(() => {
     const loadOfferings = async () => {
@@ -29,42 +30,13 @@ export default function PremiumPage() {
     loadOfferings()
   }, [])
 
-  const plans = [
-    {
-      id: 'free' as Plan,
-      name: lang === 'en' ? 'Free' : '무료',
-      price: '0',
-      unit: '원',
-      desc: lang === 'en' ? 'Ads included · Basic features' : '광고 포함 · 기본 기능',
-      saving: null,
-      badge: null,
-    },
-    {
-      id: 'monthly' as Plan,
-      name: lang === 'en' ? 'Monthly Premium' : '월간 프리미엄',
-      price: '3,900',
-      unit: '원/월',
-      desc: '광고 제거 · 무제한 사용',
-      saving: null,
-      badge: null,
-    },
-    {
-      id: 'yearly' as Plan,
-      name: lang === 'en' ? 'Annual Premium' : '연간 프리미엄',
-      price: '35,000',
-      unit: '원/년',
-      desc: '월 2,917원 · 가장 저렴해요',
-      saving: '✦ 월간 대비 25% 할인',
-      badge: '🎁 2개월 무료',
-    },
-  ]
-
-  const benefits = [
-    { icon: '📸', text: '사진 추출 무제한', desc: '광고 없이 무제한 사용' },
-    { icon: '📄', text: 'PDF 시험지 무제한', desc: '원하는 만큼 추출' },
-    { icon: '🚫', text: '광고 완전 제거', desc: '방해 없이 학습' },
-    { icon: '🔲', text: '홈 화면 위젯', desc: '학습 현황 · 오늘의 단어' },
-  ]
+  useEffect(() => {
+    const update = () => setIsDark(document.documentElement.classList.contains('dark'))
+    update()
+    const observer = new MutationObserver(update)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => observer.disconnect()
+  }, [])
 
   const handleSubscribe = async () => {
     if (selectedPlan === 'free') {
@@ -89,168 +61,255 @@ export default function PremiumPage() {
     }
   }
 
+  const text = isDark ? '#FFFFFF' : '#1C1C1E'
+  const selectedBorder = isDark ? '#FFFFFF' : '#1C1C1E'
+  const idleBorder = isDark ? 'rgba(255,255,255,0.14)' : 'rgba(60,60,67,0.12)'
+  const radioIdle = isDark ? 'rgba(235,235,245,0.3)' : 'rgba(60,60,67,0.3)'
+  const divider = isDark ? 'rgba(84,84,88,0.65)' : 'rgba(60,60,67,0.18)'
+  const linkColor = isDark ? 'rgba(235,235,245,0.45)' : 'rgba(60,60,67,0.45)'
+
+  const benefits = [
+    { icon: Camera, title: 'AI 사진 추출 무제한', desc: '교재를 찍는 만큼 단어장이 생겨요' },
+    { icon: FileText, title: 'PDF 시험지 무제한', desc: '시험 전날, 바로 뽑아서 풀어요' },
+    { icon: Ban, title: '광고 없이 집중', desc: '공부 흐름이 끊기지 않아요' },
+  ]
+
+  const radio = (selected: boolean) => (
+    <div style={{
+      width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: selected ? (isDark ? '#FFFFFF' : '#1C1C1E') : 'transparent',
+      border: selected ? 'none' : `1.5px solid ${radioIdle}`,
+      transition: '200ms',
+    }}>
+      {selected && <Check size={12} color={isDark ? '#000000' : '#FFFFFF'} strokeWidth={3} />}
+    </div>
+  )
+
   return (
     <main style={{
-      minHeight: '100vh',
-      background: 'var(--premium-bg)',
+      display: 'flex', flexDirection: 'column',
+      height: '100dvh', overflow: 'hidden', position: 'relative',
+      background: isDark ? '#000000' : '#FFFFFF',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
-      paddingBottom: '40px',
     }}>
-
-      {/* 히어로 */}
+      <style>{`.premium-cta:active:not(:disabled){transform:scale(0.98);transition:transform 80ms}`}</style>
       <div style={{
-        background: 'transparent',
-        padding: '52px 20px 24px',
-        textAlign: 'center',
-        position: 'relative',
+        position: 'absolute', left: -90, top: -120, width: 360, height: 360, borderRadius: '50%',
+        background: isDark ? 'rgba(255,255,255,0.16)' : 'rgba(142,142,147,0.30)',
+        filter: isDark ? 'blur(80px)' : 'blur(70px)', pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute', right: -110, top: -60, width: 340, height: 320, borderRadius: '50%',
+        background: isDark ? 'rgba(142,142,147,0.22)' : 'rgba(209,209,214,0.55)',
+        filter: isDark ? 'blur(80px)' : 'blur(70px)', pointerEvents: 'none',
+      }} />
+
+      <div style={{
+        position: 'relative', zIndex: 1,
+        display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0,
       }}>
-        <button
-          onClick={() => router.back()}
-          style={{ position: 'absolute', top: '52px', left: '20px', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
-        >
-          <ArrowLeft size={22} color="var(--color-text-primary)" />
-        </button>
-        <div style={{ fontSize: '44px', marginBottom: '10px' }}>👑</div>
-        <h1 style={{ fontSize: '22px', fontWeight: 900, color: 'var(--color-text-primary)', letterSpacing: '-0.5px', marginBottom: '6px' }}>
-          Memori Premium
-        </h1>
-        <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: 0 }}>
-          {t.profile.premiumDesc}
-        </p>
-      </div>
+        <div style={{
+          flexShrink: 0,
+          padding: 'max(16px, env(safe-area-inset-top)) 20px 0',
+        }}>
+          <button
+            onClick={() => router.back()}
+            aria-label="닫기"
+            style={{
+              width: 36, height: 36, borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', padding: 0,
+              background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.6)',
+              backdropFilter: isDark ? undefined : 'blur(20px)',
+              WebkitBackdropFilter: isDark ? undefined : 'blur(20px)',
+              border: isDark ? '0.5px solid rgba(255,255,255,0.12)' : '0.5px solid rgba(0,0,0,0.06)',
+              boxShadow: isDark
+                ? 'inset 0 1px 0 rgba(255,255,255,0.18)'
+                : 'inset 0 1px 0 rgba(255,255,255,0.8), 0 4px 12px rgba(0,0,0,0.08)',
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M3 3l8 8M11 3L3 11" stroke={isDark ? 'rgba(235,235,245,0.7)' : 'rgba(60,60,67,0.7)'} strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </button>
 
-      <div style={{ maxWidth: '480px', margin: '0 auto', padding: '20px 20px 0' }}>
-
-        {/* 플랜 카드 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-          {plans.map(plan => (
-            <div
-              key={plan.id}
-              onClick={() => setSelectedPlan(plan.id)}
-              style={{
-                borderRadius: '16px', padding: '14px 16px',
-                border: selectedPlan === plan.id
-                  ? '2px solid var(--color-text-primary)'
-                  : '1.5px solid var(--color-border)',
-                background: plan.id === 'free'
-                  ? 'var(--color-surface-2)'
-                  : 'var(--color-surface)',
-                position: 'relative', cursor: 'pointer',
-                boxShadow: selectedPlan === plan.id
-                  ? '0 4px 16px rgba(0,0,0,0.08)'
-                  : 'none',
-              }}
-            >
-              {plan.badge && (
-                <div style={{
-                  position: 'absolute', top: '-10px', right: '12px',
-                  background: 'var(--color-bg)',
-                  color: 'var(--color-text-primary)',
-                  border: '1.5px solid var(--color-text-primary)',
-                  borderRadius: '20px', padding: '2px 10px',
-                  fontSize: '10px', fontWeight: 800,
-                }}>
-                  {plan.badge}
-                </div>
-              )}
-
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                  {plan.name}
-                </span>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '2px' }}>
-                  <span style={{ fontSize: '16px', fontWeight: 900, color: 'var(--color-text-primary)' }}>
-                    {plan.price}
-                  </span>
-                  <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)' }}>
-                    {plan.unit}
-                  </span>
-                </div>
-              </div>
-              <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>{plan.desc}</div>
-              {plan.saving && (
-                <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-text-primary)', marginTop: '4px' }}>
-                  {plan.saving}
-                </div>
-              )}
-
-              {selectedPlan === plan.id && (
-                <div style={{
-                  position: 'absolute', top: '14px', right: '14px',
-                  width: '20px', height: '20px', borderRadius: '50%',
-                  background: 'var(--color-text-primary)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <Check size={12} color="var(--color-bg)" />
-                </div>
-              )}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginTop: 8 }}>
+            <div style={{
+              width: 52, height: 52, borderRadius: 13,
+              background: isDark ? '#FFFFFF' : '#1C1C1E',
+              color: isDark ? '#000000' : '#FFFFFF',
+              display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
+              paddingTop: 16, boxSizing: 'border-box',
+              boxShadow: isDark ? '0 10px 30px rgba(255,255,255,0.18)' : '0 10px 24px rgba(0,0,0,0.18)',
+            }}>
+              <span style={{ fontWeight: 800, fontSize: 30, letterSpacing: '-1px', lineHeight: 1 }}>M</span>
+              <span style={{ fontWeight: 800, fontSize: 18, lineHeight: 1, marginTop: -12 }}>+</span>
             </div>
-          ))}
-        </div>
 
-        {/* 혜택 */}
-        <div style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '16px', border: '1px solid var(--color-border)', marginBottom: '20px' }}>
-          <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '12px', letterSpacing: '0.3px' }}>
-            {lang === 'en' ? 'Premium Benefits' : '프리미엄 혜택'}
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-            {benefits.map((b, i) => (
-              <div key={i} style={{
-                display: 'flex', alignItems: 'center', gap: '12px',
-                padding: '10px 0',
-                borderBottom: i < benefits.length - 1 ? '1px solid var(--color-border)' : 'none',
-              }}>
-                <span style={{ fontSize: '20px' }}>{b.icon}</span>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>{b.text}</div>
-                  <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '1px' }}>{b.desc}</div>
+            <h1 style={{
+              margin: '14px 0 0', fontWeight: 800, fontSize: 28, lineHeight: 1.2,
+              letterSpacing: '-0.8px', color: text,
+            }}>
+              <span style={{
+                backgroundImage: isDark ? 'linear-gradient(90deg,#FFFFFF,#8E8E93)' : 'linear-gradient(90deg,#000000,#8E8E93)',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+              }}>Memori+</span>로
+              <br />
+              끝까지 외워요
+            </h1>
+
+            <div style={{
+              marginTop: 12, padding: '6px 12px', borderRadius: 9999,
+              fontWeight: 600, fontSize: 14,
+              background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.7)',
+              border: isDark ? '0.5px solid rgba(255,255,255,0.12)' : '0.5px solid rgba(0,0,0,0.06)',
+              color: isDark ? '#FFFFFF' : '#1C1C1E',
+            }}>
+              연간 플랜이면 <span style={{ fontWeight: 800 }}>3개월 무료</span>
+            </div>
+          </div>
+
+          <div style={{
+            marginTop: 16, borderRadius: 22, padding: '6px 16px',
+            backdropFilter: 'blur(30px)', WebkitBackdropFilter: 'blur(30px)',
+            background: isDark ? 'rgba(28,28,30,0.72)' : 'rgba(255,255,255,0.72)',
+            border: isDark ? '0.5px solid rgba(255,255,255,0.1)' : '0.5px solid rgba(0,0,0,0.06)',
+            boxShadow: isDark ? 'inset 0 1px 0 rgba(255,255,255,0.08)' : '0 8px 24px rgba(0,0,0,0.06)',
+          }}>
+            {benefits.map((item, i) => {
+              const Icon = item.icon
+              return (
+                <div key={item.title} style={{
+                  display: 'flex', alignItems: 'center', gap: 14, padding: '8px 0',
+                  borderBottom: i < benefits.length - 1 ? `0.5px solid ${divider}` : 'none',
+                }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: isDark ? 'rgba(255,255,255,0.14)' : '#1C1C1E',
+                  }}>
+                    <Icon size={20} color="#FFFFFF" strokeWidth={2} />
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: text }}>{item.title}</div>
+                    <div style={{ fontSize: 13, fontWeight: 400, color: isDark ? 'rgba(235,235,245,0.6)' : 'rgba(60,60,67,0.6)', marginTop: 1 }}>{item.desc}</div>
+                  </div>
                 </div>
-                <Check size={16} color="#34C759" />
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 
-        {/* CTA */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{
+          marginTop: 'auto',
+          padding: '18px 20px max(30px, env(safe-area-inset-bottom))',
+          display: 'flex', flexDirection: 'column', gap: 10,
+        }}>
+          <div
+            onClick={() => setSelectedPlan('yearly')}
+            style={{
+              position: 'relative', borderRadius: 22, padding: '18px 16px 16px', cursor: 'pointer',
+              border: `2px solid ${selectedPlan === 'yearly' ? selectedBorder : idleBorder}`,
+              background: isDark ? '#1C1C1E' : '#FFFFFF',
+              boxShadow: isDark ? '0 8px 24px rgba(0,0,0,0.4)' : '0 8px 24px rgba(0,0,0,0.08)',
+              transition: '200ms',
+            }}
+          >
+            <div style={{
+              position: 'absolute', top: -11, left: 16, padding: '4px 10px', borderRadius: 9999,
+              fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap',
+              background: isDark ? 'linear-gradient(90deg,#FFFFFF,#AEAEB2)' : 'linear-gradient(90deg,#000000,#636366)',
+              color: isDark ? '#000000' : '#FFFFFF',
+            }}>
+              가장 인기
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              {radio(selectedPlan === 'yearly')}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 700, fontSize: 17, color: text }}>연간</div>
+                <div style={{ fontWeight: 400, fontSize: 13, color: text, whiteSpace: 'nowrap' }}>35,000원 / 년</div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontWeight: 800, fontSize: 20, letterSpacing: '-0.4px', color: text, whiteSpace: 'nowrap' }}>월 2,917원</div>
+                <span style={{
+                  display: 'inline-block', marginTop: 4, padding: '2px 8px', borderRadius: 9999,
+                  fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap',
+                  background: isDark ? '#FFFFFF' : '#1C1C1E',
+                  color: isDark ? '#000000' : '#FFFFFF',
+                }}>11,800원 절약</span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            onClick={() => setSelectedPlan('monthly')}
+            style={{
+              borderRadius: 18, padding: '14px 16px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 12,
+              border: `2px solid ${selectedPlan === 'monthly' ? selectedBorder : idleBorder}`,
+              background: isDark ? 'rgba(28,28,30,0.8)' : 'rgba(255,255,255,0.8)',
+              transition: '200ms',
+            }}
+          >
+            {radio(selectedPlan === 'monthly')}
+            <span style={{ flex: 1, fontWeight: 600, fontSize: 16, color: text }}>월간</span>
+            <span style={{ fontWeight: 600, fontSize: 16, color: text, whiteSpace: 'nowrap' }}>3,900원 / 월</span>
+          </div>
+
           <button
+            className="premium-cta"
             onClick={handleSubscribe}
             disabled={isPurchasing}
             style={{
-              width: '100%', height: '54px',
-              background: selectedPlan === 'free' ? 'var(--color-surface-2)' : 'var(--color-text-primary)',
-              color: selectedPlan === 'free' ? 'var(--color-text-secondary)' : 'var(--color-bg)',
-              border: 'none', borderRadius: '16px',
-              fontSize: '16px', fontWeight: 800, cursor: 'pointer',
+              height: 56, borderRadius: 9999, marginTop: 6, border: 'none', cursor: 'pointer',
+              fontWeight: 700, fontSize: 17,
+              background: isDark ? 'linear-gradient(180deg,#FFFFFF,#C7C7CC)' : 'linear-gradient(180deg,#3A3A3C,#000000)',
+              color: isDark ? '#000000' : '#FFFFFF',
+              boxShadow: isDark
+                ? 'inset 0 1px 0 rgba(255,255,255,0.9), 0 12px 32px rgba(255,255,255,0.14)'
+                : 'inset 0 1px 0 rgba(255,255,255,0.28), 0 12px 28px rgba(0,0,0,0.28)',
             }}
           >
-            {selectedPlan === 'free' ? (lang === 'en' ? 'Continue for free' : '무료로 계속하기') :
-             selectedPlan === 'monthly' ? (lang === 'en' ? 'Start Monthly' : '월간 구독 시작하기') :
-             '👑 연간으로 시작 · 25% 할인'}
+            Memori+ 시작하기
           </button>
-          <button
-            onClick={() => router.back()}
-            style={{ width: '100%', height: '44px', background: 'none', border: 'none', fontSize: '13px', color: 'var(--color-text-secondary)', cursor: 'pointer' }}
-          >
-            {lang === 'en' ? 'Maybe later' : '나중에 할게요'}
-          </button>
-          <p
-            onClick={async () => {
-              try {
-                const result = await restorePurchases()
-                if (result) {
-                  alert(lang === 'en' ? 'Purchases restored!' : '구매가 복원됐어요!')
-                }
-              } catch (e) {
-                console.error('복원 실패:', e)
-              }
-            }}
-            style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', textAlign: 'center', cursor: 'pointer' }}
-          >
-            {lang === 'en' ? 'Restore Purchase' : '구매 복원'}
-          </p>
-        </div>
 
+          <p style={{
+            margin: 0, fontWeight: 400, fontSize: 12, lineHeight: 1.5, textAlign: 'center', color: linkColor,
+          }}>
+            {selectedPlan === 'monthly'
+              ? '3,900원 매월 결제 · 언제든 해지할 수 있어요'
+              : '35,000원 연 1회 결제 · 언제든 해지할 수 있어요'}
+          </p>
+
+          <div style={{
+            display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 14,
+            fontWeight: 500, fontSize: 12, color: linkColor,
+          }}>
+            <span
+              onClick={async () => {
+                try {
+                  const result = await restorePurchases()
+                  if (result) {
+                    alert(lang === 'en' ? 'Purchases restored!' : '구매가 복원됐어요!')
+                  }
+                } catch (e) {
+                  console.error('복원 실패:', e)
+                }
+              }}
+              style={{ cursor: 'pointer' }}
+            >
+              구독 복원
+            </span>
+            <span>·</span>
+            <span onClick={() => window.open('https://memori-seven.vercel.app/terms', '_blank')} style={{ cursor: 'pointer' }}>이용약관</span>
+            <span>·</span>
+            <span onClick={() => window.open('https://memori-seven.vercel.app/privacy', '_blank')} style={{ cursor: 'pointer' }}>개인정보처리방침</span>
+          </div>
+        </div>
       </div>
     </main>
   )

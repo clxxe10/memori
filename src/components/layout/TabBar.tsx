@@ -42,6 +42,7 @@ export default function TabBar() {
     '/study/speed',
     '/study/pdf',
     '/search/folder',
+    '/profile/premium',
   ].some(path => pathname.startsWith(path))
 
   if (hideTabBar) return null
