@@ -134,7 +134,7 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
     try {
       const result = await SignInWithApple.authorize({
         clientId: 'com.oneidea.memori.web',
-        redirectURI: `${window.location.origin}/auth/callback`,
+        redirectURI: 'https://ygaltwrdpcjqribqsjjn.supabase.co/auth/v1/callback',
         scopes: 'email name',
       })
       const { identityToken } = result.response
