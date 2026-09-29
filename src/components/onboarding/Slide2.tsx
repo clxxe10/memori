@@ -133,7 +133,7 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
   const handleApple = async () => {
     try {
       const result = await SignInWithApple.authorize({
-        clientId: 'com.oneidea.memori',
+        clientId: 'com.oneidea.memori.web',
         redirectURI: `${window.location.origin}/auth/callback`,
         scopes: 'email name',
       })
