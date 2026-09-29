@@ -3,6 +3,8 @@
 import { useEffect } from 'react'
 import { AdMob } from '@capacitor-community/admob'
 import { applyMyColor } from '@/lib/colorUtils'
+import { createClient } from '@/lib/supabase/client'
+import { initRevenueCat } from '@/lib/revenuecat'
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -57,6 +59,13 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
         })
       } catch (e) {
         console.error('AdMob 초기화 실패:', e)
+      }
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        await initRevenueCat(user?.id)
+      } catch (e) {
+        console.error('RevenueCat 초기화 실패:', e)
       }
     }
     initAdMob()
