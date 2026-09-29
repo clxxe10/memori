@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Check } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
+import { getOfferings, purchasePackage, restorePurchases } from '@/lib/revenuecat'
 
 type Plan = 'free' | 'monthly' | 'yearly'
 
@@ -11,6 +12,22 @@ export default function PremiumPage() {
   const { t, lang } = useTranslation()
   const router = useRouter()
   const [selectedPlan, setSelectedPlan] = useState<Plan>('yearly')
+  const [offerings, setOfferings] = useState<any>(null)
+  const [isPurchasing, setIsPurchasing] = useState(false)
+
+  useEffect(() => {
+    const loadOfferings = async () => {
+      try {
+        const offering = await getOfferings()
+        if (offering) {
+          setOfferings(offering)
+        }
+      } catch (e) {
+        console.error('Offerings 로드 실패:', e)
+      }
+    }
+    loadOfferings()
+  }, [])
 
   const plans = [
     {
@@ -49,13 +66,27 @@ export default function PremiumPage() {
     { icon: '🔲', text: '홈 화면 위젯', desc: '학습 현황 · 오늘의 단어' },
   ]
 
-  const handleSubscribe = () => {
+  const handleSubscribe = async () => {
     if (selectedPlan === 'free') {
       router.back()
       return
     }
-    // RevenueCat 연동 후 실제 구독 처리
-    alert(`${selectedPlan === 'monthly' ? '월간' : '연간'} 프리미엄 구독 (RevenueCat 연동 후 구현)`)
+    if (!offerings) { alert(t.alert.preparing); return }
+    setIsPurchasing(true)
+    try {
+      const packageType = selectedPlan === 'monthly' ? 'MONTHLY' : 'ANNUAL'
+      const pkg = offerings.availablePackages.find((p: any) => p.packageType === packageType)
+      if (!pkg) { alert(t.alert.preparing); return }
+      const result = await purchasePackage(pkg)
+      if (result) {
+        alert(lang === 'en' ? 'Successfully subscribed!' : '구독이 완료됐어요!')
+        router.back()
+      }
+    } catch (e) {
+      console.error('구매 실패:', e)
+    } finally {
+      setIsPurchasing(false)
+    }
   }
 
   return (
@@ -184,6 +215,7 @@ export default function PremiumPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <button
             onClick={handleSubscribe}
+            disabled={isPurchasing}
             style={{
               width: '100%', height: '54px',
               background: selectedPlan === 'free' ? 'var(--color-surface-2)' : 'var(--color-text-primary)',
@@ -203,7 +235,16 @@ export default function PremiumPage() {
             {lang === 'en' ? 'Maybe later' : '나중에 할게요'}
           </button>
           <p
-            onClick={() => alert(t.alert.preparing)}
+            onClick={async () => {
+              try {
+                const result = await restorePurchases()
+                if (result) {
+                  alert(lang === 'en' ? 'Purchases restored!' : '구매가 복원됐어요!')
+                }
+              } catch (e) {
+                console.error('복원 실패:', e)
+              }
+            }}
             style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', textAlign: 'center', cursor: 'pointer' }}
           >
             {lang === 'en' ? 'Restore Purchase' : '구매 복원'}
