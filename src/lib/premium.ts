@@ -1,13 +1,10 @@
-import { createClient } from '@/lib/supabase/client'
+import { checkPremium } from '@/lib/revenuecat'
 
 // 프리미엄 여부 확인
 export async function isPremium(): Promise<boolean> {
   try {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return false
-    return user.user_metadata?.is_premium === true
-  } catch {
+    return await checkPremium()
+  } catch (e) {
     return false
   }
 }
