@@ -168,6 +168,44 @@ export default function AddWordPage() {
           </div>
 
           <button
+            onClick={async () => {
+              if (!word.trim()) return
+              setIsGenerating(true)
+              setError('')
+              try {
+                const res = await fetch('/api/generate-word-info', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ word: word.trim() }),
+                })
+                if (!res.ok) throw new Error('API 오류')
+                const data = await res.json()
+                setGenerated(data)
+                if (data.meaning) setMeaning(data.meaning)
+              } catch {
+                setError(t.alert.aiFailed)
+              } finally {
+                setIsGenerating(false)
+              }
+            }}
+            disabled={!word.trim() || isGenerating}
+            style={{
+              width: '100%', height: '52px',
+              background: word.trim() ? 'var(--color-my-light)' : 'var(--color-surface-2)',
+              border: '1.5px solid',
+              borderColor: word.trim() ? 'var(--color-my)' : 'var(--color-border)',
+              borderRadius: '14px',
+              cursor: word.trim() ? 'pointer' : 'not-allowed',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+              fontSize: '14px', fontWeight: 600,
+              color: word.trim() ? 'var(--color-my)' : '#AEAEB2',
+              marginBottom: '8px',
+            }}
+          >
+            <Sparkles size={16} />
+            {isGenerating ? t.vocab.aiGenerating : (lang === 'en' ? 'AI: Auto-fill everything (meaning included)' : 'AI로 뜻까지 전부 자동 생성')}
+          </button>
+          <button
             onClick={handleGenerate}
             disabled={!word.trim() || isGenerating}
             style={{

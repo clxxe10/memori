@@ -27,7 +27,8 @@ export async function POST(request: Request) {
 {
   "part_of_speech": "품사 한국어로 (예: 명사, 동사, 형용사, 부사)",
   "pronunciation": "IPA 발음기호 (예: /æmˈbɪɡjuəs/)",
-  "example": "짧고 자연스러운 영어 예문"
+  "example": "짧고 자연스러운 영어 예문",
+  "meaning": "한국어 뜻 (간결하게 1-2가지)"
 }`,
         }],
       }),

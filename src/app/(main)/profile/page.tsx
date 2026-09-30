@@ -279,7 +279,6 @@ export default function ProfilePage() {
         </div>
 
         {/* Memori+ 배너 */}
-        {false && (
           <div onClick={() => router.push('/profile/premium')} style={{
             background: 'var(--color-surface)',
             borderRadius: '22px', padding: '16px',
@@ -311,7 +310,6 @@ export default function ProfilePage() {
               cursor: 'pointer', flexShrink: 0,
             }}>{t.profile.upgrade}</button>
           </div>
-        )}
 
         {/* 내 계정 */}
         <p style={groupTitleStyle}>{t.profile.myAccount}</p>
