@@ -1,6 +1,5 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { SignInWithApple } from '@capacitor-community/apple-sign-in'
 import { Browser } from '@capacitor/browser'
 import { createClient } from '@/lib/supabase/client'
 import { useTranslation } from '@/lib/i18n'
@@ -132,19 +131,16 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
 
   const handleApple = async () => {
     try {
-      const result = await SignInWithApple.authorize({
-        clientId: 'com.oneidea.memori.web',
-        redirectURI: 'https://ygaltwrdpcjqribqsjjn.supabase.co/auth/v1/callback',
-        scopes: 'email name',
-      })
-      const { identityToken } = result.response
       const supabase = createClient()
-      const { error } = await supabase.auth.signInWithIdToken({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'apple',
-        token: identityToken,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          skipBrowserRedirect: true,
+        }
       })
-      if (error) throw error
-      onLogin()
+      if (error || !data?.url) return
+      await Browser.open({ url: data.url, windowName: '_self' })
     } catch (e) {
       console.error('Apple 로그인 실패:', e)
     }
