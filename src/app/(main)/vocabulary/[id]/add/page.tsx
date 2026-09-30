@@ -26,6 +26,7 @@ export default function AddWordPage() {
   }, [])
   const [word, setWord] = useState('')
   const [meaning, setMeaning] = useState('')
+  const [isGeneratingAll, setIsGeneratingAll] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [generated, setGenerated] = useState<{
@@ -170,7 +171,7 @@ export default function AddWordPage() {
           <button
             onClick={async () => {
               if (!word.trim()) return
-              setIsGenerating(true)
+              setIsGeneratingAll(true)
               setError('')
               try {
                 const res = await fetch('/api/generate-word-info', {
@@ -185,10 +186,10 @@ export default function AddWordPage() {
               } catch {
                 setError(t.alert.aiFailed)
               } finally {
-                setIsGenerating(false)
+                setIsGeneratingAll(false)
               }
             }}
-            disabled={!word.trim() || isGenerating}
+            disabled={!word.trim() || isGeneratingAll}
             style={{
               width: '100%', height: '52px',
               background: word.trim() ? 'var(--color-my-light)' : 'var(--color-surface-2)',
@@ -203,7 +204,7 @@ export default function AddWordPage() {
             }}
           >
             <Sparkles size={16} />
-            {isGenerating ? t.vocab.aiGenerating : (lang === 'en' ? 'AI: Auto-fill everything (meaning included)' : 'AI로 뜻까지 전부 자동 생성')}
+            {isGeneratingAll ? t.vocab.aiGenerating : (lang === 'en' ? 'AI: Auto-fill everything (meaning included)' : 'AI로 뜻까지 전부 자동 생성')}
           </button>
           <button
             onClick={handleGenerate}
