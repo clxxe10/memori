@@ -27,6 +27,7 @@ function TypingContent() {
   const searchParams = useSearchParams()
   const isMemorySet = searchParams.get('memoryset') === 'true'
   const folderId = searchParams.get('folderId') || searchParams.get('folder')
+  const direction = searchParams.get('direction') || 'word-to-meaning'
   const padding = usePagePadding('100px')
 
   const [words, setWords] = useState<Word[]>([])
@@ -71,7 +72,8 @@ function TypingContent() {
   const handleCheck = async () => {
     if (!inputValue.trim() || result) return
     const word = words[current]
-    const isCorrect = inputValue.trim().toLowerCase() === word.word.toLowerCase()
+    const expected = direction === 'word-to-meaning' ? word.word : word.meaning
+    const isCorrect = inputValue.trim().toLowerCase() === expected.toLowerCase()
     setResult(isCorrect ? 'correct' : 'wrong')
     if (!isCorrect) setWrongWords(prev => [...prev, words[current]])
     const supabase = createClient()
@@ -198,7 +200,7 @@ function TypingContent() {
         <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '16px', position: 'sticky', bottom: 0 }}>
           <div style={{ background: 'var(--color-surface)', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.09)', padding: '32px 20px', textAlign: 'center' }}>
             <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '10px' }}>{t.study.typeWord}</div>
-            <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '10px' }}>{word.meaning}</div>
+            <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '10px' }}>{direction === 'word-to-meaning' ? word.meaning : word.word}</div>
             <span style={{ background: posStyle.bg, color: posStyle.color, borderRadius: '6px', padding: '3px 10px', fontSize: '12px', fontWeight: 600 }}>
               {word.part_of_speech || (lang === 'en' ? 'Other' : '기타')}
             </span>
@@ -209,7 +211,7 @@ function TypingContent() {
               value={inputValue}
               onChange={e => { if (!result) setInputValue(e.target.value) }}
               onKeyDown={e => e.key === 'Enter' && !result && handleCheck()}
-              placeholder={t.study.typeWordPlaceholder}
+              placeholder={direction === 'word-to-meaning' ? t.study.typeWordPlaceholder : t.study.typeMeaningPlaceholder}
               autoFocus
               style={{
                 width: '100%', height: '54px',
@@ -222,7 +224,7 @@ function TypingContent() {
             />
             {result === 'wrong' && (
               <div style={{ fontSize: '14px', color: 'var(--color-incorrect)', textAlign: 'center', marginBottom: '8px' }}>
-                {lang === 'en' ? 'Answer:' : '정답:'} <strong>{word.word}</strong>
+                {lang === 'en' ? 'Answer:' : '정답:'} <strong>{direction === 'word-to-meaning' ? word.word : word.meaning}</strong>
               </div>
             )}
             {result === 'correct' && (

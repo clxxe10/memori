@@ -12,13 +12,14 @@ function BlinkContent() {
   const isMemorySet = searchParams.get('memoryset') === 'true'
   const memorySetFolder = searchParams.get('folder')
   const folderId = searchParams.get('folderId') || memorySetFolder
+  const direction = searchParams.get('direction') || 'word-to-meaning'
 
   const [words, setWords] = useState<any[]>([])
   const [index, setIndex] = useState(0)
   const [showBack, setShowBack] = useState(false)
   const [isPlaying, setIsPlaying] = useState(true)
   const [speed, setSpeed] = useState(2000)
-  const [showMode, setShowMode] = useState<'word' | 'meaning'>('word')
+  const [showMode, setShowMode] = useState<'word' | 'meaning'>(direction === 'word-to-meaning' ? 'word' : 'meaning')
   const [loading, setLoading] = useState(true)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 

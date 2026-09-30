@@ -28,6 +28,7 @@ function QuizContent() {
   const isMemorySet = searchParams.get('memoryset') === 'true'
   const memorySetFolder = searchParams.get('folder')
   const folderId = searchParams.get('folderId') || memorySetFolder
+  const direction = searchParams.get('direction') || 'word-to-meaning'
   const padding = usePagePadding('100px')
 
   const [words, setWords] = useState<Word[]>([])
@@ -68,16 +69,17 @@ function QuizContent() {
   }, [folderId])
 
   const generateOptions = (word: Word, pool: Word[]) => {
-    const filtered = pool.filter(w => w.id !== word.id && w.meaning !== word.meaning)
-    const wrong = filtered.sort(() => Math.random() - 0.5).slice(0, 3).map(w => w.meaning)
+    const answerOf = (w: Word) => direction === 'word-to-meaning' ? w.meaning : w.word
+    const filtered = pool.filter(w => w.id !== word.id && answerOf(w) !== answerOf(word))
+    const wrong = filtered.sort(() => Math.random() - 0.5).slice(0, 3).map(w => answerOf(w))
 
     // 오답이 3개 미만이면 allWords에서 추가로 보충
     if (wrong.length < 3) {
       const extra = allWords
-        .filter(w => w.id !== word.id && w.meaning !== word.meaning && !wrong.includes(w.meaning))
+        .filter(w => w.id !== word.id && answerOf(w) !== answerOf(word) && !wrong.includes(answerOf(w)))
         .sort(() => Math.random() - 0.5)
         .slice(0, 3 - wrong.length)
-        .map(w => w.meaning)
+        .map(w => answerOf(w))
       wrong.push(...extra)
     }
 
@@ -87,7 +89,7 @@ function QuizContent() {
       wrong.push(dummies[wrong.length])
     }
 
-    const opts = [...wrong, word.meaning].sort(() => Math.random() - 0.5)
+    const opts = [...wrong, answerOf(word)].sort(() => Math.random() - 0.5)
     setOptions(opts)
   }
 
@@ -103,7 +105,7 @@ function QuizContent() {
     if (selectedOption !== null) return
     setSelectedOption(idx)
     const word = words[current]
-    const isCorrect = opt === word.meaning
+    const isCorrect = opt === (direction === 'word-to-meaning' ? word.meaning : word.word)
     if (!isCorrect) setWrongWords(prev => [...prev, words[current]])
     const supabase = createClient()
 
@@ -231,7 +233,7 @@ function QuizContent() {
           <button onClick={() => handleSpeak(word.word)} style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--color-surface-2)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
             <Volume2 size={15} color="var(--color-text-secondary)" />
           </button>
-          <div style={{ fontSize: '30px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '6px', letterSpacing: '-0.5px' }}>{word.word}</div>
+          <div style={{ fontSize: '30px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '6px', letterSpacing: '-0.5px' }}>{direction === 'word-to-meaning' ? word.word : word.meaning}</div>
           {word.pronunciation && <div style={{ fontSize: '13px', color: 'var(--color-text-tertiary)' }}>{word.pronunciation}</div>}
         </div>
 
@@ -241,7 +243,7 @@ function QuizContent() {
         }}>
           {options.map((opt, i) => {
             const isSelected = selectedOption === i
-            const isCorrect = opt === word.meaning
+            const isCorrect = opt === (direction === 'word-to-meaning' ? word.meaning : word.word)
             let bg = 'var(--color-surface)', border = '1.5px solid var(--color-border)', color = 'var(--color-text-primary)'
             if (isSelected && isCorrect) { bg = 'var(--color-correct-bg)'; border = '1.5px solid var(--color-correct)'; color = 'var(--color-correct)' }
             if (isSelected && !isCorrect) { bg = 'var(--color-incorrect-bg)'; border = '1.5px solid var(--color-incorrect)'; color = 'var(--color-incorrect)' }

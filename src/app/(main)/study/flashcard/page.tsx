@@ -30,6 +30,7 @@ function FlashcardContent() {
   const searchParams = useSearchParams()
   const isMemorySet = searchParams.get('memoryset') === 'true'
   const folderId = searchParams.get('folderId') || searchParams.get('folder')
+  const direction = searchParams.get('direction') || 'word-to-meaning'
   const padding = usePagePadding('100px')
 
   const [words, setWords] = useState<Word[]>([])
@@ -466,7 +467,7 @@ function FlashcardContent() {
                   {word.part_of_speech || (lang === 'en' ? 'Other' : '기타')}
                 </span>
                 <div style={{ fontSize: '34px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-1px', marginBottom: '10px', lineHeight: 1.1, wordBreak: 'break-word' }}>
-                  {word.word}
+                  {direction === 'word-to-meaning' ? word.word : word.meaning}
                 </div>
                 {word.pronunciation && (
                   <div style={{ fontSize: '13px', color: 'var(--color-text-tertiary)' }}>{word.pronunciation}</div>
@@ -474,13 +475,13 @@ function FlashcardContent() {
               </>
             ) : (
               <>
-                <div style={{ fontSize: '13px', color: 'var(--color-text-tertiary)', marginBottom: '10px', fontWeight: 500 }}>{word.word}</div>
+                <div style={{ fontSize: '13px', color: 'var(--color-text-tertiary)', marginBottom: '10px', fontWeight: 500 }}>{direction === 'word-to-meaning' ? word.word : word.meaning}</div>
                 <div style={{ width: '36px', height: '2px', background: 'var(--color-track)', borderRadius: '2px', marginBottom: '12px' }} />
                 <span style={{ background: posStyle.bg, color: posStyle.color, borderRadius: '8px', padding: '3px 10px', fontSize: '11px', fontWeight: 600, marginBottom: '10px', display: 'inline-block' }}>
                   {word.part_of_speech || (lang === 'en' ? 'Other' : '기타')}
                 </span>
                 <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.5px', marginBottom: '8px', wordBreak: 'break-word' }}>
-                  {word.meaning}
+                  {direction === 'word-to-meaning' ? word.meaning : word.word}
                 </div>
                 {word.pronunciation && (
                   <div style={{ fontSize: '12px', color: 'var(--color-text-tertiary)', marginBottom: '8px' }}>{word.pronunciation}</div>
