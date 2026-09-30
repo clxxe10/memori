@@ -16,6 +16,7 @@ export default function StudyPage() {
   const [favorites, setFavorites] = useState<string[]>(['flashcard', 'blink', 'typing'])
   const [showFolderSheet, setShowFolderSheet] = useState(false)
   const [selectedMode, setSelectedMode] = useState<string | null>(null)
+  const [direction, setDirection] = useState<'word-to-meaning' | 'meaning-to-word'>('word-to-meaning')
   const [folders, setFolders] = useState<Array<{ id: string; name: string; icon: string; word_count?: number; color?: string }>>([])
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -192,7 +193,9 @@ export default function StudyPage() {
       }
 
       setShowFolderSheet(false)
-      const queryStr = folderId ? `?folderId=${folderId}` : ''
+      const queryStr = folderId
+        ? `?folderId=${folderId}&direction=${direction}`
+        : `?direction=${direction}`
       router.push(`/study/${selectedMode}${queryStr}`)
     } finally {
       setIsStarting(false)
@@ -438,6 +441,32 @@ export default function StudyPage() {
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px', textAlign: 'center' }}>
               {selectedMode === 'review' ? (lang === 'en' ? 'Which words to review?' : '어떤 단어를 복습할까요?') : t.study.selectFolderDesc}
             </p>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+              <button
+                onClick={() => setDirection('word-to-meaning')}
+                style={{
+                  flex: 1, height: '40px', borderRadius: '10px', border: '1.5px solid',
+                  borderColor: direction === 'word-to-meaning' ? 'var(--color-my)' : 'var(--color-border)',
+                  background: direction === 'word-to-meaning' ? 'var(--color-my-light)' : 'var(--color-surface-2)',
+                  color: direction === 'word-to-meaning' ? 'var(--color-my)' : 'var(--color-text-secondary)',
+                  fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                {lang === 'en' ? 'Word → Meaning' : '단어 → 뜻'}
+              </button>
+              <button
+                onClick={() => setDirection('meaning-to-word')}
+                style={{
+                  flex: 1, height: '40px', borderRadius: '10px', border: '1.5px solid',
+                  borderColor: direction === 'meaning-to-word' ? 'var(--color-my)' : 'var(--color-border)',
+                  background: direction === 'meaning-to-word' ? 'var(--color-my-light)' : 'var(--color-surface-2)',
+                  color: direction === 'meaning-to-word' ? 'var(--color-my)' : 'var(--color-text-secondary)',
+                  fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                {lang === 'en' ? 'Meaning → Word' : '뜻 → 단어'}
+              </button>
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
               <button onClick={() => handleStart()}
                 disabled={isStarting}
