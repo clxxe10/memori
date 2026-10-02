@@ -107,7 +107,7 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: 'https://memori-seven.vercel.app/auth/callback',
         skipBrowserRedirect: true,
       }
     })
@@ -120,7 +120,7 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'kakao',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: 'https://memori-seven.vercel.app/auth/callback',
         scopes: 'profile_nickname profile_image',
         skipBrowserRedirect: true,
       }
@@ -135,7 +135,7 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'apple',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: 'https://memori-seven.vercel.app/auth/callback',
           skipBrowserRedirect: true,
         }
       })
