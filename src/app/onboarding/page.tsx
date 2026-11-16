@@ -5,14 +5,14 @@ import Slide1 from '@/components/onboarding/Slide1'
 import Slide2 from '@/components/onboarding/Slide2'
 import Slide2Name from '@/components/onboarding/Slide2Name'
 import Slide3 from '@/components/onboarding/Slide3'
-import Slide4 from '@/components/onboarding/Slide4'
 import Slide5 from '@/components/onboarding/Slide5'
 
 function OnboardingContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const initialStep = Number(searchParams.get('step')) || 1
-  const [step, setStep] = useState(Math.min(initialStep, 6))
+  const [step, setStep] = useState(Math.min(initialStep, 5))
+  const [direction, setDirection] = useState<'forward' | 'back'>('forward')
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
 
@@ -34,29 +34,57 @@ function OnboardingContent() {
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
       overflow: 'hidden',
     }}>
-      {step === 1 && <Slide1 onNext={() => setStep(2)} />}
-      {step === 2 && (
-        <Slide2
-          onNext={() => setStep(3)}
-          onBack={() => setStep(1)}
-          onLogin={handleFinish}
-          email={email}
-          setEmail={setEmail}
-          name={name}
-          setName={setName}
-        />
-      )}
-      {step === 3 && (
-        <Slide2Name
-          onNext={() => setStep(4)}
-          onBack={() => setStep(2)}
-          name={name}
-          setName={setName}
-        />
-      )}
-      {step === 4 && <Slide3 onNext={() => setStep(5)} onBack={() => setStep(3)} />}
-      {step === 5 && <Slide4 onNext={() => setStep(6)} onBack={() => setStep(4)} />}
-      {step === 6 && <Slide5 onFinish={handleFinish} />}
+      <style>{`
+        @keyframes onbSlideInRight {
+          from { opacity: 0; transform: translateX(28px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes onbSlideInLeft {
+          from { opacity: 0; transform: translateX(-28px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          @keyframes onbSlideInRight { from { opacity: 1; transform: none; } to { opacity: 1; transform: none; } }
+          @keyframes onbSlideInLeft  { from { opacity: 1; transform: none; } to { opacity: 1; transform: none; } }
+        }
+      `}</style>
+      <div
+        key={step}
+        style={{
+          position: 'absolute', inset: 0,
+          animation: `${direction === 'forward' ? 'onbSlideInRight' : 'onbSlideInLeft'} 0.32s cubic-bezier(0.32, 0.72, 0, 1) both`,
+        }}
+      >
+        {step === 1 && (
+          <Slide1 onNext={() => { setDirection('forward'); setStep(2) }} />
+        )}
+        {step === 2 && (
+          <Slide2
+            onNext={() => { setDirection('forward'); setStep(3) }}
+            onBack={() => { setDirection('back'); setStep(1) }}
+            onLogin={handleFinish}
+            email={email}
+            setEmail={setEmail}
+            name={name}
+            setName={setName}
+          />
+        )}
+        {step === 3 && (
+          <Slide2Name
+            onNext={() => { setDirection('forward'); setStep(4) }}
+            onBack={() => { setDirection('back'); setStep(2) }}
+            name={name}
+            setName={setName}
+          />
+        )}
+        {step === 4 && (
+          <Slide3
+            onNext={() => { setDirection('forward'); setStep(5) }}
+            onBack={() => { setDirection('back'); setStep(3) }}
+          />
+        )}
+        {step === 5 && <Slide5 onFinish={handleFinish} />}
+      </div>
     </main>
   )
 }

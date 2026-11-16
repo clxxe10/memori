@@ -207,10 +207,12 @@ export default function ProfilePage() {
     </main>
   )
 
+  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+
   return (
     <main style={{
       minHeight: '100vh', backgroundColor: 'var(--color-bg)',
-      paddingBottom: '100px',
+      paddingBottom: 'calc(140px + env(safe-area-inset-bottom))',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
       <div style={{ maxWidth: bp === 'mobile' ? '100%' : '600px', margin: '0 auto', padding: pagePadding }}>
@@ -360,22 +362,21 @@ export default function ProfilePage() {
             <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{t.profile.rateApp}</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
-          <div style={menuRowStyle(true)} onClick={() => router.push('/profile/notices')}>
+          <div style={menuRowStyle()} onClick={() => router.push('/profile/notices')}>
             <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{t.profile.notices}</span>
             <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
-          <div onClick={() => {
-            localStorage.removeItem('tutorial_done')
-            router.push('/tutorial')
-          }} style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '14px 0', cursor: 'pointer',
-            borderBottom: '0.5px solid var(--color-border)',
-          }}>
-            <span style={{ fontSize: '15px', color: 'var(--color-text-primary)' }}>
+          <div
+            style={menuRowStyle(true)}
+            onClick={() => {
+              localStorage.removeItem('tutorial_done')
+              router.push('/tutorial')
+            }}
+          >
+            <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>
               {lang === 'en' ? 'View Tutorial Again' : '튜토리얼 다시 보기'}
             </span>
-            <span style={{ color: 'var(--color-text-tertiary)', fontSize: '16px' }}>›</span>
+            <ChevronRight size={16} color="var(--color-text-tertiary)" />
           </div>
         </div>
 
@@ -415,18 +416,20 @@ export default function ProfilePage() {
         <>
           <div onClick={() => setShowThemeSheet(false)} style={{
             position: 'fixed', inset: 0, zIndex: 200,
-            background: 'rgba(0,0,0,0.4)',
+            background: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.25)',
           }} />
           <div style={{
             position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-            width: '320px', zIndex: 201,
-            background: 'var(--color-surface)',
-            boxShadow: '0 16px 40px rgba(0, 0, 0, 0.14)',
-            border: '1px solid var(--color-border)',
+            width: 'min(340px, calc(100vw - 40px))', zIndex: 201,
+            background: isDark ? 'rgba(44,44,46,0.96)' : 'rgba(242,242,247,0.96)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            boxShadow: 'none',
+            border: 'none',
             borderRadius: '24px',
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
-            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
+            animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.theme}</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -454,18 +457,20 @@ export default function ProfilePage() {
         <>
           <div onClick={() => setShowColorSheet(false)} style={{
             position: 'fixed', inset: 0, zIndex: 200,
-            background: 'rgba(0,0,0,0.4)',
+            background: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.25)',
           }} />
           <div style={{
             position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-            width: '320px', zIndex: 201,
-            background: 'var(--color-surface)',
-            boxShadow: '0 16px 40px rgba(0, 0, 0, 0.14)',
-            border: '1px solid var(--color-border)',
+            width: 'min(340px, calc(100vw - 40px))', zIndex: 201,
+            background: isDark ? 'rgba(44,44,46,0.96)' : 'rgba(242,242,247,0.96)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            boxShadow: 'none',
+            border: 'none',
             borderRadius: '24px',
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
-            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
+            animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.myColor}</h3>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', padding: '14px 16px', background: 'var(--color-surface-2)', borderRadius: '14px' }}>
@@ -527,18 +532,20 @@ export default function ProfilePage() {
         <>
           <div onClick={() => setShowLangSheet(false)} style={{
             position: 'fixed', inset: 0, zIndex: 200,
-            background: 'rgba(0,0,0,0.4)',
+            background: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.25)',
           }} />
           <div style={{
             position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-            width: '320px', zIndex: 201,
-            background: 'var(--color-surface)',
-            boxShadow: '0 16px 40px rgba(0, 0, 0, 0.14)',
-            border: '1px solid var(--color-border)',
+            width: 'min(340px, calc(100vw - 40px))', zIndex: 201,
+            background: isDark ? 'rgba(44,44,46,0.96)' : 'rgba(242,242,247,0.96)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            boxShadow: 'none',
+            border: 'none',
             borderRadius: '24px',
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
-            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
+            animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.language}</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
@@ -586,18 +593,20 @@ export default function ProfilePage() {
         <>
           <div onClick={() => setShowGoalSheet(false)} style={{
             position: 'fixed', inset: 0, zIndex: 200,
-            background: 'rgba(0,0,0,0.4)',
+            background: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.25)',
           }} />
           <div style={{
             position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-            width: '320px', zIndex: 201,
-            background: 'var(--color-surface)',
-            boxShadow: '0 16px 40px rgba(0, 0, 0, 0.14)',
-            border: '1px solid var(--color-border)',
+            width: 'min(340px, calc(100vw - 40px))', zIndex: 201,
+            background: isDark ? 'rgba(44,44,46,0.96)' : 'rgba(242,242,247,0.96)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            boxShadow: 'none',
+            border: 'none',
             borderRadius: '24px',
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
-            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
+            animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.dailyGoal}</h3>
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>{t.profile.goalQuestion}</p>
@@ -631,18 +640,20 @@ export default function ProfilePage() {
         <>
           <div onClick={() => setShowNotifSheet(false)} style={{
             position: 'fixed', inset: 0, zIndex: 200,
-            background: 'rgba(0,0,0,0.4)',
+            background: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.25)',
           }} />
           <div style={{
             position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-            width: '320px', zIndex: 201,
-            background: 'var(--color-surface)',
-            boxShadow: '0 16px 40px rgba(0, 0, 0, 0.14)',
-            border: '1px solid var(--color-border)',
+            width: 'min(340px, calc(100vw - 40px))', zIndex: 201,
+            background: isDark ? 'rgba(44,44,46,0.96)' : 'rgba(242,242,247,0.96)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            boxShadow: 'none',
+            border: 'none',
             borderRadius: '24px',
             padding: '24px 20px 20px',
             maxHeight: '80vh', overflowY: 'auto' as const,
-            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
+            animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.notifications}</h3>
 

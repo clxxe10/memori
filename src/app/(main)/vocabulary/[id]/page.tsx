@@ -306,6 +306,8 @@ export default function VocabularyDetailPage() {
     return { bg: 'rgba(142,142,147,0.10)', color: 'var(--color-text-secondary)', label: lang === 'en' ? 'Normal' : '보통' }
   }
 
+  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+
   return (
     <main style={{
       minHeight: '100vh', backgroundColor: 'var(--color-bg)',
@@ -588,17 +590,19 @@ export default function VocabularyDetailPage() {
         <>
           <div onClick={() => setShowAddSheet(false)} style={{
             position: 'fixed', inset: 0, zIndex: 200,
-            background: 'rgba(0,0,0,0.4)',
+            background: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.25)',
           }} />
           <div style={{
             position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-            width: '320px', zIndex: 201,
-            background: 'var(--color-surface)',
-            boxShadow: '0 16px 40px rgba(0, 0, 0, 0.14)',
-            border: '1px solid var(--color-border)',
+            width: 'min(340px, calc(100vw - 40px))', zIndex: 201,
+            background: isDark ? 'rgba(44,44,46,0.96)' : 'rgba(242,242,247,0.96)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            boxShadow: 'none',
+            border: 'none',
             borderRadius: '24px',
             padding: '24px 20px 20px',
-            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
+            animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
             <p style={{ fontSize: '20px', fontWeight: 800, margin: '0 0 16px', color: 'var(--color-text-primary)', textAlign: 'center' }}>
               {t.vocab.addWord}

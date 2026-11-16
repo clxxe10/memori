@@ -238,6 +238,8 @@ export default function StudyPage() {
     </main>
   )
 
+  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+
   return (
     <main style={{
       minHeight: '100vh',
@@ -422,18 +424,20 @@ export default function StudyPage() {
         <>
           <div onClick={() => setShowFolderSheet(false)} style={{
             position: 'fixed', inset: 0, zIndex: 199,
-            background: 'rgba(0,0,0,0.4)',
+            background: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.25)',
           }} />
           <div style={{
             position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-            width: '320px', zIndex: 200,
-            background: 'var(--color-surface)',
-            boxShadow: '0 16px 40px rgba(0, 0, 0, 0.14)',
-            border: '1px solid var(--color-border)',
+            width: 'min(340px, calc(100vw - 40px))', zIndex: 200,
+            background: isDark ? 'rgba(44,44,46,0.96)' : 'rgba(242,242,247,0.96)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            boxShadow: 'none',
+            border: 'none',
             borderRadius: '24px',
             padding: '24px 20px 20px',
             maxHeight: '70vh', overflowY: 'auto' as const,
-            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
+            animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
             <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '6px', textAlign: 'center' }}>
               {selectedMode === 'review' ? t.home.reviewStart : t.study.selectFolder}

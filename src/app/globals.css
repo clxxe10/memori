@@ -119,15 +119,6 @@ textarea {
   font-size: 16px !important;
 }
 
-button {
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 0.1s ease, opacity 0.1s ease;
-}
-button:active {
-  transform: scale(0.97);
-  opacity: 0.8;
-}
-
 @keyframes pageFadeIn {
   from {
     opacity: 0;
@@ -156,6 +147,17 @@ button:active {
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modalEnterCentered {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
   }
 }
 
@@ -595,9 +597,10 @@ nav.tab-bar-container {
   justify-content: space-around !important;
 }
 
-button:not(:disabled) {
-  transition: transform 0.1s ease;
+button {
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s cubic-bezier(0.32, 0.72, 0, 1);
 }
 button:not(:disabled):not(.no-press-anim):active {
-  transform: scale(0.96);
+  transform: scale(0.98);
 }
