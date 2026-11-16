@@ -369,8 +369,12 @@ export default function ProfilePage() {
           <div
             style={menuRowStyle(true)}
             onClick={() => {
+              localStorage.removeItem('coach_home_done')
+              localStorage.removeItem('coach_vocab_done')
+              localStorage.removeItem('coach_study_done')
+              localStorage.removeItem('coach_search_done')
               localStorage.removeItem('tutorial_done')
-              router.push('/tutorial')
+              router.push('/home')
             }}
           >
             <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>

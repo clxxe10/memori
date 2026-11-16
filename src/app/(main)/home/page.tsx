@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Play, BookOpen, Clock, ChevronRight } from 'lucide-react'
@@ -8,6 +8,7 @@ import { usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import { useCountUp } from '@/hooks/useCountUp'
 import PullToRefresh from '@/components/ui/PullToRefresh'
+import Coachmark from '@/components/ui/Coachmark'
 import { useTranslation } from '@/lib/i18n'
 
 export default function HomePage() {
@@ -29,6 +30,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const pagePadding = usePagePadding()
   const bp = useBreakpoint()
+  const reviewCardRef = useRef<HTMLDivElement>(null)
 
   const animatedReviewCount = useCountUp(reviewCount)
   const animatedTotalWords = useCountUp(totalWords)
@@ -139,13 +141,6 @@ export default function HomePage() {
       setLoading(false)
     }
   }, [calendarMonth])
-
-  useEffect(() => {
-    const done = localStorage.getItem('tutorial_done')
-    if (!done) {
-      router.push('/tutorial')
-    }
-  }, [])
 
   useEffect(() => {
     fetchData()
@@ -285,7 +280,10 @@ export default function HomePage() {
         </div>
 
         {/* 복습 배너 카드 */}
-        <div className="review-card-glass" style={{
+        <div
+          ref={reviewCardRef}
+          className="review-card-glass"
+          style={{
           background: 'rgba(255,255,255,0.5)',
           backdropFilter: 'blur(20px) saturate(180%)',
           WebkitBackdropFilter: 'blur(20px) saturate(180%)',
@@ -674,6 +672,12 @@ export default function HomePage() {
           </div>
         </>
       )}
+      <Coachmark
+        id="home"
+        targetRef={reviewCardRef}
+        text={lang === 'en' ? 'Words to review today appear here' : '오늘 복습할 단어가 여기 표시돼요'}
+        placement="bottom"
+      />
     </main>
   )
 }

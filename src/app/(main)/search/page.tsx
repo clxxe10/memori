@@ -44,7 +44,7 @@
 
 'use client'
 
-import { Suspense, useCallback, useEffect, useState } from 'react'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Search } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -54,6 +54,7 @@ import SelectDropdown from '@/components/ui/SelectDropdown'
 import EmptyState from '@/components/ui/EmptyState'
 import { FolderSkeleton } from '@/components/ui/Skeleton'
 import PullToRefresh from '@/components/ui/PullToRefresh'
+import Coachmark from '@/components/ui/Coachmark'
 
 type PublicFolder = {
   id: string
@@ -82,6 +83,7 @@ function SearchPageContent() {
   const [importedIds, setImportedIds] = useState<Set<string>>(new Set())
   const [myUserId, setMyUserId] = useState<string | null>(null)
   const pagePadding = usePagePadding()
+  const searchInputRef = useRef<HTMLDivElement>(null)
 
   const fetchPublicFolders = useCallback(async () => {
     try {
@@ -223,7 +225,9 @@ function SearchPageContent() {
         </div>
 
         {/* 검색창 */}
-        <div style={{
+        <div
+          ref={searchInputRef}
+          style={{
           display: 'flex', alignItems: 'center', gap: '8px',
           background: 'var(--color-surface)', border: '1.5px solid var(--color-border)',
           borderRadius: '14px', padding: '11px 14px', marginBottom: '12px',
@@ -395,6 +399,14 @@ function SearchPageContent() {
 
       </div>
       </PullToRefresh>
+      <Coachmark
+        id="search"
+        targetRef={searchInputRef}
+        placement="bottom"
+        text={lang === 'en'
+          ? 'Find vocabulary lists made by others and import them instantly'
+          : '다른 사람이 만든 단어장을 찾아 내 단어장에 바로 가져올 수 있어요'}
+      />
     </main>
   )
 }

@@ -16,7 +16,7 @@
 
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronRight, Plus, Search, X } from 'lucide-react'
 
@@ -27,6 +27,7 @@ import EmptyState from '@/components/ui/EmptyState'
 import { showToast } from '@/components/ui/Toast'
 import { FolderSkeleton } from '@/components/ui/Skeleton'
 import PullToRefresh from '@/components/ui/PullToRefresh'
+import Coachmark from '@/components/ui/Coachmark'
 import { useTranslation } from '@/lib/i18n'
 
 type Folder = {
@@ -50,6 +51,7 @@ export default function VocabularyPage() {
   const [search, setSearch] = useState('')
   const [showModal, setShowModal] = useState(false)
   const pagePadding = usePagePadding()
+  const addButtonRef = useRef<HTMLButtonElement>(null)
   const [creating, setCreating] = useState(false)
   const [newFolder, setNewFolder] = useState({
     name: '',
@@ -357,6 +359,7 @@ export default function VocabularyPage() {
       </PullToRefresh>
 
       <button
+        ref={addButtonRef}
         onClick={() => setShowModal(true)}
         style={{
           position: 'fixed',
@@ -484,6 +487,14 @@ export default function VocabularyPage() {
           </div>
         </>
       )}
+      <Coachmark
+        id="vocab"
+        targetRef={addButtonRef}
+        placement="top"
+        text={lang === 'en'
+          ? 'Tap here to create a vocabulary list. Just take a photo and AI organizes the words'
+          : '여기를 눌러 단어장을 만들어요. 사진만 찍으면 AI가 단어를 정리해줘요'}
+      />
     </main>
   )
 }

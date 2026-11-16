@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronRight, HelpCircle } from 'lucide-react'
 import HelpSheet from '@/components/ui/HelpSheet'
+import Coachmark from '@/components/ui/Coachmark'
 import { createClient } from '@/lib/supabase/client'
 import { usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
@@ -25,6 +26,7 @@ export default function StudyPage() {
   const [helpMode, setHelpMode] = useState<string | null>(null)
   const pagePadding = usePagePadding()
   const bp = useBreakpoint()
+  const memorySetRef = useRef<HTMLDivElement>(null)
 
   const ALL_MODES = [
     {
@@ -285,6 +287,7 @@ export default function StudyPage() {
         }}>
           {tab === 'all' && (
           <div
+            ref={memorySetRef}
             className="memoryset-card"
             onClick={() => router.push('/study/memoryset')}
             role="button"
@@ -525,6 +528,16 @@ export default function StudyPage() {
 
       {helpMode && (
         <HelpSheet mode={helpMode} onClose={() => setHelpMode(null)} />
+      )}
+      {tab === 'all' && (
+        <Coachmark
+          id="study"
+          targetRef={memorySetRef}
+          placement="bottom"
+          text={lang === 'en'
+            ? 'New here? Start with Memory Set — memorize in 4 easy steps'
+            : '처음이라면 암기세트부터! 4단계로 차근차근 외워요'}
+        />
       )}
     </main>
   )
