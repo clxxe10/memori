@@ -240,7 +240,7 @@ export default function PremiumPage() {
                   fontWeight: 700, fontSize: 12, whiteSpace: 'nowrap',
                   background: isDark ? '#FFFFFF' : '#1C1C1E',
                   color: isDark ? '#000000' : '#FFFFFF',
-                }}>11,800원 절약</span>
+                }}>{lang === 'en' ? 'Save ₩23,800' : '23,800원 절약'}</span>
               </div>
             </div>
           </div>
@@ -257,7 +257,7 @@ export default function PremiumPage() {
           >
             {radio(selectedPlan === 'monthly')}
             <span style={{ flex: 1, fontWeight: 600, fontSize: 16, color: text }}>월간</span>
-            <span style={{ fontWeight: 600, fontSize: 16, color: text, whiteSpace: 'nowrap' }}>3,900원 / 월</span>
+            <span style={{ fontWeight: 600, fontSize: 16, color: text, whiteSpace: 'nowrap' }}>4,900원 / 월</span>
           </div>
 
           <button
@@ -281,7 +281,7 @@ export default function PremiumPage() {
             margin: 0, fontWeight: 400, fontSize: 12, lineHeight: 1.5, textAlign: 'center', color: linkColor,
           }}>
             {selectedPlan === 'monthly'
-              ? '3,900원 매월 결제 · 언제든 해지할 수 있어요'
+              ? '4,900원 매월 결제 · 언제든 해지할 수 있어요'
               : '35,000원 연 1회 결제 · 언제든 해지할 수 있어요'}
           </p>
 
