@@ -1,11 +1,12 @@
 'use client'
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect, useState, type CSSProperties } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Slide1 from '@/components/onboarding/Slide1'
 import Slide2 from '@/components/onboarding/Slide2'
 import Slide2Name from '@/components/onboarding/Slide2Name'
 import Slide3 from '@/components/onboarding/Slide3'
 import Slide5 from '@/components/onboarding/Slide5'
+import { onboardingDarkVars, onboardingLightVars } from '@/lib/onboardingBtnStyles'
 
 function OnboardingContent() {
   const router = useRouter()
@@ -15,11 +16,19 @@ function OnboardingContent() {
   const [direction, setDirection] = useState<'forward' | 'back'>('forward')
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
+  const [themeVars, setThemeVars] = useState<Record<string, string>>(onboardingLightVars)
 
   useEffect(() => {
-    const isDark = document.documentElement.classList.contains('dark')
-    document.documentElement.style.setProperty('--color-my', isDark ? '#FFFFFF' : '#1C1C1E')
-    document.documentElement.style.setProperty('--color-my-contrast', isDark ? '#000000' : '#FFFFFF')
+    const apply = () => {
+      const isDark = document.documentElement.classList.contains('dark')
+      document.documentElement.style.setProperty('--color-my', isDark ? '#FFFFFF' : '#1C1C1E')
+      document.documentElement.style.setProperty('--color-my-contrast', isDark ? '#000000' : '#FFFFFF')
+      setThemeVars(isDark ? onboardingDarkVars : onboardingLightVars)
+    }
+    apply()
+    const observer = new MutationObserver(apply)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => observer.disconnect()
   }, [])
 
   const handleFinish = () => {
@@ -30,9 +39,11 @@ function OnboardingContent() {
     <main style={{
       position: 'fixed', inset: 0,
       height: '100dvh',
-      background: 'var(--color-bg)',
-      fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+      background: 'var(--m-bg)',
+      color: 'var(--m-fg)',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo", system-ui, sans-serif',
       overflow: 'hidden',
+      ...(themeVars as CSSProperties),
     }}>
       <style>{`
         @keyframes onbSlideInRight {

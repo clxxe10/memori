@@ -1,17 +1,13 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { ChevronLeft, Camera, Layers, Share2 } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
 import {
   onboardingBackBtn,
-  onboardingCtaRow,
-  onboardingPageBg,
+  onboardingFooter,
   onboardingPrimaryCta,
-  onboardingProgressFill,
-  onboardingProgressTrack,
-  onboardingSecondaryText,
-  onboardingSurface,
-  onboardingText,
-  onboardingTokens,
+  onboardingShell,
+  onboardingTitle,
+  onboardingTopBar,
 } from '@/lib/onboardingBtnStyles'
 
 interface Props {
@@ -21,114 +17,93 @@ interface Props {
 
 export default function Slide3({ onNext, onBack }: Props) {
   const { t } = useTranslation()
-  const [isDark, setIsDark] = useState(false)
-
-  useEffect(() => {
-    const checkDark = () => {
-      const savedTheme = localStorage.getItem('app_theme') || '시스템'
-      if (savedTheme === '다크') setIsDark(true)
-      else if (savedTheme === '라이트') setIsDark(false)
-      else setIsDark(window.matchMedia('(prefers-color-scheme: dark)').matches)
-    }
-    checkDark()
-    const style = document.createElement('style')
-    style.textContent = `
-      @keyframes s3FadeUp {
-        from { opacity: 0; transform: translateY(18px); }
-        to   { opacity: 1; transform: translateY(0); }
-      }
-      .s3-title-anim { animation: s3FadeUp 700ms cubic-bezier(0.32,0.72,0,1) both; }
-      .s3-card-anim { animation: s3FadeUp 700ms cubic-bezier(0.32,0.72,0,1) 120ms both; }
-    `
-    document.head.appendChild(style)
-    return () => { document.head.removeChild(style) }
-  }, [])
-
-  const titleColor = onboardingText(isDark)
-  const subColor = onboardingSecondaryText(isDark)
-  const dividerColor = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(60,60,67,0.12)'
-  const featureBg = onboardingSurface(isDark)
 
   const features = [
-    { emoji: '📸', title: t.onboarding.featurePhoto, desc: t.onboarding.featurePhotoDesc },
-    { emoji: '🎓', title: t.onboarding.featureModes, desc: t.onboarding.featureModesDesc },
-    { emoji: '🔥', title: t.onboarding.featureMemoryset, desc: t.onboarding.featureMemosetDesc },
-    { emoji: '📄', title: t.onboarding.featurePdf, desc: t.onboarding.featurePdfDesc },
-    { emoji: '🌐', title: t.onboarding.featureCommunity, desc: t.onboarding.featureCommunityDesc },
+    { icon: Camera, title: t.onboarding.featurePhoto, desc: t.onboarding.featurePhotoDesc },
+    { icon: Layers, title: t.onboarding.featureModes, desc: t.onboarding.featureModesDesc },
+    { icon: Share2, title: t.onboarding.featureCommunity, desc: t.onboarding.featureCommunityDesc },
   ]
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0,
-      background: onboardingPageBg(isDark),
-      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif',
-      overflow: 'hidden',
-      display: 'flex', flexDirection: 'column',
-    }}>
+    <div style={onboardingShell}>
+      <div style={onboardingTopBar}>
+        <button type="button" onClick={onBack} style={onboardingBackBtn()}>
+          <ChevronLeft size={20} strokeWidth={2} />
+        </button>
+        <div style={{ width: 44 }} />
+      </div>
+
       <div style={{
-        flex: 1, display: 'flex', flexDirection: 'column',
-        justifyContent: 'center',
-        paddingTop: 'max(66px, calc(env(safe-area-inset-top) + 20px))',
-        paddingBottom: 'max(24px, calc(env(safe-area-inset-bottom) + 16px))',
-        paddingLeft: '20px', paddingRight: '20px',
-        position: 'relative', zIndex: 1,
+        flex: 1,
+        paddingLeft: 20,
+        paddingRight: 20,
+        minHeight: 0,
         overflowY: 'auto',
-        WebkitOverflowScrolling: 'touch' as const,
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '0' }}>
-          <button onClick={onBack} style={onboardingBackBtn(isDark)}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
-          <div style={onboardingProgressTrack(isDark)}>
-            <div style={onboardingProgressFill(isDark, '100%')} />
+        <div style={{ position: 'relative', height: 170, marginTop: 12, marginBottom: 28 }}>
+          <div style={{
+            position: 'absolute', left: 'calc(50% - 117px)', top: 58,
+            width: 76, height: 76, borderRadius: 20,
+            background: 'var(--m-card)', boxShadow: '0 0 0 1px var(--m-stroke)',
+            transform: 'rotate(-10deg)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'var(--m-fg2)',
+          }}>
+            <Layers size={32} strokeWidth={1.6} />
+          </div>
+          <div style={{
+            position: 'absolute', left: 'calc(50% + 41px)', top: 58,
+            width: 76, height: 76, borderRadius: 20,
+            background: 'var(--m-card)', boxShadow: '0 0 0 1px var(--m-stroke)',
+            transform: 'rotate(10deg)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'var(--m-fg2)',
+          }}>
+            <Share2 size={32} strokeWidth={1.6} />
+          </div>
+          <div style={{
+            position: 'absolute', left: 'calc(50% - 48px)', top: 30,
+            width: 96, height: 96, borderRadius: 24,
+            background: 'var(--m-btn)', color: 'var(--m-btn-fg)',
+            boxShadow: '0 12px 32px rgba(0,0,0,.18)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
+              <path d="M7 9h10M7 12h7M7 15h9" />
+            </svg>
           </div>
         </div>
 
-        <div className="s3-title-anim" style={{ marginBottom: '28px', marginTop: 'auto' }}>
-          <h1 style={{ fontSize: '32px', fontWeight: 800, color: titleColor, letterSpacing: '-0.8px', margin: '0 0 10px', lineHeight: 1.15 }}>
-            {t.onboarding.features}
-          </h1>
-          <p style={{ fontSize: '16px', color: subColor, margin: 0, lineHeight: 1.4 }}>
-            {t.onboarding.featuresDesc}
-          </p>
-        </div>
+        <h1 style={{ ...onboardingTitle, marginBottom: 28 }}>{t.onboarding.features}</h1>
 
-        <div className="s3-card-anim" style={{
-          background: featureBg,
-          borderRadius: '20px',
-          padding: '8px 16px',
-          display: 'flex', flexDirection: 'column', gap: '0',
-          marginBottom: 'auto',
-        }}>
-          {features.map((f, i) => (
-            <div key={f.title}>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: '14px',
-                padding: '14px 4px',
-              }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
+          {features.map(f => {
+            const Icon = f.icon
+            return (
+              <div key={f.title} style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                 <div style={{
-                  width: '40px', height: '40px', borderRadius: '12px',
-                  background: isDark ? onboardingTokens.bgDark : '#FFFFFF',
+                  flex: 'none', width: 44, height: 44, borderRadius: 12,
+                  background: 'var(--m-surface)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '20px', flexShrink: 0,
-                }}>{f.emoji}</div>
-                <div>
-                  <div style={{ fontSize: '15px', fontWeight: 600, color: titleColor, marginBottom: '2px' }}>{f.title}</div>
-                  <div style={{ fontSize: '13px', color: subColor }}>{f.desc}</div>
+                  color: 'var(--m-fg)',
+                }}>
+                  <Icon size={22} strokeWidth={1.8} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <div style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.3, color: 'var(--m-fg)' }}>{f.title}</div>
+                  <div style={{ fontSize: 14, fontWeight: 400, lineHeight: 1.4, color: 'var(--m-fg2)' }}>{f.desc}</div>
                 </div>
               </div>
-              {i < features.length - 1 && (
-                <div style={{ height: '0.5px', background: dividerColor, marginLeft: '58px' }} />
-              )}
-            </div>
-          ))}
+            )
+          })}
         </div>
+      </div>
 
-        <div style={{ ...onboardingCtaRow, paddingTop: '20px' }}>
-          <button onClick={onNext} style={onboardingPrimaryCta(isDark)}>
-            {t.common.next}
-          </button>
-        </div>
+      <div style={onboardingFooter()}>
+        <button onClick={onNext} style={onboardingPrimaryCta()}>
+          {t.common.next}
+        </button>
       </div>
     </div>
   )
