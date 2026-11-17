@@ -134,21 +134,21 @@ export default function PremiumPage() {
             </svg>
           </button>
 
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginTop: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginTop: 4 }}>
             <div style={{
-              width: 52, height: 52, borderRadius: 13,
+              width: 48, height: 48, borderRadius: 12,
               background: isDark ? '#FFFFFF' : '#1C1C1E',
               color: isDark ? '#000000' : '#FFFFFF',
               display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
-              paddingTop: 16, boxSizing: 'border-box',
+              paddingTop: 14, boxSizing: 'border-box',
               boxShadow: isDark ? '0 10px 30px rgba(255,255,255,0.18)' : '0 10px 24px rgba(0,0,0,0.18)',
             }}>
-              <span style={{ fontWeight: 800, fontSize: 30, letterSpacing: '-1px', lineHeight: 1 }}>M</span>
-              <span style={{ fontWeight: 800, fontSize: 18, lineHeight: 1, marginTop: -12 }}>+</span>
+              <span style={{ fontWeight: 800, fontSize: 28, letterSpacing: '-1px', lineHeight: 1 }}>M</span>
+              <span style={{ fontWeight: 800, fontSize: 16, lineHeight: 1, marginTop: -10 }}>+</span>
             </div>
 
             <h1 style={{
-              margin: '14px 0 0', fontWeight: 800, fontSize: 28, lineHeight: 1.2,
+              margin: '10px 0 0', fontWeight: 800, fontSize: 26, lineHeight: 1.2,
               letterSpacing: '-0.8px', color: text,
             }}>
               <span style={{
@@ -163,8 +163,8 @@ export default function PremiumPage() {
             </h1>
 
             <div style={{
-              marginTop: 12, padding: '6px 12px', borderRadius: 9999,
-              fontWeight: 600, fontSize: 14,
+              marginTop: 8, padding: '5px 11px', borderRadius: 9999,
+              fontWeight: 600, fontSize: 13,
               background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.7)',
               border: isDark ? '0.5px solid rgba(255,255,255,0.12)' : '0.5px solid rgba(0,0,0,0.06)',
               color: isDark ? '#FFFFFF' : '#1C1C1E',
@@ -174,7 +174,7 @@ export default function PremiumPage() {
           </div>
 
           <div style={{
-            marginTop: 16, borderRadius: 22, padding: '6px 16px',
+            marginTop: 12, borderRadius: 22, padding: '4px 16px',
             backdropFilter: 'blur(30px)', WebkitBackdropFilter: 'blur(30px)',
             background: isDark ? 'rgba(28,28,30,0.72)' : 'rgba(255,255,255,0.72)',
             border: isDark ? '0.5px solid rgba(255,255,255,0.1)' : '0.5px solid rgba(0,0,0,0.06)',
@@ -184,19 +184,19 @@ export default function PremiumPage() {
               const Icon = item.icon
               return (
                 <div key={item.title} style={{
-                  display: 'flex', alignItems: 'center', gap: 14, padding: '8px 0',
+                  display: 'flex', alignItems: 'center', gap: 14, padding: '7px 0',
                   borderBottom: i < benefits.length - 1 ? `0.5px solid ${divider}` : 'none',
                 }}>
                   <div style={{
-                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                    width: 34, height: 34, borderRadius: 10, flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     background: isDark ? 'rgba(255,255,255,0.14)' : '#1C1C1E',
                   }}>
-                    <Icon size={20} color="#FFFFFF" strokeWidth={2} />
+                    <Icon size={18} color="#FFFFFF" strokeWidth={2} />
                   </div>
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: 15, fontWeight: 700, color: text }}>{item.title}</div>
-                    <div style={{ fontSize: 13, fontWeight: 400, color: isDark ? 'rgba(235,235,245,0.6)' : 'rgba(60,60,67,0.6)', marginTop: 1 }}>{item.desc}</div>
+                    <div style={{ fontSize: 12, fontWeight: 400, color: isDark ? 'rgba(235,235,245,0.6)' : 'rgba(60,60,67,0.6)', marginTop: 1 }}>{item.desc}</div>
                   </div>
                 </div>
               )
@@ -206,13 +206,13 @@ export default function PremiumPage() {
 
         <div style={{
           marginTop: 'auto',
-          padding: '18px 20px max(30px, env(safe-area-inset-bottom))',
-          display: 'flex', flexDirection: 'column', gap: 10,
+          padding: '14px 20px max(30px, calc(env(safe-area-inset-bottom) + 16px))',
+          display: 'flex', flexDirection: 'column', gap: 8,
         }}>
           <div
             onClick={() => setSelectedPlan('yearly')}
             style={{
-              position: 'relative', borderRadius: 22, padding: '18px 16px 16px', cursor: 'pointer',
+              position: 'relative', borderRadius: 22, padding: '16px 16px 14px', cursor: 'pointer',
               border: `2px solid ${selectedPlan === 'yearly' ? selectedBorder : idleBorder}`,
               background: isDark ? '#1C1C1E' : '#FFFFFF',
               boxShadow: isDark ? '0 8px 24px rgba(0,0,0,0.4)' : '0 8px 24px rgba(0,0,0,0.08)',
@@ -248,7 +248,7 @@ export default function PremiumPage() {
           <div
             onClick={() => setSelectedPlan('monthly')}
             style={{
-              borderRadius: 18, padding: '14px 16px', cursor: 'pointer',
+              borderRadius: 18, padding: '12px 16px', cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 12,
               border: `2px solid ${selectedPlan === 'monthly' ? selectedBorder : idleBorder}`,
               background: isDark ? 'rgba(28,28,30,0.8)' : 'rgba(255,255,255,0.8)',
@@ -265,7 +265,7 @@ export default function PremiumPage() {
             onClick={handleSubscribe}
             disabled={isPurchasing}
             style={{
-              height: 56, borderRadius: 9999, marginTop: 6, border: 'none', cursor: 'pointer',
+              height: 52, borderRadius: 9999, marginTop: 4, border: 'none', cursor: 'pointer',
               fontWeight: 700, fontSize: 17,
               background: isDark ? 'linear-gradient(180deg,#FFFFFF,#C7C7CC)' : 'linear-gradient(180deg,#3A3A3C,#000000)',
               color: isDark ? '#000000' : '#FFFFFF',

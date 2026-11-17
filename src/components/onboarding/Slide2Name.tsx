@@ -44,11 +44,12 @@ export default function Slide2Name({ onNext, onBack, name, setName }: Props) {
 
       <div style={{
         flex: 1,
+        minHeight: 0,
+        overflowY: 'auto',
+        WebkitOverflowScrolling: 'touch',
         paddingLeft: 20,
         paddingRight: 20,
         paddingTop: 24,
-        minHeight: 0,
-        overflowY: 'auto',
       }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

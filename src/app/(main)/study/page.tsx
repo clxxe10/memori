@@ -454,8 +454,8 @@ export default function StudyPage() {
                 style={{
                   flex: 1, height: '40px', borderRadius: '10px', border: '1.5px solid',
                   borderColor: direction === 'word-to-meaning' ? 'var(--color-my)' : 'var(--color-border)',
-                  background: direction === 'word-to-meaning' ? 'var(--color-my-light)' : 'var(--color-surface-2)',
-                  color: direction === 'word-to-meaning' ? 'var(--color-my)' : 'var(--color-text-secondary)',
+                  background: direction === 'word-to-meaning' ? 'var(--color-my)' : 'var(--color-surface-2)',
+                  color: direction === 'word-to-meaning' ? 'var(--color-my-contrast)' : 'var(--color-text-secondary)',
                   fontSize: '13px', fontWeight: 600, cursor: 'pointer',
                 }}
               >
@@ -466,8 +466,8 @@ export default function StudyPage() {
                 style={{
                   flex: 1, height: '40px', borderRadius: '10px', border: '1.5px solid',
                   borderColor: direction === 'meaning-to-word' ? 'var(--color-my)' : 'var(--color-border)',
-                  background: direction === 'meaning-to-word' ? 'var(--color-my-light)' : 'var(--color-surface-2)',
-                  color: direction === 'meaning-to-word' ? 'var(--color-my)' : 'var(--color-text-secondary)',
+                  background: direction === 'meaning-to-word' ? 'var(--color-my)' : 'var(--color-surface-2)',
+                  color: direction === 'meaning-to-word' ? 'var(--color-my-contrast)' : 'var(--color-text-secondary)',
                   fontSize: '13px', fontWeight: 600, cursor: 'pointer',
                 }}
               >

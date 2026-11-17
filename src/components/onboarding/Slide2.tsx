@@ -1,11 +1,12 @@
 'use client'
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Browser } from '@capacitor/browser'
 import { ChevronLeft, ChevronRight, Eye, EyeOff, Mail } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useTranslation } from '@/lib/i18n'
 import { useKeyboard } from '@/hooks/useKeyboard'
 import {
+  ONBOARDING_ILLUST_CSS,
   onboardingAppleCta,
   onboardingBackBtn,
   onboardingFooter,
@@ -75,7 +76,7 @@ function TermsLine({ t }: { t: ReturnType<typeof useTranslation>['t'] }) {
 
 function WordCardsIllust({ photoLabel }: { photoLabel: string }) {
   return (
-    <div style={{ position: 'relative', height: 220, marginBottom: 24 }}>
+    <div className="onb-illust onb-illust-fixed" style={{ position: 'relative', height: 220, marginBottom: 24, flexShrink: 1, minHeight: 0 }}>
       <div style={{
         position: 'absolute', left: 24, top: 34, width: 200, height: 150,
         borderRadius: 24, background: 'var(--m-card)',
@@ -135,6 +136,13 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
   const [stepDir, setStepDir] = useState<'forward' | 'back'>('forward')
   const [emailFocused, setEmailFocused] = useState(false)
   const [passwordFocused, setPasswordFocused] = useState(false)
+
+  useEffect(() => {
+    const style = document.createElement('style')
+    style.textContent = ONBOARDING_ILLUST_CSS
+    document.head.appendChild(style)
+    return () => { document.head.removeChild(style) }
+  }, [])
 
   const stage: Stage = mode === 'select'
     ? 'select'

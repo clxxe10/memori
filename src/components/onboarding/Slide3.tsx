@@ -1,7 +1,9 @@
 'use client'
+import { useEffect } from 'react'
 import { ChevronLeft, Camera, Layers, Share2 } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
 import {
+  ONBOARDING_ILLUST_CSS,
   onboardingBackBtn,
   onboardingFooter,
   onboardingPrimaryCta,
@@ -17,6 +19,13 @@ interface Props {
 
 export default function Slide3({ onNext, onBack }: Props) {
   const { t } = useTranslation()
+
+  useEffect(() => {
+    const style = document.createElement('style')
+    style.textContent = ONBOARDING_ILLUST_CSS
+    document.head.appendChild(style)
+    return () => { document.head.removeChild(style) }
+  }, [])
 
   const features = [
     { icon: Camera, title: t.onboarding.featurePhoto, desc: t.onboarding.featurePhotoDesc },
@@ -35,12 +44,16 @@ export default function Slide3({ onNext, onBack }: Props) {
 
       <div style={{
         flex: 1,
-        paddingLeft: 20,
-        paddingRight: 20,
         minHeight: 0,
         overflowY: 'auto',
+        WebkitOverflowScrolling: 'touch',
+        paddingLeft: 20,
+        paddingRight: 20,
       }}>
-        <div style={{ position: 'relative', height: 170, marginTop: 12, marginBottom: 28 }}>
+        <div
+          className="onb-illust onb-illust-fixed"
+          style={{ position: 'relative', height: 170, marginTop: 12, marginBottom: 28, flexShrink: 1, minHeight: 0 }}
+        >
           <div style={{
             position: 'absolute', left: 'calc(50% - 117px)', top: 58,
             width: 76, height: 76, borderRadius: 20,

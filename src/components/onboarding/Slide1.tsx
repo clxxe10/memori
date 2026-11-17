@@ -1,6 +1,8 @@
 'use client'
+import { useEffect } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import {
+  ONBOARDING_ILLUST_CSS,
   onboardingFooter,
   onboardingPrimaryCta,
   onboardingShell,
@@ -10,10 +12,20 @@ import {
 export default function Slide1({ onNext }: { onNext: () => void }) {
   const { t } = useTranslation()
 
+  useEffect(() => {
+    const style = document.createElement('style')
+    style.textContent = ONBOARDING_ILLUST_CSS
+    document.head.appendChild(style)
+    return () => { document.head.removeChild(style) }
+  }, [])
+
   return (
     <div style={onboardingShell}>
       <div style={{
         flex: 1,
+        minHeight: 0,
+        overflowY: 'auto',
+        WebkitOverflowScrolling: 'touch',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -22,6 +34,7 @@ export default function Slide1({ onNext }: { onNext: () => void }) {
         padding: '0 20px',
       }}>
         <img
+          className="onb-illust"
           src="/onboarding/memori-logo.png"
           alt="Memori"
           style={{
@@ -30,9 +43,11 @@ export default function Slide1({ onNext }: { onNext: () => void }) {
             borderRadius: 22,
             display: 'block',
             boxShadow: '0 0 0 1px var(--m-stroke)',
+            flexShrink: 1,
+            minHeight: 0,
           }}
         />
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           <h1 style={{
             fontSize: 34,
             fontWeight: 700,

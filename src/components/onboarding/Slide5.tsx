@@ -2,6 +2,7 @@
 import { useEffect } from 'react'
 import { useTranslation } from '@/lib/i18n'
 import {
+  ONBOARDING_ILLUST_CSS,
   onboardingFooter,
   onboardingPrimaryCta,
   onboardingShell,
@@ -15,6 +16,7 @@ export default function Slide5({ onFinish }: { onFinish: () => void }) {
   useEffect(() => {
     const style = document.createElement('style')
     style.textContent = `
+      ${ONBOARDING_ILLUST_CSS}
       @keyframes s5CheckPop {
         0%   { opacity: 0; transform: scale(0.5); }
         70%  { opacity: 1; transform: scale(1.1); }
@@ -35,6 +37,9 @@ export default function Slide5({ onFinish }: { onFinish: () => void }) {
     <div style={onboardingShell}>
       <div style={{
         flex: 1,
+        minHeight: 0,
+        overflowY: 'auto',
+        WebkitOverflowScrolling: 'touch',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -42,18 +47,26 @@ export default function Slide5({ onFinish }: { onFinish: () => void }) {
         gap: 36,
         padding: '0 20px',
       }}>
-        <div style={{
-          width: 184, height: 184, borderRadius: '50%',
-          boxShadow: 'inset 0 0 0 1px var(--m-stroke)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <div style={{
-            width: 136, height: 136, borderRadius: '50%',
-            background: 'var(--m-surface)',
+        <div
+          className="onb-illust onb-illust-circle"
+          style={{
+            width: 184, height: 184, borderRadius: '50%',
+            boxShadow: 'inset 0 0 0 1px var(--m-stroke)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
+            flexShrink: 1,
+            minHeight: 0,
+          }}
+        >
+          <div
+            className="onb-illust-circle-mid"
+            style={{
+              width: 136, height: 136, borderRadius: '50%',
+              background: 'var(--m-surface)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
             <div
-              className="s5-check-pop"
+              className="s5-check-pop onb-illust-circle-inner"
               style={{
                 width: 88, height: 88, borderRadius: '50%',
                 background: 'var(--m-btn)', color: 'var(--m-btn-fg)',
@@ -67,7 +80,7 @@ export default function Slide5({ onFinish }: { onFinish: () => void }) {
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, flexShrink: 0 }}>
           <h1 style={{ ...onboardingTitle, textAlign: 'center' }}>{t.onboarding.ready}</h1>
           <p style={{ ...onboardingSubtitle, textAlign: 'center' }}>{t.onboarding.readyDesc}</p>
         </div>

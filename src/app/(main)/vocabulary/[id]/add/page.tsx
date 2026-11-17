@@ -192,14 +192,14 @@ export default function AddWordPage() {
             disabled={!word.trim() || isGeneratingAll}
             style={{
               width: '100%', height: '52px',
-              background: word.trim() ? 'var(--color-my-light)' : 'var(--color-surface-2)',
+              background: word.trim() ? 'var(--color-my)' : 'var(--color-surface-2)',
               border: '1.5px solid',
               borderColor: word.trim() ? 'var(--color-my)' : 'var(--color-border)',
               borderRadius: '14px',
               cursor: word.trim() ? 'pointer' : 'not-allowed',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
               fontSize: '14px', fontWeight: 600,
-              color: word.trim() ? 'var(--color-my)' : '#AEAEB2',
+              color: word.trim() ? 'var(--color-my-contrast)' : '#AEAEB2',
               marginBottom: '8px',
             }}
           >

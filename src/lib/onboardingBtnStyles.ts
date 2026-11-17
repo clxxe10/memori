@@ -185,6 +185,7 @@ export function onboardingSecondaryText(_isDark?: boolean): string {
 export const onboardingShell: CSSProperties = {
   position: 'absolute',
   inset: 0,
+  height: '100%',
   display: 'flex',
   flexDirection: 'column',
   background: 'var(--m-bg)',
@@ -192,6 +193,37 @@ export const onboardingShell: CSSProperties = {
   fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo", system-ui, sans-serif',
   overflow: 'hidden',
 }
+
+/** Inject once per slide for short-viewport illustration behavior */
+export const ONBOARDING_ILLUST_CSS = `
+  .onb-illust {
+    flex-shrink: 1;
+    min-height: 0;
+  }
+  @media (max-height: 700px) {
+    .onb-illust {
+      transform: scale(0.8);
+      transform-origin: center top;
+    }
+    .onb-illust-fixed {
+      height: auto !important;
+      max-height: 140px;
+      margin-bottom: 8px !important;
+    }
+    .onb-illust-circle {
+      width: 148px !important;
+      height: 148px !important;
+    }
+    .onb-illust-circle-mid {
+      width: 110px !important;
+      height: 110px !important;
+    }
+    .onb-illust-circle-inner {
+      width: 70px !important;
+      height: 70px !important;
+    }
+  }
+`
 
 export const onboardingTopBar: CSSProperties = {
   display: 'flex',
@@ -215,11 +247,12 @@ export const onboardingBody: CSSProperties = {
 }
 
 export function onboardingFooter(keyboardPad = 0): CSSProperties {
+  const basePad = 'max(20px, calc(env(safe-area-inset-bottom) + 12px))'
   return {
     marginTop: 'auto',
     paddingLeft: 20,
     paddingRight: 20,
-    paddingBottom: `calc(env(safe-area-inset-bottom) + 20px + ${keyboardPad}px)`,
+    paddingBottom: keyboardPad > 0 ? `calc(${basePad} + ${keyboardPad}px)` : basePad,
     display: 'flex',
     flexDirection: 'column',
     gap: 12,

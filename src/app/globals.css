@@ -352,11 +352,11 @@ textarea {
   display: flex;
   align-items: center;
   gap: 5px;
-  background: rgba(var(--color-my-rgb), 0.12);
-  color: var(--color-my);
+  background: var(--color-my);
+  color: var(--color-my-contrast);
+  border: 1.5px solid var(--color-my);
   padding: 8px 16px;
   border-radius: 9999px;
-  border: none;
   cursor: pointer;
   font-weight: 700;
   font-size: 14px;
@@ -364,8 +364,7 @@ textarea {
   transition: transform 0.15s;
 }
 
-.dark .streak-badge,
-.dark .btn-review-start {
+.dark .streak-badge {
   background: rgba(var(--color-my-rgb), 0.2);
 }
 
