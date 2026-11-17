@@ -7,7 +7,7 @@ import { ArrowLeft, Camera, Image, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { detectLanguage } from '@/lib/detectLanguage'
 import { showToast } from '@/components/ui/Toast'
-import { canUsePhotoExtract, incrementExtractCount } from '@/lib/premium'
+import { addExtractBonus, canUsePhotoExtract, incrementExtractCount } from '@/lib/premium'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
 import { ADMOB_REWARD_PHOTO_EXTRACT } from '@/lib/adConfig'
@@ -544,7 +544,7 @@ export default function CameraPage() {
               {t.vocab.dailyLimit}
             </h3>
             <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px', lineHeight: 1.6 }}>
-              광고를 시청하거나 프리미엄으로<br />무제한 사용해보세요
+              {t.vocab.watchAdDesc}
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
@@ -555,11 +555,8 @@ export default function CameraPage() {
                     }
                     await AdMob.prepareRewardVideoAd(options)
 
-                    AdMob.addListener(RewardAdPluginEvents.Rewarded, async (reward: AdMobRewardItem) => {
-                      // 광고 시청 완료 시 쿼터 리셋
-                      const today = new Date().toLocaleDateString('en-CA')
-                      localStorage.setItem(`extract_date`, today)
-                      localStorage.setItem(`extract_count`, '0')
+                    AdMob.addListener(RewardAdPluginEvents.Rewarded, async (_reward: AdMobRewardItem) => {
+                      addExtractBonus()
                       setShowPhotoGate(false)
                       alert(t.study.adComplete)
                     })

@@ -151,10 +151,10 @@ const getHelpContent = (lang: string) => ({
     ],
     tips: lang === 'en' ? [
       'Import to GoodNotes and solve by hand',
-      'First generation is free',
+      'One free PDF per day',
     ] : [
       '굿노트에 불러와서 손으로 풀 수 있어요',
-      '처음 1회는 무료로 생성할 수 있어요',
+      '하루 1회 무료로 만들 수 있어요',
     ],
   },
 })

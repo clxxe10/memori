@@ -536,7 +536,7 @@ export default function PDFPage() {
               {t.study.freeOnce}
             </h3>
             <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px', lineHeight: 1.6 }}>
-              광고를 시청하거나 프리미엄으로<br />무제한 사용해보세요
+              {t.vocab.watchAdDesc}
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button

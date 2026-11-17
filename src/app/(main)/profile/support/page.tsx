@@ -34,7 +34,7 @@ export default function SupportPage() {
   const FAQ_LIST = lang === 'en' ? [
     { q: 'How do I add words?', a: 'Tap the + button in your vocabulary list. You can add words manually or extract them from a photo using AI.' },
     { q: 'How does AI photo extraction work?', a: 'Take a photo of your textbook or printed material. Our AI will automatically detect and extract vocabulary words and their meanings.' },
-    { q: 'How many free uses do I have?', a: 'You get 1 free AI photo extraction per day. Watch an ad or upgrade to Premium for unlimited use.' },
+    { q: 'How many free uses do I have?', a: 'You get 3 free AI photo extractions per month. Watch an ad for 1 more, or upgrade to Premium for unlimited use.' },
     { q: 'What study modes are available?', a: 'Flashcard, Blink, Quiz, Typing, Listening, Review, Speed Mode, and PDF Test Sheet — 8 modes total.' },
     { q: 'How do I share my vocabulary list?', a: 'Go to vocabulary settings and toggle Public on. Your list will appear in the Explore tab.' },
     { q: 'How do I delete my account?', a: 'Go to Profile → scroll to the bottom → tap Delete Account.' },
