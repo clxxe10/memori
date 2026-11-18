@@ -69,13 +69,28 @@ function TypingContent() {
     return { bg: 'rgba(142,142,147,0.12)', color: '#636366' }
   }
 
+  const normalizeMeaning = (s: string) =>
+    s.replace(/\([^)]*\)/g, '').replace(/[~\s.]/g, '').toLowerCase()
+
+  const isMeaningMatch = (input: string, meaning: string) => {
+    const normalizedInput = normalizeMeaning(input)
+    if (!normalizedInput) return false
+    return meaning
+      .split(/[,;/]/)
+      .map(normalizeMeaning)
+      .filter(Boolean)
+      .some(part => part === normalizedInput)
+  }
+
   const handleCheck = async () => {
     if (!inputValue.trim() || result) return
     const word = words[current]
-    const expected = direction === 'word-to-meaning' ? word.word : word.meaning
-    const isCorrect = inputValue.trim().toLowerCase() === expected.toLowerCase()
+    if (!word) return
+    const isCorrect = direction === 'word-to-meaning'
+      ? isMeaningMatch(inputValue, word.meaning)
+      : inputValue.trim().toLowerCase() === word.word.trim().toLowerCase()
     setResult(isCorrect ? 'correct' : 'wrong')
-    if (!isCorrect) setWrongWords(prev => [...prev, words[current]])
+    if (!isCorrect) setWrongWords(prev => [...prev, word])
     const supabase = createClient()
 
     const { nextInterval, nextEaseFactor, nextReviewDate } = calculateNextReview(
@@ -175,8 +190,13 @@ function TypingContent() {
   )
 
   const word = words[current]
+  if (!word) return null
   const posStyle = getPosStyle(word.part_of_speech)
   const progress = (current / words.length) * 100
+  const promptText = direction === 'word-to-meaning' ? word.word : word.meaning
+  const answerText = direction === 'word-to-meaning' ? word.meaning : word.word
+  const hintText = direction === 'word-to-meaning' ? t.study.typeMeaning : t.study.typeWord
+  const placeholder = direction === 'word-to-meaning' ? t.study.typeMeaningPlaceholder : t.study.typeWordPlaceholder
 
   return (
     <main style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'var(--color-bg)', display: 'flex', flexDirection: 'column', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', overflow: 'hidden', animation: 'pageEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both' }}>
@@ -199,8 +219,8 @@ function TypingContent() {
 
         <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '16px', position: 'sticky', bottom: 0 }}>
           <div style={{ background: 'var(--color-surface)', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.09)', padding: '32px 20px', textAlign: 'center' }}>
-            <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '10px' }}>{t.study.typeWord}</div>
-            <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '10px' }}>{direction === 'word-to-meaning' ? word.meaning : word.word}</div>
+            <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '10px' }}>{hintText}</div>
+            <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '10px' }}>{promptText}</div>
             <span style={{ background: posStyle.bg, color: posStyle.color, borderRadius: '6px', padding: '3px 10px', fontSize: '12px', fontWeight: 600 }}>
               {word.part_of_speech || (lang === 'en' ? 'Other' : '기타')}
             </span>
@@ -211,7 +231,7 @@ function TypingContent() {
               value={inputValue}
               onChange={e => { if (!result) setInputValue(e.target.value) }}
               onKeyDown={e => e.key === 'Enter' && !result && handleCheck()}
-              placeholder={direction === 'word-to-meaning' ? t.study.typeWordPlaceholder : t.study.typeMeaningPlaceholder}
+              placeholder={placeholder}
               autoFocus
               style={{
                 width: '100%', height: '54px',
@@ -224,7 +244,7 @@ function TypingContent() {
             />
             {result === 'wrong' && (
               <div style={{ fontSize: '14px', color: 'var(--color-incorrect)', textAlign: 'center', marginBottom: '8px' }}>
-                {lang === 'en' ? 'Answer:' : '정답:'} <strong>{direction === 'word-to-meaning' ? word.word : word.meaning}</strong>
+                {lang === 'en' ? 'Answer:' : '정답:'} <strong>{answerText}</strong>
               </div>
             )}
             {result === 'correct' && (
@@ -236,7 +256,7 @@ function TypingContent() {
 
           {!result ? (
             <button onClick={handleCheck} disabled={!inputValue.trim()}
-              style={{ width: '100%', height: '52px', background: inputValue.trim() ? 'var(--color-neutral)' : 'var(--color-surface-2)', color: inputValue.trim() ? 'var(--color-neutral-contrast)' : 'var(--color-text-tertiary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: inputValue.trim() ? 'pointer' : 'not-allowed' }}>
+              style={{ width: '100%', height: '52px', background: inputValue.trim() ? 'var(--color-neutral)' : 'var(--color-surface-2)', color: inputValue.trim() ? 'var(--color-neutral-contrast)' : 'var(--color-text-secondary)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: inputValue.trim() ? 'pointer' : 'not-allowed', opacity: inputValue.trim() ? 1 : 0.6 }}>
               {t.study.confirm}
             </button>
           ) : (

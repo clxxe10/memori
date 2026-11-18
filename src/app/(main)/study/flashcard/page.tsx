@@ -46,6 +46,7 @@ function FlashcardContent() {
   const [swipeX, setSwipeX] = useState(0)
   const [dragging, setDragging] = useState(false)
   const dragStartX = useRef(0)
+  const busyRef = useRef(false)
   useEffect(() => {
     const style = document.createElement('style')
     style.textContent = `
@@ -136,10 +137,14 @@ function FlashcardContent() {
   }
 
   const handleAnswer = async (know: boolean) => {
+    if (finished || busyRef.current) return
+    const word = words[current]
+    if (!word) return
+    busyRef.current = true
+
     if (know) haptics.success()
     else haptics.medium()
 
-    const word = words[current]
     const supabase = createClient()
 
     const { nextInterval, nextEaseFactor, nextReviewDate } = calculateNextReview(
@@ -170,44 +175,56 @@ function FlashcardContent() {
     if (current + 1 >= words.length) {
       recordStudyProgress(words.length)
       setFinished(true)
+      busyRef.current = false
     } else {
       setCurrent(prev => prev + 1)
       setFlipped(false)
+      busyRef.current = false
     }
   }
 
+  const queueAnswer = (know: boolean) => {
+    if (finished || busyRef.current || exitDirection) return
+    busyRef.current = true
+    setExitDirection(know ? 'right' : 'left')
+    setTimeout(() => {
+      setExitDirection(null)
+      // unlock briefly so handleAnswer can re-acquire
+      busyRef.current = false
+      handleAnswer(know)
+    }, 450)
+  }
+
   const handleRestart = () => {
+    busyRef.current = false
     setWords(prev => [...prev].sort(() => Math.random() - 0.5))
     setCurrent(0); setFlipped(false); setFinished(false)
     setStats({ know: 0, dontKnow: 0 })
     setCardAnim('')
+    setExitDirection(null)
   }
 
   const handleRetryWrong = () => {
+    busyRef.current = false
     setWords(wrongWords)
     setWrongWords([])
     setCurrent(0)
     setFlipped(false)
     setFinished(false)
     setStats({ know: 0, dontKnow: 0 })
+    setExitDirection(null)
   }
 
   const swipeHandlers = useSwipe({
     onSwipeLeft: () => {
+      if (finished || busyRef.current || exitDirection) return
       haptics.medium()
-      setExitDirection('left')
-      setTimeout(() => {
-        handleAnswer(false)
-        setExitDirection(null)
-      }, 450)
+      queueAnswer(false)
     },
     onSwipeRight: () => {
+      if (finished || busyRef.current || exitDirection) return
       haptics.success()
-      setExitDirection('right')
-      setTimeout(() => {
-        handleAnswer(true)
-        setExitDirection(null)
-      }, 450)
+      queueAnswer(true)
     },
     threshold: 60,
   })
@@ -299,8 +316,11 @@ function FlashcardContent() {
   )
 
   const word = words[current]
+  if (!word) return null
   const posStyle = getPosStyle(word.part_of_speech)
   const progress = (current / words.length) * 100
+  const frontHint = direction === 'word-to-meaning' ? t.study.tapToSeeMeaning : t.study.tapToSeeWord
+  const backHint = direction === 'word-to-meaning' ? t.study.tapToSeeWord : t.study.tapToSeeMeaning
 
   return (
     <main style={{
@@ -400,11 +420,16 @@ function FlashcardContent() {
             }}
             className={cardAnim}
             onClick={() => {
+              if (busyRef.current || exitDirection || cardAnim) return
+              busyRef.current = true
               setCardAnim('card-flip-out')
               setTimeout(() => {
                 setFlipped(f => !f)
                 setCardAnim('card-flip-in')
-                setTimeout(() => setCardAnim(''), 150)
+                setTimeout(() => {
+                  setCardAnim('')
+                  busyRef.current = false
+                }, 150)
               }, 150)
             }}
             style={{
@@ -458,7 +483,7 @@ function FlashcardContent() {
             </button>
 
             <div style={{ position: 'absolute', top: '16px', right: '14px', fontSize: '10px', color: 'var(--color-text-tertiary)' }}>
-              {flipped ? t.study.tapToSeeWord : t.study.tapToSeeMeaning}
+              {flipped ? backHint : frontHint}
             </div>
 
             {!flipped ? (
@@ -469,7 +494,7 @@ function FlashcardContent() {
                 <div style={{ fontSize: '34px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-1px', marginBottom: '10px', lineHeight: 1.1, wordBreak: 'break-word' }}>
                   {direction === 'word-to-meaning' ? word.word : word.meaning}
                 </div>
-                {word.pronunciation && (
+                {direction === 'word-to-meaning' && word.pronunciation && (
                   <div style={{ fontSize: '13px', color: 'var(--color-text-tertiary)' }}>{word.pronunciation}</div>
                 )}
               </>
@@ -534,25 +559,13 @@ function FlashcardContent() {
         {/* 알아요/몰라요 버튼 */}
         <div style={{ display: 'flex', gap: '10px', flexShrink: 0 }}>
           <button
-            onClick={() => {
-              setExitDirection('left')
-              setTimeout(() => {
-                handleAnswer(false)
-                setExitDirection(null)
-              }, 450)
-            }}
+            onClick={() => queueAnswer(false)}
             style={{ flex: 1, height: '52px', background: 'transparent', border: '1.5px solid var(--color-border)', color: 'var(--color-text-primary)', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}
           >
             {t.study.dontKnow}
           </button>
           <button
-            onClick={() => {
-              setExitDirection('right')
-              setTimeout(() => {
-                handleAnswer(true)
-                setExitDirection(null)
-              }, 450)
-            }}
+            onClick={() => queueAnswer(true)}
             style={{ flex: 1, height: '52px', background: 'transparent', border: '1.5px solid var(--color-border)', color: 'var(--color-text-primary)', borderRadius: '16px', fontSize: '16px', fontWeight: 700, cursor: 'pointer' }}
           >
             {t.study.know}

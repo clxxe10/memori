@@ -67,7 +67,7 @@ function WordCard({ word, onDelete, children }: { word: Word; onDelete: () => vo
           <button onClick={() => setConfirming(false)} style={{
             padding: '8px 14px', borderRadius: '10px',
             border: 'none', background: 'rgba(255,255,255,0.2)',
-            color: 'white', fontSize: '13px', cursor: 'pointer',
+            color: '#FFFFFF', fontSize: '13px', fontWeight: 600, cursor: 'pointer',
           }}>{t.common.cancel}</button>
           <button onClick={() => { haptics.error(); onDelete() }} style={{
             padding: '8px 14px', borderRadius: '10px',

@@ -234,7 +234,9 @@ function QuizContent() {
             <Volume2 size={15} color="var(--color-text-secondary)" />
           </button>
           <div style={{ fontSize: '30px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '6px', letterSpacing: '-0.5px' }}>{direction === 'word-to-meaning' ? word.word : word.meaning}</div>
-          {word.pronunciation && <div style={{ fontSize: '13px', color: 'var(--color-text-tertiary)' }}>{word.pronunciation}</div>}
+          {(direction === 'word-to-meaning' || selectedOption !== null) && word.pronunciation && (
+            <div style={{ fontSize: '13px', color: 'var(--color-text-tertiary)' }}>{word.pronunciation}</div>
+          )}
         </div>
 
         <div style={{
