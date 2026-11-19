@@ -91,32 +91,75 @@ function SearchPageContent() {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) setMyUserId(user.id)
 
-      const { data: folderData } = await supabase
+      const { data: folderData, error: folderError } = await supabase
         .from('folders')
         .select('*')
         .eq('is_public', true)
 
-      if (!folderData) {
-        setLoading(false)
-        return
+      if (folderError) {
+        console.error('공개 폴더 조회 오류:', folderError)
       }
 
+      const folderList = folderData ?? []
+
+      // reports/user_blocks 테이블이 없거나 실패해도 목록은 그대로 표시
+      let blockedIds = new Set<string>()
+      let reportedFolderIds = new Set<string>()
+      if (user) {
+        try {
+          const { data: blocks, error: blockError } = await supabase
+            .from('user_blocks')
+            .select('blocked_id')
+            .eq('blocker_id', user.id)
+          if (blockError) {
+            console.warn('user_blocks 조회 실패(무시):', blockError.message)
+          } else {
+            blockedIds = new Set((blocks || []).map(b => b.blocked_id))
+          }
+        } catch (e) {
+          console.warn('user_blocks 조회 예외(무시):', e)
+        }
+        try {
+          const { data: reports, error: reportError } = await supabase
+            .from('reports')
+            .select('folder_id')
+            .eq('reporter_id', user.id)
+          if (reportError) {
+            console.warn('reports 조회 실패(무시):', reportError.message)
+          } else {
+            reportedFolderIds = new Set((reports || []).map(r => r.folder_id))
+          }
+        } catch (e) {
+          console.warn('reports 조회 예외(무시):', e)
+        }
+      }
+
+      const visibleFolders = folderList.filter(
+        f => !blockedIds.has(f.user_id) && !reportedFolderIds.has(f.id)
+      )
+
       const foldersWithCount = await Promise.all(
-        folderData.map(async (folder) => {
+        visibleFolders.map(async (folder) => {
           const { count: wordCount } = await supabase
             .from('words')
             .select('*', { count: 'exact', head: true })
             .eq('folder_id', folder.id)
 
-          const { count: likeCount } = await supabase
-            .from('folder_likes')
-            .select('*', { count: 'exact', head: true })
-            .eq('folder_id', folder.id)
+          let likeCount = 0
+          try {
+            const { count } = await supabase
+              .from('folder_likes')
+              .select('*', { count: 'exact', head: true })
+              .eq('folder_id', folder.id)
+            likeCount = count || 0
+          } catch {
+            likeCount = 0
+          }
 
           return {
             ...folder,
             word_count: wordCount || 0,
-            like_count: likeCount || 0,
+            like_count: likeCount,
           }
         })
       )
@@ -128,9 +171,9 @@ function SearchPageContent() {
       })
 
       setFolders(sorted)
-      setLoading(false)
     } catch (e) {
       console.error('공개 폴더 로딩 오류:', e)
+      setFolders([])
     } finally {
       setLoading(false)
     }

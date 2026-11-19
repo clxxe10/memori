@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import TimeTracker from '@/components/providers/TimeTracker'
@@ -18,6 +18,12 @@ export const metadata: Metadata = {
   icons: {
     apple: [{ url: '/icons/icon-180.png', sizes: '180x180', type: 'image/png' }],
   },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
   themeColor: '#0A0A0A',
 }
 

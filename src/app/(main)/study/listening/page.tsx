@@ -6,9 +6,9 @@ import { ArrowLeft, Volume2, RotateCcw } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { calculateNextReview } from '@/lib/srs'
 import { recordStudyProgress } from '@/lib/studyTracker'
-import { detectLanguage, languageToTTSCode } from '@/lib/detectLanguage'
 import { usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
+import { speak } from '@/lib/tts'
 
 type Word = {
   id: string
@@ -56,35 +56,8 @@ function ListeningContent() {
   }, [folderId])
 
   const handleSpeak = () => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window) || words.length === 0) return
-    const word = words[current]
-    window.speechSynthesis.cancel()
-
-    const detectedLang = detectLanguage(word.word)
-    const langCode = languageToTTSCode(detectedLang)
-
-    const utter = new SpeechSynthesisUtterance(word.word)
-    utter.lang = langCode
-    utter.rate = 0.85
-    utter.volume = 1
-    utter.pitch = 1
-
-    const trySpeak = () => {
-      const voices = window.speechSynthesis.getVoices()
-      const found = voices.find(v => v.lang.startsWith(langCode.split('-')[0]))
-      if (found) utter.voice = found
-      window.speechSynthesis.speak(utter)
-    }
-
-    const voices = window.speechSynthesis.getVoices()
-    if (voices.length > 0) {
-      trySpeak()
-    } else {
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.onvoiceschanged = null
-        trySpeak()
-      }
-    }
+    if (words.length === 0) return
+    void speak(words[current]?.word || '')
   }
 
   const handleCheck = async () => {

@@ -32,6 +32,7 @@ export default function Slide1({ onNext }: { onNext: () => void }) {
         justifyContent: 'center',
         gap: 20,
         padding: '0 20px',
+        paddingTop: 'max(12px, calc(env(safe-area-inset-top) + 8px))',
       }}>
         <img
           className="onb-illust"

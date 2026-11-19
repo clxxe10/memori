@@ -4,7 +4,6 @@ import { useEffect, useState, useRef, type ReactNode } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { ArrowLeft, Bookmark, Camera, Pencil, Plus, Volume2, Settings } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { detectLanguage, languageToTTSCode } from '@/lib/detectLanguage'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import { useSwipe } from '@/hooks/useSwipe'
@@ -14,6 +13,9 @@ import EmptyState from '@/components/ui/EmptyState'
 import { WordSkeleton } from '@/components/ui/Skeleton'
 import { showToast } from '@/components/ui/Toast'
 import { useTranslation } from '@/lib/i18n'
+import { findBlockedInList, type BlockHit } from '@/lib/contentFilter'
+import { speak } from '@/lib/tts'
+import AlertModal from '@/components/AlertModal'
 
 type Word = {
   id: string
@@ -128,6 +130,7 @@ export default function VocabularyDetailPage() {
   const [showEditSheet, setShowEditSheet] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [filterAlert, setFilterAlert] = useState<{ title: string; description: string } | null>(null)
   const [editForm, setEditForm] = useState({
     name: '',
     description: '',
@@ -178,27 +181,93 @@ export default function VocabularyDetailPage() {
     return true
   })
 
+  const showBlockHitAlert = (hit: BlockHit) => {
+    const hitLine = t.search.cannotPublishHit
+      .replace('{term}', hit.term)
+      .replace('{source}', hit.source)
+    setFilterAlert({
+      title: t.search.cannotPublish,
+      description: `${t.search.cannotPublishDesc}\n\n${hitLine}`,
+    })
+  }
+
   const handleEditSave = async () => {
     const trimmedName = editForm.name.trim()
     if (!trimmedName) {
-      alert(lang === 'en' ? 'Please enter a vocabulary name.' : '단어장 이름을 입력해주세요.')
+      setFilterAlert({
+        title: lang === 'en' ? 'Name required' : '이름을 입력해주세요',
+        description: lang === 'en' ? 'Please enter a vocabulary name.' : '단어장 이름을 입력해주세요.',
+      })
       return
+    }
+    if (editForm.is_public) {
+      const texts = [
+        trimmedName,
+        editForm.description,
+        ...words.map(w => w.word),
+        ...words.map(w => w.meaning),
+      ]
+      const labels = [
+        lang === 'en' ? `Title: ${trimmedName}` : `제목: ${trimmedName}`,
+        editForm.description
+          ? (lang === 'en' ? `Description: ${editForm.description}` : `설명: ${editForm.description}`)
+          : null,
+        ...words.map(w => (lang === 'en' ? `Word: ${w.word}` : `단어: ${w.word}`)),
+        ...words.map(w => (lang === 'en' ? `Meaning: ${w.meaning}` : `뜻: ${w.meaning}`)),
+      ]
+      const hit = findBlockedInList(texts, labels)
+      if (hit) {
+        showBlockHitAlert(hit)
+        return
+      }
     }
     setIsSaving(true)
     try {
       const supabase = createClient()
-      await supabase.from('folders').update({
-        name: trimmedName,
-        description: editForm.description.trim() || null,
-        category: editForm.category,
-        is_public: editForm.is_public,
-      }).eq('id', folderId)
-      setFolder(prev => prev ? { ...prev, ...editForm, name: trimmedName } : prev)
-      setEditForm(f => ({ ...f, name: trimmedName }))
+      const { data, error } = await supabase
+        .from('folders')
+        .update({
+          name: trimmedName,
+          description: editForm.description.trim() || null,
+          category: editForm.category,
+          is_public: editForm.is_public,
+        })
+        .eq('id', folderId)
+        .select('id, name, is_public')
+        .maybeSingle()
+
+      if (error) {
+        console.error('저장 오류:', error)
+        setFilterAlert({
+          title: t.alert.saveFailed,
+          description: error.message || t.search.savePublicFailed,
+        })
+        return
+      }
+      if (!data) {
+        console.error('저장 0건 — RLS 또는 id 불일치')
+        setFilterAlert({
+          title: t.alert.saveFailed,
+          description: t.search.savePublicFailed,
+        })
+        return
+      }
+
+      setFolder(prev => prev ? { ...prev, ...editForm, name: trimmedName, is_public: data.is_public } : prev)
+      setEditForm(f => ({ ...f, name: trimmedName, is_public: !!data.is_public }))
       setShowEditSheet(false)
+      showToast(
+        data.is_public
+          ? (lang === 'en' ? 'Saved — now public in Explore' : '저장됐어요. 탐색 탭에 공개됩니다.')
+          : (lang === 'en' ? 'Saved' : '저장됐어요.'),
+        'success',
+      )
     } catch (e) {
       console.error('저장 오류:', e)
-      alert(t.alert.saveFailed)
+      setFilterAlert({
+        title: t.alert.saveFailed,
+        description: t.search.savePublicFailed,
+      })
     } finally {
       setIsSaving(false)
     }
@@ -236,33 +305,7 @@ export default function VocabularyDetailPage() {
   }
 
   const handleSpeak = (text: string) => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
-    window.speechSynthesis.cancel()
-
-    const utter = new SpeechSynthesisUtterance(text)
-    const detectedLang = detectLanguage(text)
-    const langCode = languageToTTSCode(detectedLang)
-    utter.lang = langCode
-    utter.rate = 0.85
-    utter.volume = 1
-    utter.pitch = 1
-
-    const trySpeak = () => {
-      const voices = window.speechSynthesis.getVoices()
-      const found = voices.find(v => v.lang.startsWith(langCode.split('-')[0]))
-      if (found) utter.voice = found
-      window.speechSynthesis.speak(utter)
-    }
-
-    const voices = window.speechSynthesis.getVoices()
-    if (voices.length > 0) {
-      trySpeak()
-    } else {
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.onvoiceschanged = null
-        trySpeak()
-      }
-    }
+    void speak(text)
   }
 
   const posColors: Record<string, string> = {
@@ -584,6 +627,17 @@ export default function VocabularyDetailPage() {
             </div>
           </div>
         </>
+      )}
+
+      {filterAlert && (
+        <AlertModal
+          title={filterAlert.title}
+          description={filterAlert.description}
+          confirmText={t.common.confirm}
+          cancelText={t.common.close}
+          onConfirm={() => setFilterAlert(null)}
+          onCancel={() => setFilterAlert(null)}
+        />
       )}
 
       {showAddSheet && (

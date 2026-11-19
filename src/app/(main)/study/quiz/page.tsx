@@ -8,6 +8,7 @@ import { calculateNextReview } from '@/lib/srs'
 import { recordStudyProgress } from '@/lib/studyTracker'
 import { usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
+import { speak } from '@/lib/tts'
 
 type Word = {
   id: string
@@ -95,11 +96,7 @@ function QuizContent() {
   }
 
   const handleSpeak = (text: string) => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
-    window.speechSynthesis.cancel()
-    const utter = new SpeechSynthesisUtterance(text)
-    utter.lang = 'en-US'; utter.rate = 0.9
-    window.speechSynthesis.speak(utter)
+    void speak(text)
   }
 
   const handleSelect = async (opt: string, idx: number) => {

@@ -29,6 +29,7 @@ import { FolderSkeleton } from '@/components/ui/Skeleton'
 import PullToRefresh from '@/components/ui/PullToRefresh'
 import Coachmark from '@/components/ui/Coachmark'
 import { useTranslation } from '@/lib/i18n'
+import { findBlockedInList } from '@/lib/contentFilter'
 
 type Folder = {
   id: string
@@ -114,6 +115,24 @@ export default function VocabularyPage() {
 
   const handleCreate = async () => {
     if (!newFolder.name.trim()) return
+    if (newFolder.is_public) {
+      const hit = findBlockedInList(
+        [newFolder.name, newFolder.description],
+        [
+          lang === 'en' ? `Title: ${newFolder.name}` : `제목: ${newFolder.name}`,
+          newFolder.description
+            ? (lang === 'en' ? `Description: ${newFolder.description}` : `설명: ${newFolder.description}`)
+            : null,
+        ],
+      )
+      if (hit) {
+        const hitLine = t.search.cannotPublishHit
+          .replace('{term}', hit.term)
+          .replace('{source}', hit.source)
+        alert(`${t.search.cannotPublish}\n${t.search.cannotPublishDesc}\n\n${hitLine}`)
+        return
+      }
+    }
     setCreating(true)
 
     try {

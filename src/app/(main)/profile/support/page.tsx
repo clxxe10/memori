@@ -186,6 +186,23 @@ export default function SupportPage() {
             </button>
           </div>
         )}
+
+        <div style={{
+          marginTop: '40px',
+          paddingTop: '20px',
+          borderTop: '1px solid var(--color-border)',
+          textAlign: 'center',
+        }}>
+          <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '0 0 6px' }}>
+            {lang === 'en' ? 'Or email us directly' : '또는 이메일로 문의하세요'}
+          </p>
+          <a
+            href="mailto:byoneidea@gmail.com"
+            style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)', textDecoration: 'none' }}
+          >
+            byoneidea@gmail.com
+          </a>
+        </div>
       </div>
     </main>
   )

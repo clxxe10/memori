@@ -232,7 +232,7 @@ export const onboardingTopBar: CSSProperties = {
   height: 44,
   paddingLeft: 16,
   paddingRight: 16,
-  paddingTop: 'calc(env(safe-area-inset-top) + 8px)',
+  paddingTop: 'max(12px, calc(env(safe-area-inset-top) + 8px))',
   flexShrink: 0,
   boxSizing: 'content-box',
 }

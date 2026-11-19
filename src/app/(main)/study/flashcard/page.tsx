@@ -10,6 +10,7 @@ import { usePagePadding } from '@/lib/responsive'
 import { useSwipe } from '@/hooks/useSwipe'
 import { haptics } from '@/lib/haptics'
 import { useTranslation } from '@/lib/i18n'
+import { speak as speakWord } from '@/lib/tts'
 
 type Word = {
   id: string
@@ -117,23 +118,7 @@ function FlashcardContent() {
   }, [folderId])
 
   const handleSpeak = (text: string) => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
-    window.speechSynthesis.cancel()
-    const speak = () => {
-      const utter = new SpeechSynthesisUtterance(text)
-      utter.lang = 'en-US'
-      utter.rate = 0.9
-      const voices = window.speechSynthesis.getVoices()
-      const preferred = ['Samantha', 'Alex', 'Karen', 'Google US English']
-      for (const name of preferred) {
-        const found = voices.find(v => v.name.includes(name) && v.lang.startsWith('en'))
-        if (found) { utter.voice = found; break }
-      }
-      window.speechSynthesis.speak(utter)
-    }
-    const voices = window.speechSynthesis.getVoices()
-    if (voices.length > 0) speak()
-    else { window.speechSynthesis.onvoiceschanged = () => { speak(); window.speechSynthesis.onvoiceschanged = null } }
+    void speakWord(text)
   }
 
   const handleAnswer = async (know: boolean) => {

@@ -40,11 +40,12 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { ArrowLeft, Send, X } from 'lucide-react'
+import { ArrowLeft, MoreHorizontal, Send, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { showToast } from '@/components/ui/Toast'
 import { useTranslation } from '@/lib/i18n'
+import AlertModal from '@/components/AlertModal'
 
 type Folder = {
   id: string
@@ -91,7 +92,18 @@ export default function PublicFolderPage() {
   const [submitting, setSubmitting] = useState(false)
   const [myNickname, setMyNickname] = useState('')
   const [showCommentSheet, setShowCommentSheet] = useState(false)
-  const { t } = useTranslation()
+  const [showMoreMenu, setShowMoreMenu] = useState(false)
+  const [showReportSheet, setShowReportSheet] = useState(false)
+  const [showBlockConfirm, setShowBlockConfirm] = useState(false)
+  const [actionBusy, setActionBusy] = useState(false)
+  const { t, lang } = useTranslation()
+
+  const REPORT_REASONS = [
+    { key: 'inappropriate', label: t.search.reportReasonInappropriate },
+    { key: 'hate', label: t.search.reportReasonHate },
+    { key: 'spam', label: t.search.reportReasonSpam },
+    { key: 'other', label: t.search.reportReasonOther },
+  ] as const
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -237,6 +249,61 @@ export default function PublicFolderPage() {
 
   const isMyFolder = folder?.user_id === myUserId
 
+  const handleReport = async (reason: string) => {
+    if (!myUserId || !folder || actionBusy) return
+    setActionBusy(true)
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.from('reports').insert({
+        reporter_id: myUserId,
+        folder_id: folder.id,
+        owner_id: folder.user_id,
+        reason,
+      })
+      // 23505 = already reported (unique) — still hide from list
+      if (error && error.code !== '23505') {
+        console.error(error)
+        showToast(t.search.reportFailed, 'error')
+        return
+      }
+      setShowReportSheet(false)
+      setShowMoreMenu(false)
+      showToast(t.search.reportSubmitted, 'success')
+      router.replace('/search')
+    } catch (e) {
+      console.error(e)
+      showToast(t.search.reportFailed, 'error')
+    } finally {
+      setActionBusy(false)
+    }
+  }
+
+  const handleBlock = async () => {
+    if (!myUserId || !folder || actionBusy) return
+    setActionBusy(true)
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.from('user_blocks').insert({
+        blocker_id: myUserId,
+        blocked_id: folder.user_id,
+      })
+      if (error && error.code !== '23505') {
+        console.error(error)
+        showToast(t.search.blockFailed, 'error')
+        return
+      }
+      setShowBlockConfirm(false)
+      setShowMoreMenu(false)
+      showToast(t.search.blockDone, 'success')
+      router.replace('/search')
+    } catch (e) {
+      console.error(e)
+      showToast(t.search.blockFailed, 'error')
+    } finally {
+      setActionBusy(false)
+    }
+  }
+
   if (loading) return (
     <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', fontFamily: '-apple-system, sans-serif' }}>
       <p style={{ color: 'var(--color-text-secondary)' }}>{t.common.loading}</p>
@@ -256,8 +323,20 @@ export default function PublicFolderPage() {
           <button onClick={() => router.back()} style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer' }}>
             <ArrowLeft size={22} color="var(--color-text-primary)" />
           </button>
-          <h1 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0, flex: 1 }}>단어장 보기</h1>
-          <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>{words.length}개+</span>
+          <h1 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0, flex: 1 }}>
+            {lang === 'en' ? 'Vocabulary' : '단어장 보기'}
+          </h1>
+          <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginRight: '4px' }}>{words.length}{lang === 'en' ? '+' : '개+'}</span>
+          {!isMyFolder && myUserId && (
+            <button
+              onClick={() => setShowMoreMenu(true)}
+              aria-label={t.search.more}
+              style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer', display: 'flex' }}
+              type="button"
+            >
+              <MoreHorizontal size={22} color="var(--color-text-primary)" />
+            </button>
+          )}
         </div>
 
         {/* 단어장 정보 카드 */}
@@ -345,6 +424,122 @@ export default function PublicFolderPage() {
           </button>
         )}
       </div>
+
+      {/* ⋯ 메뉴 */}
+      {showMoreMenu && (
+        <>
+          <div
+            onClick={() => setShowMoreMenu(false)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 300 }}
+          />
+          <div style={{
+            position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 301,
+            background: 'var(--color-surface)',
+            borderRadius: '24px 24px 0 0',
+            padding: '12px 20px max(32px, calc(env(safe-area-inset-bottom) + 16px))',
+          }}>
+            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 16px' }} />
+            <button
+              type="button"
+              onClick={() => { setShowMoreMenu(false); setShowReportSheet(true) }}
+              style={{
+                width: '100%', height: '52px', background: 'none', border: 'none',
+                borderBottom: '1px solid var(--color-border)',
+                fontSize: '16px', fontWeight: 600, color: 'var(--color-text-primary)',
+                cursor: 'pointer', textAlign: 'left', padding: '0 4px',
+              }}
+            >
+              {t.search.report}
+            </button>
+            <button
+              type="button"
+              onClick={() => { setShowMoreMenu(false); setShowBlockConfirm(true) }}
+              style={{
+                width: '100%', height: '52px', background: 'none', border: 'none',
+                fontSize: '16px', fontWeight: 600, color: '#FF3B30',
+                cursor: 'pointer', textAlign: 'left', padding: '0 4px',
+              }}
+            >
+              {t.search.blockUser}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowMoreMenu(false)}
+              style={{
+                width: '100%', height: '48px', marginTop: '8px',
+                background: 'var(--color-surface-2)', border: 'none', borderRadius: '14px',
+                fontSize: '15px', fontWeight: 600, color: 'var(--color-text-secondary)', cursor: 'pointer',
+              }}
+            >
+              {t.common.cancel}
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* 신고 사유 선택 */}
+      {showReportSheet && (
+        <>
+          <div
+            onClick={() => setShowReportSheet(false)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 300 }}
+          />
+          <div style={{
+            position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 301,
+            background: 'var(--color-surface)',
+            borderRadius: '24px 24px 0 0',
+            padding: '12px 20px max(32px, calc(env(safe-area-inset-bottom) + 16px))',
+          }}>
+            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 16px' }} />
+            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', margin: '0 0 4px', textAlign: 'center' }}>
+              {t.search.reportTitle}
+            </h3>
+            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '0 0 16px', textAlign: 'center' }}>
+              {t.search.reportDesc}
+            </p>
+            {REPORT_REASONS.map((r, i) => (
+              <button
+                key={r.key}
+                type="button"
+                disabled={actionBusy}
+                onClick={() => handleReport(r.key)}
+                style={{
+                  width: '100%', height: '52px', background: 'none', border: 'none',
+                  borderBottom: i < REPORT_REASONS.length - 1 ? '1px solid var(--color-border)' : 'none',
+                  fontSize: '16px', fontWeight: 600, color: 'var(--color-text-primary)',
+                  cursor: actionBusy ? 'not-allowed' : 'pointer', textAlign: 'left', padding: '0 4px',
+                  opacity: actionBusy ? 0.6 : 1,
+                }}
+              >
+                {r.label}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => setShowReportSheet(false)}
+              style={{
+                width: '100%', height: '48px', marginTop: '12px',
+                background: 'var(--color-surface-2)', border: 'none', borderRadius: '14px',
+                fontSize: '15px', fontWeight: 600, color: 'var(--color-text-secondary)', cursor: 'pointer',
+              }}
+            >
+              {t.common.cancel}
+            </button>
+          </div>
+        </>
+      )}
+
+      {showBlockConfirm && (
+        <AlertModal
+          title={t.search.blockTitle}
+          description={t.search.blockDesc}
+          confirmText={t.search.blockConfirm}
+          cancelText={t.common.cancel}
+          isDestructive
+          onConfirm={handleBlock}
+          onCancel={() => setShowBlockConfirm(false)}
+        />
+      )}
 
       {/* 댓글 바텀시트 */}
       {showCommentSheet && (

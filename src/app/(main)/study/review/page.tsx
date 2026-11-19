@@ -8,6 +8,7 @@ import { calculateNextReview } from '@/lib/srs'
 import { recordStudyProgress } from '@/lib/studyTracker'
 import { usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
+import { speak as speakWord } from '@/lib/tts'
 
 type Word = {
   id: string
@@ -94,19 +95,7 @@ function ReviewContent() {
   }, [current, words])
 
   const handleSpeak = (text: string) => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
-    window.speechSynthesis.cancel()
-    const speak = () => {
-      const utter = new SpeechSynthesisUtterance(text)
-      utter.lang = 'en-US'; utter.rate = 0.9
-      const voices = window.speechSynthesis.getVoices()
-      const found = voices.find(v => v.name.includes('Samantha') && v.lang.startsWith('en'))
-      if (found) utter.voice = found
-      window.speechSynthesis.speak(utter)
-    }
-    const voices = window.speechSynthesis.getVoices()
-    if (voices.length > 0) speak()
-    else { window.speechSynthesis.onvoiceschanged = () => { speak(); window.speechSynthesis.onvoiceschanged = null } }
+    void speakWord(text)
   }
 
   const commitAnswer = async (know: boolean) => {
