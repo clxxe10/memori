@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useRef, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, Volume2, RotateCcw } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -41,6 +41,7 @@ function QuizContent() {
   const [stats, setStats] = useState({ correct: 0, wrong: 0 })
   const [wrongWords, setWrongWords] = useState<typeof words>([])
   const [folderName, setFolderName] = useState('')
+  const busyRef = useRef(false)
   useEffect(() => {
     const fetchWords = async () => {
       const supabase = createClient()
@@ -102,9 +103,11 @@ function QuizContent() {
   }
 
   const handleSelect = async (opt: string, idx: number) => {
-    if (selectedOption !== null) return
-    setSelectedOption(idx)
+    if (selectedOption !== null || busyRef.current) return
     const word = words[current]
+    if (!word) return
+    busyRef.current = true
+    setSelectedOption(idx)
     const isCorrect = opt === (direction === 'word-to-meaning' ? word.meaning : word.word)
     if (!isCorrect) setWrongWords(prev => [...prev, words[current]])
     const supabase = createClient()
@@ -129,10 +132,12 @@ function QuizContent() {
       if (current + 1 >= words.length) {
         await recordStudyProgress(words.length)
         setFinished(true)
+        busyRef.current = false
       } else {
         const next = current + 1
         setCurrent(next)
         setSelectedOption(null)
+        busyRef.current = false
         generateOptions(words[next], allWords)
       }
     }, 900)
@@ -144,6 +149,7 @@ function QuizContent() {
     setWrongWords([])
     setCurrent(0)
     setSelectedOption(null)
+    busyRef.current = false
     setFinished(false)
     setStats({ correct: 0, wrong: 0 })
     generateOptions(retryWords[0], allWords)
@@ -167,7 +173,7 @@ function QuizContent() {
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', maxWidth: '320px' }}>
-        <button onClick={() => { setCurrent(0); setFinished(false); setSelectedOption(null); setStats({ correct: 0, wrong: 0 }); setWords(prev => { const s = [...prev].sort(() => Math.random() - 0.5); generateOptions(s[0], allWords); return s }) }}
+        <button onClick={() => { setCurrent(0); setFinished(false); setSelectedOption(null); busyRef.current = false; setStats({ correct: 0, wrong: 0 }); setWords(prev => { const s = [...prev].sort(() => Math.random() - 0.5); generateOptions(s[0], allWords); return s }) }}
           style={{ width: '100%', height: '52px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
           <RotateCcw size={18} /> {t.study.restart}
         </button>

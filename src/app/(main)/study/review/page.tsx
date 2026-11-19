@@ -48,6 +48,7 @@ function ReviewContent() {
   const [allWords, setAllWords] = useState<Word[]>([])
   const [isAnswered, setIsAnswered] = useState(false)
   const typingAdvanceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const busyRef = useRef(false)
   useEffect(() => {
     const fetchWords = async () => {
       const supabase = createClient()
@@ -88,6 +89,7 @@ function ReviewContent() {
     setInputResult(null)
     setIsAnswered(false)
     setSelectedOption(null)
+    busyRef.current = false
     if (randomMode === 'quiz') generateOptions(words[current])
   }, [current, words])
 
@@ -107,8 +109,13 @@ function ReviewContent() {
     else { window.speechSynthesis.onvoiceschanged = () => { speak(); window.speechSynthesis.onvoiceschanged = null } }
   }
 
-  const handleAnswer = async (know: boolean) => {
+  const commitAnswer = async (know: boolean) => {
     const word = words[current]
+    if (!word) {
+      busyRef.current = false
+      return
+    }
+
     const supabase = createClient()
 
     const { nextInterval, nextEaseFactor, nextReviewDate } = calculateNextReview(
@@ -137,9 +144,16 @@ function ReviewContent() {
     if (current + 1 >= words.length) {
       await recordStudyProgress(words.length)
       setFinished(true)
+      busyRef.current = false
     } else {
       setCurrent(prev => prev + 1)
     }
+  }
+
+  const handleAnswer = async (know: boolean) => {
+    if (busyRef.current) return
+    busyRef.current = true
+    await commitAnswer(know)
   }
 
   const handleTypingCheck = async () => {
@@ -189,12 +203,15 @@ function ReviewContent() {
     }, 1200)
   }
 
-  const handleOptionSelect = async (opt: string) => {
+  const handleOptionSelect = (opt: string) => {
+    if (selectedOption !== null || busyRef.current) return
     const word = words[current]
+    if (!word) return
     const idx = options.indexOf(opt)
     setSelectedOption(idx)
+    busyRef.current = true
     const isCorrect = opt === word.meaning
-    setTimeout(() => handleAnswer(isCorrect), 800)
+    setTimeout(() => { void commitAnswer(isCorrect) }, 800)
   }
 
   const getPosStyle = (pos: string | null) => {
@@ -319,8 +336,8 @@ function ReviewContent() {
                 if (isSelected && isCorrect) { bg = 'var(--color-correct-bg)'; border = '1.5px solid var(--color-correct)'; color = 'var(--color-correct)' }
                 if (isSelected && !isCorrect) { bg = 'var(--color-incorrect-bg)'; border = '1.5px solid var(--color-incorrect)'; color = 'var(--color-incorrect)' }
                 return (
-                  <button key={i} onClick={() => !selectedOption && handleOptionSelect(opt)}
-                    style={{ width: '100%', padding: '14px 16px', background: bg, border, borderRadius: '14px', fontSize: '14px', color, fontWeight: 500, textAlign: 'left', cursor: 'pointer' }}>
+                  <button key={i} onClick={() => { if (selectedOption === null) handleOptionSelect(opt) }}
+                    style={{ width: '100%', padding: '14px 16px', background: bg, border, borderRadius: '14px', fontSize: '14px', color, fontWeight: 500, textAlign: 'left', cursor: selectedOption === null ? 'pointer' : 'default' }}>
                     {['①','②','③','④'][i]} {opt}
                   </button>
                 )
