@@ -7,6 +7,7 @@ import { ArrowLeft, Camera, Image, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { detectLanguage } from '@/lib/detectLanguage'
 import { showToast } from '@/components/ui/Toast'
+import { showAlert } from '@/components/ui/AlertHost'
 import { addExtractBonus, canUsePhotoExtract, incrementExtractCount } from '@/lib/premium'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
@@ -178,7 +179,7 @@ export default function CameraPage() {
           example: w.example || null,
         }))
       )
-      if (error) { alert('단어 저장에 실패했어요.'); setIsSaving(false); return }
+      if (error) { await showAlert(t.alert.saveFailed); setIsSaving(false); return }
       incrementExtractCount()
       if (selected.length > 0) {
         const detectedLang = detectLanguage(selected[0].word)
@@ -558,13 +559,13 @@ export default function CameraPage() {
                     AdMob.addListener(RewardAdPluginEvents.Rewarded, async (_reward: AdMobRewardItem) => {
                       addExtractBonus()
                       setShowPhotoGate(false)
-                      alert(t.study.adComplete)
+                      showToast(t.study.adComplete)
                     })
 
                     await AdMob.showRewardVideoAd()
                   } catch (e) {
                     console.error('광고 로드 실패:', e)
-                    alert('광고를 불러오지 못했어요. 잠시 후 다시 시도해주세요.')
+                    await showAlert(t.alert.adLoadFailed)
                   }
                 }}
                 style={{

@@ -44,6 +44,7 @@ import { ArrowLeft, MoreHorizontal, Send, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { showToast } from '@/components/ui/Toast'
+import { showAlert } from '@/components/ui/AlertHost'
 import { useTranslation } from '@/lib/i18n'
 import AlertModal from '@/components/AlertModal'
 
@@ -172,13 +173,13 @@ export default function PublicFolderPage() {
     if (isLiked) {
       const { error } = await supabase.from('folder_likes')
         .delete().eq('folder_id', folderId).eq('user_id', myUserId)
-      if (error) { alert(t.alert.likeFailed); return }
+      if (error) { await showAlert(t.alert.likeFailed); return }
       setIsLiked(false)
       setLikeCount(p => p - 1)
     } else {
       const { error } = await supabase.from('folder_likes')
         .insert({ folder_id: folderId, user_id: myUserId })
-      if (error) { alert(t.alert.likeFailed); return }
+      if (error) { await showAlert(t.alert.likeFailed); return }
       setIsLiked(true)
       setLikeCount(p => p + 1)
     }
@@ -202,7 +203,7 @@ export default function PublicFolderPage() {
       .select().single()
 
     if (folderError || !newFolder) {
-      alert(t.alert.importFailed)
+      await showAlert(t.alert.importFailed)
       setImporting(false)
       return
     }
@@ -238,7 +239,7 @@ export default function PublicFolderPage() {
       nickname: myNickname,
     }).select().single()
     if (error) {
-      alert(t.alert.commentFailed)
+      await showAlert(t.alert.commentFailed)
       setSubmitting(false)
       return
     }

@@ -25,6 +25,7 @@ import { usePagePadding } from '@/lib/responsive'
 import SelectDropdown from '@/components/ui/SelectDropdown'
 import EmptyState from '@/components/ui/EmptyState'
 import { showToast } from '@/components/ui/Toast'
+import { showAlert } from '@/components/ui/AlertHost'
 import { FolderSkeleton } from '@/components/ui/Skeleton'
 import PullToRefresh from '@/components/ui/PullToRefresh'
 import Coachmark from '@/components/ui/Coachmark'
@@ -129,7 +130,10 @@ export default function VocabularyPage() {
         const hitLine = t.search.cannotPublishHit
           .replace('{term}', hit.term)
           .replace('{source}', hit.source)
-        alert(`${t.search.cannotPublish}\n${t.search.cannotPublishDesc}\n\n${hitLine}`)
+        await showAlert({
+          title: t.search.cannotPublish,
+          description: `${t.search.cannotPublishDesc}\n\n${hitLine}`,
+        })
         return
       }
     }
@@ -180,7 +184,7 @@ export default function VocabularyPage() {
           .single()
 
         if (fallbackError) {
-          alert((lang === 'en' ? 'Failed to create vocabulary: ' : '단어장 생성에 실패했습니다: ') + fallbackError.message)
+          await showAlert((lang === 'en' ? 'Failed to create vocabulary: ' : '단어장 생성에 실패했습니다: ') + fallbackError.message)
           return
         }
 
@@ -199,7 +203,7 @@ export default function VocabularyPage() {
       showToast(lang === 'en' ? 'Vocabulary created!' : '단어장이 만들어졌어요!')
     } catch (e) {
       console.error(e)
-      alert(t.common.error)
+      await showAlert(t.common.error)
     } finally {
       setCreating(false)
     }

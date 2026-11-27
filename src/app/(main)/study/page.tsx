@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/client'
 import { usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import { useTranslation } from '@/lib/i18n'
+import { showAlert } from '@/components/ui/AlertHost'
 
 export default function StudyPage() {
   const router = useRouter()
@@ -190,7 +191,7 @@ export default function StudyPage() {
       const { count } = await query
 
       if (!count || count === 0) {
-        alert(lang === 'en' ? 'No words in this vocabulary. Add words first.' : '단어장에 단어가 없어요! 단어를 먼저 추가해주세요.')
+        await showAlert(lang === 'en' ? 'No words in this vocabulary. Add words first.' : '단어장에 단어가 없어요! 단어를 먼저 추가해주세요.')
         return
       }
 

@@ -644,6 +644,9 @@ function SpeedContent() {
       display: 'flex', flexDirection: 'column',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
       overflow: 'hidden',
+      paddingTop: 'env(safe-area-inset-top)',
+      paddingBottom: 'env(safe-area-inset-bottom)',
+      boxSizing: 'border-box',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 20px 8px', flexShrink: 0 }}>
         <button onClick={() => { if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current); router.back() }}
@@ -764,14 +767,14 @@ function SpeedContent() {
 
       <div style={{
         flexShrink: 0,
-        padding: '12px 16px',
-        paddingBottom: '90px',
+        padding: '12px 16px 16px',
         background: 'var(--color-bg)',
         borderTop: '1px solid var(--color-border)',
         display: 'flex',
         flexDirection: 'column',
         gap: '8px',
         alignItems: 'center',
+        boxSizing: 'border-box',
       }}>
         <div style={{ height: '3px', background: 'var(--color-surface-2)', borderRadius: '3px', marginBottom: '8px', overflow: 'hidden' }}>
           <div style={{

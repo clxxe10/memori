@@ -1,6 +1,7 @@
 'use client'
 import TabBar from '@/components/layout/TabBar'
 import ToastContainer from '@/components/ui/Toast'
+import AlertHost from '@/components/ui/AlertHost'
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -20,6 +21,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           {children}
         </div>
         <ToastContainer />
+        <AlertHost />
       </main>
       <TabBar />
     </>

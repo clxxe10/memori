@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { showToast } from '@/components/ui/Toast'
+import { showAlert } from '@/components/ui/AlertHost'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
 
@@ -67,7 +68,7 @@ export default function ProfilePasswordPage() {
     setSaving(false)
 
     if (error) {
-      alert(error.message)
+      await showAlert(error.message)
       return
     }
 

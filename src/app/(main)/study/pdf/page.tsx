@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { canUsePdfExtract, incrementPdfCount } from '@/lib/premium'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
+import { showAlert } from '@/components/ui/AlertHost'
 import { ADMOB_REWARD_PDF_EXAM } from '@/lib/adConfig'
 import { AdMob, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob'
 
@@ -205,7 +206,7 @@ export default function PDFPage() {
       setStep('done')
     } catch (e) {
       console.error('PDF 생성 오류:', e)
-      alert(t.study.pdfGenFailed)
+      await showAlert(t.study.pdfGenFailed)
     } finally {
       setGenerating(false)
     }
@@ -554,7 +555,7 @@ export default function PDFPage() {
                     await AdMob.showRewardVideoAd()
                   } catch (e) {
                     console.error('광고 로드 실패:', e)
-                    alert('광고를 불러오지 못했어요. 잠시 후 다시 시도해주세요.')
+                    await showAlert(t.alert.adLoadFailed)
                   }
                 }}
                 style={{

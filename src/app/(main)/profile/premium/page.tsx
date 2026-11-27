@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { Ban, Camera, Check, FileText } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
 import { getOfferings, purchasePackage, restorePurchases } from '@/lib/revenuecat'
+import { showAlert } from '@/components/ui/AlertHost'
+import { showToast } from '@/components/ui/Toast'
 
 type Plan = 'free' | 'monthly' | 'yearly'
 
@@ -43,15 +45,15 @@ export default function PremiumPage() {
       router.back()
       return
     }
-    if (!offerings) { alert(t.alert.preparing); return }
+    if (!offerings) { await showAlert(t.alert.preparing); return }
     setIsPurchasing(true)
     try {
       const packageType = selectedPlan === 'monthly' ? 'MONTHLY' : 'ANNUAL'
       const pkg = offerings.availablePackages.find((p: any) => p.packageType === packageType)
-      if (!pkg) { alert(t.alert.preparing); return }
+      if (!pkg) { await showAlert(t.alert.preparing); return }
       const result = await purchasePackage(pkg)
       if (result) {
-        alert(lang === 'en' ? 'Successfully subscribed!' : '구독이 완료됐어요!')
+        showToast(t.alert.subscribeDone)
         router.back()
       }
     } catch (e) {
@@ -294,7 +296,7 @@ export default function PremiumPage() {
                 try {
                   const result = await restorePurchases()
                   if (result) {
-                    alert(lang === 'en' ? 'Purchases restored!' : '구매가 복원됐어요!')
+                    showToast(t.alert.restoreDone)
                   }
                 } catch (e) {
                   console.error('복원 실패:', e)

@@ -12,6 +12,7 @@ import SelectDropdown from '@/components/ui/SelectDropdown'
 import EmptyState from '@/components/ui/EmptyState'
 import { WordSkeleton } from '@/components/ui/Skeleton'
 import { showToast } from '@/components/ui/Toast'
+import { showAlert, showConfirm } from '@/components/ui/AlertHost'
 import { useTranslation } from '@/lib/i18n'
 import { findBlockedInList, type BlockHit } from '@/lib/contentFilter'
 import { speak } from '@/lib/tts'
@@ -159,7 +160,7 @@ export default function VocabularyDetailPage() {
       setWords(wordData || [])
     } catch (e) {
       console.error('단어 로딩 오류:', e)
-      alert(t.common.error)
+      await showAlert(t.common.error)
     } finally {
       setLoading(false)
     }
@@ -274,7 +275,12 @@ export default function VocabularyDetailPage() {
   }
 
   const handleFolderDelete = async () => {
-    if (!confirm(lang === 'en' ? 'Delete this vocabulary? All words will be deleted.' : '단어장을 삭제할까요? 단어도 모두 삭제돼요.')) return
+    const ok = await showConfirm({
+      title: t.alert.deleteFolderConfirm,
+      confirmText: t.common.delete,
+      destructive: true,
+    })
+    if (!ok) return
     setIsDeleting(true)
     try {
       const supabase = createClient()
@@ -283,7 +289,7 @@ export default function VocabularyDetailPage() {
       router.back()
     } catch (e) {
       console.error('삭제 오류:', e)
-      alert(t.alert.deleteFailed)
+      await showAlert(t.alert.deleteFailed)
     } finally {
       setIsDeleting(false)
     }
@@ -292,14 +298,14 @@ export default function VocabularyDetailPage() {
   const toggleBookmark = async (word: Word) => {
     const supabase = createClient()
     const { error } = await supabase.from('words').update({ is_bookmarked: !word.is_bookmarked }).eq('id', word.id)
-    if (error) { alert(t.alert.saveFailed); return }
+    if (error) { await showAlert(t.alert.saveFailed); return }
     setWords(prev => prev.map(w => w.id === word.id ? { ...w, is_bookmarked: !w.is_bookmarked } : w))
   }
 
   const handleDeleteWord = async (wordId: string) => {
     const supabase = createClient()
     const { error } = await supabase.from('words').delete().eq('id', wordId)
-    if (error) { alert(t.alert.deleteFailed); return }
+    if (error) { await showAlert(t.alert.deleteFailed); return }
     setWords(prev => prev.filter(w => w.id !== wordId))
     showToast(lang === 'en' ? 'Deleted' : '삭제되었습니다', 'success')
   }

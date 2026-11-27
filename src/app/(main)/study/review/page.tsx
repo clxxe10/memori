@@ -33,7 +33,7 @@ function ReviewContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const folderId = searchParams.get('folderId')
-  const padding = usePagePadding('100px')
+  const padding = usePagePadding('max(24px, calc(env(safe-area-inset-bottom) + 16px))')
 
   const [words, setWords] = useState<Word[]>([])
   const [current, setCurrent] = useState(0)
@@ -261,7 +261,7 @@ function ReviewContent() {
   const modeLabel = mode === 'flashcard' ? '플래시카드' : mode === 'quiz' ? '객관식' : '타이핑'
 
   return (
-    <main style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'var(--color-bg)', display: 'flex', flexDirection: 'column', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', overflow: 'hidden', animation: 'pageEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both' }}>
+    <main style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'var(--color-bg)', display: 'flex', flexDirection: 'column', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', overflow: 'hidden', animation: 'pageEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both', boxSizing: 'border-box' }}>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding, maxWidth: 'min(560px, 100%)', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', flexShrink: 0 }}>

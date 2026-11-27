@@ -28,7 +28,7 @@ function TypingContent() {
   const isMemorySet = searchParams.get('memoryset') === 'true'
   const folderId = searchParams.get('folderId') || searchParams.get('folder')
   const direction = searchParams.get('direction') || 'word-to-meaning'
-  const padding = usePagePadding('100px')
+  const padding = usePagePadding('max(24px, calc(env(safe-area-inset-bottom) + 16px))')
 
   const [words, setWords] = useState<Word[]>([])
   const [current, setCurrent] = useState(0)
@@ -199,7 +199,7 @@ function TypingContent() {
   const placeholder = direction === 'word-to-meaning' ? t.study.typeMeaningPlaceholder : t.study.typeWordPlaceholder
 
   return (
-    <main style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'var(--color-bg)', display: 'flex', flexDirection: 'column', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', overflow: 'hidden', animation: 'pageEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both' }}>
+    <main style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'var(--color-bg)', display: 'flex', flexDirection: 'column', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', overflow: 'hidden', animation: 'pageEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both', boxSizing: 'border-box' }}>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding, maxWidth: 'min(560px, 100%)', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', flexShrink: 0 }}>
@@ -226,7 +226,7 @@ function TypingContent() {
             </span>
           </div>
 
-          <div style={{ paddingBottom: 'max(20px, calc(env(safe-area-inset-bottom) + 80px))' }}>
+          <div style={{ paddingBottom: '8px' }}>
             <input
               value={inputValue}
               onChange={e => { if (!result) setInputValue(e.target.value) }}

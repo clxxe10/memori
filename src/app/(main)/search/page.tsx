@@ -55,6 +55,7 @@ import EmptyState from '@/components/ui/EmptyState'
 import { FolderSkeleton } from '@/components/ui/Skeleton'
 import PullToRefresh from '@/components/ui/PullToRefresh'
 import Coachmark from '@/components/ui/Coachmark'
+import { showAlert } from '@/components/ui/AlertHost'
 
 type PublicFolder = {
   id: string
@@ -201,7 +202,7 @@ function SearchPageContent() {
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { alert(lang === 'en' ? 'Please sign in to import.' : '로그인이 필요해요.'); return }
+      if (!user) { await showAlert(lang === 'en' ? 'Please sign in to import.' : '로그인이 필요해요.'); return }
 
       const { data: newFolder } = await supabase
         .from('folders')
@@ -241,7 +242,7 @@ function SearchPageContent() {
       setImportedIds(prev => new Set([...prev, folder.id]))
     } catch (e) {
       console.error('가져오기 오류:', e)
-      alert(t.alert.importFailed)
+      await showAlert(t.alert.importFailed)
     } finally {
       setImporting(null)
     }

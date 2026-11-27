@@ -19,6 +19,7 @@ import { ArrowLeft, Camera, User } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
+import { showAlert } from '@/components/ui/AlertHost'
 
 export default function ProfileEditPage() {
   const { t, lang } = useTranslation()
@@ -64,7 +65,7 @@ export default function ProfileEditPage() {
 
       if (uploadError) {
         console.error('업로드 오류:', uploadError)
-        alert((lang === 'en' ? 'Photo upload failed: ' : '사진 업로드에 실패했어요: ') + uploadError.message)
+        await showAlert((lang === 'en' ? 'Photo upload failed: ' : '사진 업로드에 실패했어요: ') + uploadError.message)
         setUploading(false)
         return
       }
@@ -81,7 +82,7 @@ export default function ProfileEditPage() {
 
       if (updateError) {
         console.error('메타데이터 업데이트 오류:', updateError)
-        alert(lang === 'en' ? 'Profile update failed' : '프로필 업데이트에 실패했어요')
+        await showAlert(lang === 'en' ? 'Profile update failed' : '프로필 업데이트에 실패했어요')
         setUploading(false)
         return
       }
@@ -89,7 +90,7 @@ export default function ProfileEditPage() {
       setAvatarUrl(publicUrl)
     } catch (e) {
       console.error('프로필 사진 오류:', e)
-      alert('오류가 발생했어요')
+      await showAlert('오류가 발생했어요')
     } finally {
       setUploading(false)
     }

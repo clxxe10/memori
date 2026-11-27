@@ -6,6 +6,8 @@ import { ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
+import { showAlert, showConfirm } from '@/components/ui/AlertHost'
+import { showToast } from '@/components/ui/Toast'
 
 export default function EditWordPage() {
   const { t } = useTranslation()
@@ -40,16 +42,43 @@ export default function EditWordPage() {
 
   const handleSave = async () => {
     setSaving(true)
-    const supabase = createClient()
-    await supabase.from('words').update(form).eq('id', wordId)
-    router.back()
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.from('words').update(form).eq('id', wordId)
+      if (error) {
+        await showAlert(t.alert.saveFailed)
+        return
+      }
+      showToast(t.common.save)
+      router.back()
+    } catch (e) {
+      console.error('단어 저장 오류:', e)
+      await showAlert(t.alert.saveFailed)
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleDelete = async () => {
-    if (!confirm(t.alert.deleteFailed)) return
-    const supabase = createClient()
-    await supabase.from('words').delete().eq('id', wordId)
-    router.back()
+    const ok = await showConfirm({
+      title: t.alert.deleteWordConfirm,
+      confirmText: t.common.delete,
+      destructive: true,
+    })
+    if (!ok) return
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.from('words').delete().eq('id', wordId)
+      if (error) {
+        await showAlert(t.alert.deleteFailed)
+        return
+      }
+      showToast(t.common.delete)
+      router.back()
+    } catch (e) {
+      console.error('단어 삭제 오류:', e)
+      await showAlert(t.alert.deleteFailed)
+    }
   }
 
   const inputStyle = {

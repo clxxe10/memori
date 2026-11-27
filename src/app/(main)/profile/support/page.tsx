@@ -18,6 +18,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Send } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
+import { showAlert } from '@/components/ui/AlertHost'
 import { useTranslation } from '@/lib/i18n'
 
 export default function SupportPage() {
@@ -62,7 +63,7 @@ export default function SupportPage() {
 
   const handleSend = async () => {
     if (!content.trim()) return
-    if (!contactEmail.trim()) { alert('답변받을 이메일을 입력해주세요'); return }
+    if (!contactEmail.trim()) { await showAlert('답변받을 이메일을 입력해주세요'); return }
 
     setIsSending(true)
     try {
@@ -80,7 +81,7 @@ export default function SupportPage() {
 
       if (error) {
         console.error('문의 저장 오류:', error)
-        alert('문의 전송에 실패했어요. 다시 시도해주세요.')
+        await showAlert('문의 전송에 실패했어요. 다시 시도해주세요.')
         return
       }
 
@@ -88,7 +89,7 @@ export default function SupportPage() {
       setContent('')
     } catch (e) {
       console.error(e)
-      alert('오류가 발생했어요.')
+      await showAlert('오류가 발생했어요.')
     } finally {
       setIsSending(false)
     }

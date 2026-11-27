@@ -8,6 +8,7 @@ import { applyMyColor } from '@/lib/colorUtils'
 import { usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import AlertModal from '@/components/AlertModal'
+import { showAlert } from '@/components/ui/AlertHost'
 import { useTranslation } from '@/lib/i18n'
 
 export default function ProfilePage() {
@@ -721,7 +722,7 @@ export default function ProfilePage() {
           onConfirm={async () => {
             try {
               const supabase = createClient()
-              if (!user) { alert(t.alert.checkLogin); return }
+              if (!user) { await showAlert(t.alert.checkLogin); return }
               await supabase.from('words').delete().eq('user_id', user.id)
               await supabase.from('folders').delete().eq('user_id', user.id)
               await supabase.from('user_learning_stats').delete().eq('user_id', user.id)
@@ -741,7 +742,7 @@ export default function ProfilePage() {
               router.push('/onboarding')
             } catch (e) {
               console.error('탈퇴 오류:', e)
-              alert(t.alert.deleteAccountFailed)
+              await showAlert(t.alert.deleteAccountFailed)
             }
           }}
           onCancel={() => setShowDeleteSheet(false)}

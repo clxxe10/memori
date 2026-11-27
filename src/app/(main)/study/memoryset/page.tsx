@@ -45,7 +45,7 @@ export default function MemorySetPage() {
     <main style={{
       minHeight: '100vh', background: 'var(--color-bg)',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
-      paddingBottom: '40px',
+      paddingBottom: 'max(40px, calc(env(safe-area-inset-bottom) + 24px))',
     }}>
       <div style={{ maxWidth: '640px', margin: '0 auto', padding: '0 20px' }}>
         {/* 헤더 */}

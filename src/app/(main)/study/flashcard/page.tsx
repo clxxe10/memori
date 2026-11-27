@@ -32,7 +32,7 @@ function FlashcardContent() {
   const isMemorySet = searchParams.get('memoryset') === 'true'
   const folderId = searchParams.get('folderId') || searchParams.get('folder')
   const direction = searchParams.get('direction') || 'word-to-meaning'
-  const padding = usePagePadding('100px')
+  const padding = usePagePadding('max(24px, calc(env(safe-area-inset-bottom) + 16px))')
 
   const [words, setWords] = useState<Word[]>([])
   const [current, setCurrent] = useState(0)
@@ -317,6 +317,7 @@ function FlashcardContent() {
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
       overflow: 'hidden',
       animation: 'pageEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
+      boxSizing: 'border-box',
     }}>
       <div style={{
         display: 'flex',

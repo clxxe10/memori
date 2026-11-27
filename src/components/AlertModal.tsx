@@ -8,6 +8,8 @@ interface Props {
   confirmText: string
   cancelText?: string
   isDestructive?: boolean
+  /** When false, only the confirm button is shown (안내/에러용) */
+  showCancel?: boolean
   onConfirm: () => void
   onCancel: () => void
 }
@@ -18,6 +20,7 @@ export default function AlertModal({
   confirmText,
   cancelText,
   isDestructive = false,
+  showCancel = true,
   onConfirm,
   onCancel,
 }: Props) {
@@ -96,25 +99,27 @@ export default function AlertModal({
           display: 'flex',
           borderTop: `0.5px solid ${separator}`,
         }}>
-          <button
-            className="no-press-anim alert-modal-btn"
-            onClick={onCancel}
-            style={{
-              flex: 1,
-              height: '50px',
-              background: 'transparent',
-              border: 'none',
-              borderRight: `0.5px solid ${separator}`,
-              borderRadius: 0,
-              fontSize: '17px',
-              fontWeight: 400,
-              color: cancelColor,
-              cursor: 'pointer',
-              padding: 0,
-            }}
-          >
-            {cancelText ?? t.common.cancel}
-          </button>
+          {showCancel && (
+            <button
+              className="no-press-anim alert-modal-btn"
+              onClick={onCancel}
+              style={{
+                flex: 1,
+                height: '50px',
+                background: 'transparent',
+                border: 'none',
+                borderRight: `0.5px solid ${separator}`,
+                borderRadius: 0,
+                fontSize: '17px',
+                fontWeight: 400,
+                color: cancelColor,
+                cursor: 'pointer',
+                padding: 0,
+              }}
+            >
+              {cancelText ?? t.common.cancel}
+            </button>
+          )}
           <button
             className="no-press-anim alert-modal-btn"
             onClick={onConfirm}
