@@ -173,7 +173,7 @@ textarea {
 @keyframes glassSheetUp {
   from {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(28px);
   }
   to {
     opacity: 1;
@@ -433,71 +433,39 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
-  border-radius: 12px;
+  height: 48px;
+  padding: 0 14px;
+  border-radius: 14px;
   cursor: pointer;
-  border: 1.5px solid var(--color-border);
-  background: var(--color-surface);
+  border: none;
+  background: rgba(120, 120, 128, 0.12);
   color: var(--color-text-primary);
   font-size: 15px;
   font-weight: 600;
+  box-sizing: border-box;
+}
+
+.dark .setting-option {
+  background: rgba(120, 120, 128, 0.22);
 }
 
 .setting-option.selected {
-  background: var(--color-text-primary) !important;
-  border-radius: 12px;
-  border: 1.5px solid var(--color-text-primary);
-  color: var(--color-bg);
-  font-weight: 700;
+  background: #1C1C1E !important;
+  color: #FFFFFF;
+  font-weight: 600;
 }
 
 .setting-option.selected .check-icon {
-  color: var(--color-bg);
+  color: #FFFFFF;
 }
 
 .dark .setting-option.selected {
-  background: var(--color-text-primary) !important;
-  border: 1.5px solid var(--color-text-primary);
-  color: var(--color-bg);
+  background: #FFFFFF !important;
+  color: #1C1C1E;
 }
 
 .dark .setting-option.selected .check-icon {
-  color: var(--color-bg);
-}
-
-.goal-option {
-  width: calc(33% - 7px);
-  height: 52px;
-  border-radius: 14px;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface-2);
-  color: var(--color-text-primary);
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-.goal-option.selected {
-  background: var(--color-text-primary) !important;
-  border: 1.5px solid var(--color-text-primary);
-  font-weight: 700;
-  color: var(--color-bg);
-}
-
-.dark .goal-option {
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-primary);
-}
-
-.dark .goal-option.selected {
-  background: var(--color-text-primary) !important;
-  border: 1.5px solid var(--color-text-primary);
-  color: var(--color-bg);
+  color: #1C1C1E;
 }
 
 .chip-selected {
@@ -604,9 +572,9 @@ textarea {
 
 .comment-sheet {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 10px;
+  right: 10px;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   z-index: 201;
   max-height: 75vh;
   display: flex;
@@ -615,11 +583,10 @@ textarea {
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.5);
-  border-bottom: none;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 20px 40px rgba(0, 0, 0, 0.15);
-  border-radius: 28px 28px 0 0;
-  padding: 12px 20px max(20px, env(safe-area-inset-bottom));
-  animation: glassSheetUp 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
+  border-radius: 32px;
+  padding: 20px;
+  animation: glassSheetUp 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
 }
 
 .dark .comment-sheet {

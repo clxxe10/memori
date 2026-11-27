@@ -564,19 +564,16 @@ export default function CameraPage() {
           <div
             className="glass-surface"
             style={{
-              ...glassBottomSheetStyle(isDark, {
-                zIndex: 201,
-                padding: '16px 20px max(28px, calc(env(safe-area-inset-bottom) + 16px))',
-              }),
+              ...glassBottomSheetStyle(isDark, { zIndex: 201 }),
               textAlign: 'center',
             }}
           >
             <div style={glassGrabberStyle(isDark)} />
             <div style={{ fontSize: '44px', marginBottom: '12px' }}>📸</div>
-            <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>
               {t.vocab.dailyLimit}
             </h3>
-            <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '24px', lineHeight: 1.6 }}>
+            <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '16px', lineHeight: 1.6 }}>
               {t.vocab.watchAdDesc}
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>

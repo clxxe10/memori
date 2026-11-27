@@ -482,7 +482,7 @@ export default function PublicFolderPage() {
           <div onClick={() => setShowReportSheet(false)} style={glassDimStyle(isDark, 300)} />
           <div className="glass-surface" style={glassBottomSheetStyle(isDark, { zIndex: 301 })}>
             <div style={glassGrabberStyle(isDark)} />
-            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', margin: '0 0 4px', textAlign: 'center' }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', margin: '0 0 6px', textAlign: 'center' }}>
               {t.search.reportTitle}
             </h3>
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '0 0 16px', textAlign: 'center' }}>
@@ -535,7 +535,7 @@ export default function PublicFolderPage() {
           <div className="comment-sheet glass-surface">
             <div style={glassGrabberStyle(isDark)} />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
                 댓글 {comments.length}개
               </h3>
               <button

@@ -31,6 +31,16 @@ import PullToRefresh from '@/components/ui/PullToRefresh'
 import Coachmark from '@/components/ui/Coachmark'
 import { useTranslation } from '@/lib/i18n'
 import { findBlockedInList } from '@/lib/contentFilter'
+import {
+  GLASS_BTN_PRESS_CSS,
+  glassBottomSheetStyle,
+  glassButtonPrimary,
+  glassDimStyle,
+  glassGrabberStyle,
+  glassInputLabelStyle,
+  glassInputStyle,
+  glassSheetTitleStyle,
+} from '@/lib/glassModalStyles'
 
 type Folder = {
   id: string
@@ -409,59 +419,37 @@ export default function VocabularyPage() {
 
       {showModal && (
         <>
-          <div onClick={() => setShowModal(false)} style={{
-            position: 'fixed', inset: 0, zIndex: 200,
-            background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.25)',
-          }} />
-          <div style={{
-            position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-            width: 'min(340px, calc(100vw - 40px))', zIndex: 201,
-            background: isDark ? 'rgba(30,30,32,0.82)' : 'rgba(255,255,255,0.88)',
-            backdropFilter: 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 20px 40px rgba(0,0,0,0.15)',
-            border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.5)',
-            borderRadius: '28px',
-            padding: '24px 20px 20px',
-            maxHeight: '80vh', overflowY: 'auto' as const,
-            animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>{t.vocab.newFolder}</h2>
+          <style>{GLASS_BTN_PRESS_CSS}</style>
+          <div onClick={() => setShowModal(false)} style={glassDimStyle(isDark)} />
+          <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
+            <div style={glassGrabberStyle(isDark)} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <h2 style={{ ...glassSheetTitleStyle(isDark), margin: 0 }}>{t.vocab.newFolder}</h2>
               <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>
                 <X size={20} color="var(--color-text-secondary)" />
               </button>
             </div>
 
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>{t.vocab.folderName}</label>
+              <label style={glassInputLabelStyle()}>{t.vocab.folderName}</label>
               <input value={newFolder.name} onChange={e => setNewFolder(f => ({ ...f, name: e.target.value }))}
                 placeholder={lang === 'en' ? 'e.g. TOEIC Essential Words' : '예: 토익 필수 단어'}
-                style={{
-                  width: '100%', height: '48px', padding: '0 16px', fontSize: '15px', borderRadius: '14px',
-                  border: '1px solid var(--color-border)',
-                  background: 'var(--color-surface-2)',
-                  color: 'var(--color-text-primary)', outline: 'none', boxSizing: 'border-box' as const,
-                }} />
+                style={glassInputStyle(isDark)} />
             </div>
 
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>
+              <label style={glassInputLabelStyle()}>
                 {t.vocab.folderDesc} <span style={{ fontWeight: 400, color: 'var(--color-text-tertiary)' }}>{lang === 'en' ? '(optional)' : '(선택)'}</span>
               </label>
               <input value={newFolder.description} onChange={e => setNewFolder(f => ({ ...f, description: e.target.value }))}
                 placeholder={lang === 'en' ? 'Brief description' : '이 단어장에 대한 간단한 설명'}
-                style={{
-                  width: '100%', height: '48px', padding: '0 16px', fontSize: '14px', borderRadius: '14px',
-                  border: '1px solid var(--color-border)',
-                  background: 'var(--color-surface-2)',
-                  color: 'var(--color-text-primary)', outline: 'none', boxSizing: 'border-box' as const,
-                }} />
+                style={glassInputStyle(isDark)} />
             </div>
 
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px', display: 'block' }}>{t.vocab.category}</label>
+              <label style={glassInputLabelStyle()}>{t.vocab.category}</label>
               <SelectDropdown
+                variant="field"
                 value={newFolder.category}
                 onChange={val => setNewFolder(f => ({ ...f, category: val }))}
                 options={[
@@ -476,13 +464,13 @@ export default function VocabularyPage() {
             </div>
 
             <div style={{
-              background: 'var(--color-surface-2)',
-              borderRadius: '14px', padding: '14px 16px', marginBottom: '20px',
+              background: isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)',
+              borderRadius: '14px', height: '56px', padding: '0 14px', marginBottom: '16px',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              border: '1px solid var(--color-border)',
+              boxSizing: 'border-box',
             }}>
               <div>
-                <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>{t.vocab.isPublic}</p>
+                <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>{t.vocab.isPublic}</p>
                 <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: '2px 0 0' }}>{t.vocab.isPublicDesc}</p>
               </div>
               <div onClick={() => setNewFolder(f => ({ ...f, is_public: !f.is_public }))} style={{
@@ -497,14 +485,16 @@ export default function VocabularyPage() {
               </div>
             </div>
 
-            <button onClick={handleCreate} disabled={creating || !newFolder.name.trim()} style={{
-              width: '100%', padding: '16px',
-              background: 'var(--color-text-primary)',
-              color: 'var(--color-bg)',
-              border: 'none', borderRadius: '9999px',
-              fontSize: '16px', fontWeight: 700, cursor: 'pointer',
-              opacity: (creating || !newFolder.name.trim()) ? 0.5 : 1,
-            }}>
+            <button
+              className="no-press-anim glass-press"
+              onClick={handleCreate}
+              disabled={creating || !newFolder.name.trim()}
+              style={{
+                ...glassButtonPrimary(isDark),
+                width: '100%', flex: 'none',
+                opacity: (creating || !newFolder.name.trim()) ? 0.5 : 1,
+              }}
+            >
               {creating ? t.vocab.creating : t.vocab.createFolder}
             </button>
           </div>

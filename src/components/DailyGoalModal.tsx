@@ -94,14 +94,14 @@ export default function DailyGoalModal({ initialGoal, onSave, onTurnOff, onCance
         onClick={e => e.stopPropagation()}
         style={{
           ...glassPanelStyle(isDark),
-          padding: '28px 16px 16px',
+          padding: '24px 16px 16px',
           boxSizing: 'border-box',
         }}
       >
         <h3 style={{
-          fontSize: '18px', fontWeight: 600, letterSpacing: '-0.4px',
+          fontSize: '17px', fontWeight: 700, letterSpacing: '-0.3px',
           color: isDark ? '#FFFFFF' : '#000000',
-          margin: '0 0 20px', textAlign: 'center',
+          margin: '0 0 16px', textAlign: 'center',
         }}>
           {t.home.goalModalTitle}
         </h3>

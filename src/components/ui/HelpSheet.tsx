@@ -4,9 +4,11 @@ import { X } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
 import {
   GLASS_BTN_PRESS_CSS,
+  glassBottomSheetStyle,
   glassButtonSecondary,
   glassDimStyle,
-  glassFixedPanelStyle,
+  glassGrabberStyle,
+  glassSheetTitleStyle,
 } from '@/lib/glassModalStyles'
 
 type Props = { mode: string; onClose: () => void }
@@ -188,15 +190,14 @@ export default function HelpSheet({ mode, onClose }: Props) {
       <div onClick={onClose} style={glassDimStyle(isDark, 999)} />
       <div
         className="glass-surface"
-        style={glassFixedPanelStyle(isDark, {
+        style={glassBottomSheetStyle(isDark, {
           zIndex: 1000,
           maxHeight: '75vh',
-          overflowY: 'auto',
-          padding: '28px 20px 20px',
         })}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-          <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
+        <div style={glassGrabberStyle(isDark)} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+          <h3 style={{ ...glassSheetTitleStyle(isDark), margin: 0 }}>
             {content.title} {lang === 'en' ? 'Guide' : '사용법'}
           </h3>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>
@@ -207,7 +208,7 @@ export default function HelpSheet({ mode, onClose }: Props) {
         <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '10px', letterSpacing: '0.3px' }}>
           {lang === 'en' ? 'How to Use' : '사용 방법'}
         </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
           {content.steps.map((step, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
               <div style={{

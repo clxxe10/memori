@@ -10,6 +10,15 @@ import { usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import { useTranslation } from '@/lib/i18n'
 import { showAlert } from '@/components/ui/AlertHost'
+import {
+  glassBottomSheetStyle,
+  glassButtonSecondary,
+  glassDimStyle,
+  glassGrabberStyle,
+  glassSheetDescStyle,
+  glassSheetTitleStyle,
+  GLASS_BTN_PRESS_CSS,
+} from '@/lib/glassModalStyles'
 
 export default function StudyPage() {
   const router = useRouter()
@@ -426,27 +435,14 @@ export default function StudyPage() {
 
       {showFolderSheet && (
         <>
-          <div onClick={() => setShowFolderSheet(false)} style={{
-            position: 'fixed', inset: 0, zIndex: 199,
-            background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.25)',
-          }} />
-          <div style={{
-            position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-            width: 'min(340px, calc(100vw - 40px))', zIndex: 200,
-            background: isDark ? 'rgba(30,30,32,0.82)' : 'rgba(255,255,255,0.88)',
-            backdropFilter: 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 20px 40px rgba(0,0,0,0.15)',
-            border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.5)',
-            borderRadius: '28px',
-            padding: '24px 20px 20px',
-            maxHeight: '70vh', overflowY: 'auto' as const,
-            animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
-          }}>
-            <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '6px', textAlign: 'center' }}>
+          <style>{GLASS_BTN_PRESS_CSS}</style>
+          <div onClick={() => setShowFolderSheet(false)} style={glassDimStyle(isDark, 199)} />
+          <div className="glass-surface" style={glassBottomSheetStyle(isDark, { zIndex: 200, maxHeight: '70vh' })}>
+            <div style={glassGrabberStyle(isDark)} />
+            <h3 style={{ ...glassSheetTitleStyle(isDark), textAlign: 'center' }}>
               {selectedMode === 'review' ? t.home.reviewStart : t.study.selectFolder}
             </h3>
-            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px', textAlign: 'center' }}>
+            <p style={{ ...glassSheetDescStyle(isDark), textAlign: 'center' }}>
               {selectedMode === 'review' ? (lang === 'en' ? 'Which words to review?' : '어떤 단어를 복습할까요?') : t.study.selectFolderDesc}
             </p>
             <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
@@ -516,13 +512,13 @@ export default function StudyPage() {
                 ))
               )}
             </div>
-            <button onClick={() => setShowFolderSheet(false)} style={{
-              width: '100%', padding: '14px',
-              borderRadius: '9999px', border: 'none',
-              background: 'var(--color-surface-2)',
-              color: 'var(--color-text-primary)',
-              fontSize: '16px', fontWeight: 600, cursor: 'pointer',
-            }}>{t.common.cancel}</button>
+            <button
+              className="no-press-anim glass-press"
+              onClick={() => setShowFolderSheet(false)}
+              style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
+            >
+              {t.common.cancel}
+            </button>
           </div>
         </>
       )}

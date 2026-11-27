@@ -50,15 +50,15 @@ export default function AlertModal({
         onClick={e => e.stopPropagation()}
         style={{
           ...glassPanelStyle(isDark),
-          padding: '28px 16px 16px',
+          padding: '24px 16px 16px',
           boxSizing: 'border-box',
         }}
       >
-        <div style={{ textAlign: 'center', marginBottom: '20px', padding: '0 4px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '16px', padding: '0 4px' }}>
           <h3 style={{
-            fontSize: '18px',
-            fontWeight: 600,
-            letterSpacing: '-0.4px',
+            fontSize: '17px',
+            fontWeight: 700,
+            letterSpacing: '-0.3px',
             color: isDark ? '#FFFFFF' : '#000000',
             margin: 0,
           }}>

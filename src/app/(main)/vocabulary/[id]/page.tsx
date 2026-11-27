@@ -24,6 +24,7 @@ import {
   glassDestructive,
   glassDimStyle,
   glassGrabberStyle,
+  glassInputStyle,
 } from '@/lib/glassModalStyles'
 
 type Word = {
@@ -570,40 +571,36 @@ export default function VocabularyDetailPage() {
           />
           <div
             className="glass-surface"
-            style={{
-              ...glassBottomSheetStyle(isDark, {
-                zIndex: 50,
-                padding: '12px 20px max(100px, calc(env(safe-area-inset-bottom) + 80px))',
-              }),
-            }}
+            style={glassBottomSheetStyle(isDark, { zIndex: 50 })}
           >
             <div style={glassGrabberStyle(isDark)} />
-            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{lang === 'en' ? 'Edit Vocabulary' : '단어장 편집'}</h3>
+            <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '16px' }}>{lang === 'en' ? 'Edit Vocabulary' : '단어장 편집'}</h3>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
               <div>
-                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>{lang === 'en' ? 'Name' : '단어장 이름'}</p>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>{lang === 'en' ? 'Name' : '단어장 이름'}</p>
                 <input
                   value={editForm.name}
                   onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
-                  style={{ width: '100%', height: '46px', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: '12px', padding: '0 14px', fontSize: '14px', color: 'var(--color-text-primary)', outline: 'none', boxSizing: 'border-box' as const }}
+                  style={glassInputStyle(isDark)}
                 />
               </div>
 
               <div>
-                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>{lang === 'en' ? 'Description' : '설명'} <span style={{ fontWeight: 400, color: 'var(--color-text-tertiary)' }}>{lang === 'en' ? '(optional)' : '(선택)'}</span></p>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>{lang === 'en' ? 'Description' : '설명'} <span style={{ fontWeight: 400, color: 'var(--color-text-tertiary)' }}>{lang === 'en' ? '(optional)' : '(선택)'}</span></p>
                 <input
                   value={editForm.description}
                   onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
                   placeholder={lang === 'en' ? 'Brief description' : '이 단어장에 대한 간단한 설명'}
-                  style={{ width: '100%', height: '46px', background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', borderRadius: '12px', padding: '0 14px', fontSize: '14px', color: 'var(--color-text-primary)', outline: 'none', boxSizing: 'border-box' }}
+                  style={glassInputStyle(isDark)}
                 />
               </div>
 
               <div>
-                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>{lang === 'en' ? 'Category' : '카테고리'}</p>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>{lang === 'en' ? 'Category' : '카테고리'}</p>
                 <SelectDropdown
+                  variant="field"
                   value={editForm.category}
                   onChange={val => setEditForm(f => ({ ...f, category: val }))}
                   options={[
@@ -617,9 +614,14 @@ export default function VocabularyDetailPage() {
                 />
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 14px', background: 'var(--color-surface-2)', borderRadius: '12px' }}>
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                height: '56px', padding: '0 14px',
+                background: isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)',
+                borderRadius: '14px', boxSizing: 'border-box',
+              }}>
                 <div>
-                  <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>공개</p>
+                  <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>공개</p>
                   <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>다른 사용자에게 공개</p>
                 </div>
                 <div onClick={() => setEditForm(f => ({ ...f, is_public: !f.is_public }))}
@@ -668,23 +670,10 @@ export default function VocabularyDetailPage() {
 
       {showAddSheet && (
         <>
-          <div onClick={() => setShowAddSheet(false)} style={{
-            position: 'fixed', inset: 0, zIndex: 200,
-            background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.25)',
-          }} />
-          <div style={{
-            position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-            width: 'min(340px, calc(100vw - 40px))', zIndex: 201,
-            background: isDark ? 'rgba(30,30,32,0.82)' : 'rgba(255,255,255,0.88)',
-            backdropFilter: 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 20px 40px rgba(0,0,0,0.15)',
-            border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.5)',
-            borderRadius: '28px',
-            padding: '24px 20px 20px',
-            animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
-          }}>
-            <p style={{ fontSize: '20px', fontWeight: 800, margin: '0 0 16px', color: 'var(--color-text-primary)', textAlign: 'center' }}>
+          <div onClick={() => setShowAddSheet(false)} style={glassDimStyle(isDark)} />
+          <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
+            <div style={glassGrabberStyle(isDark)} />
+            <p style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 16px', color: 'var(--color-text-primary)', textAlign: 'center' }}>
               {t.vocab.addWord}
             </p>
 

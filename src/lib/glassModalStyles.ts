@@ -190,24 +190,26 @@ export function glassFixedPanelStyle(
   }
 }
 
-/** Bottom sheet glass panel */
+/**
+ * iOS 26 floating sheet — inset from screen edges, all corners rounded.
+ * (replaces edge-stuck bottom sheets)
+ */
 export function glassBottomSheetStyle(
   isDark: boolean,
   opts?: { zIndex?: number; padding?: string; maxHeight?: string },
 ): CSSProperties {
   return {
     position: 'fixed',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    left: '10px',
+    right: '10px',
+    bottom: 'calc(10px + env(safe-area-inset-bottom, 0px))',
     zIndex: opts?.zIndex ?? 201,
     maxHeight: opts?.maxHeight ?? '85vh',
     overflowY: 'auto',
-    padding: opts?.padding ?? '12px 20px max(28px, calc(env(safe-area-inset-bottom) + 16px))',
+    padding: opts?.padding ?? '20px',
     boxSizing: 'border-box',
-    ...glassSurfaceStyle(isDark, { borderRadius: '28px 28px 0 0' }),
-    borderBottom: 'none',
-    animation: 'glassSheetUp 0.28s cubic-bezier(0.32, 0.72, 0, 1) both',
+    ...glassSurfaceStyle(isDark, { borderRadius: '32px' }),
+    animation: 'glassSheetUp 0.3s cubic-bezier(0.32, 0.72, 0, 1) both',
   }
 }
 
@@ -217,7 +219,78 @@ export function glassGrabberStyle(isDark: boolean): CSSProperties {
     height: '5px',
     borderRadius: '999px',
     background: isDark ? 'rgba(235,235,245,0.3)' : 'rgba(60,60,67,0.3)',
-    margin: '0 auto 16px',
+    margin: '0 auto 14px',
+  }
+}
+
+/** Sheet title */
+export function glassSheetTitleStyle(isDark: boolean): CSSProperties {
+  return {
+    fontSize: '17px',
+    fontWeight: 700,
+    letterSpacing: '-0.3px',
+    color: isDark ? '#FFFFFF' : '#000000',
+    margin: '0 0 6px',
+  }
+}
+
+/** Sheet subtitle / description */
+export function glassSheetDescStyle(isDark: boolean): CSSProperties {
+  return {
+    fontSize: '13px',
+    fontWeight: 400,
+    color: isDark ? 'rgba(235,235,245,0.55)' : 'rgba(60,60,67,0.55)',
+    margin: '0 0 16px',
+    lineHeight: 1.4,
+  }
+}
+
+/** Selectable option row (theme / language) */
+export function glassOptionRowStyle(isDark: boolean, selected: boolean): CSSProperties {
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: '48px',
+    padding: '0 14px',
+    borderRadius: '14px',
+    cursor: 'pointer',
+    border: 'none',
+    background: selected
+      ? (isDark ? '#FFFFFF' : '#1C1C1E')
+      : (isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)'),
+    color: selected
+      ? (isDark ? '#1C1C1E' : '#FFFFFF')
+      : 'var(--color-text-primary)',
+    fontSize: '15px',
+    fontWeight: 600,
+    boxSizing: 'border-box',
+  }
+}
+
+/** Form input field */
+export function glassInputStyle(isDark: boolean): CSSProperties {
+  return {
+    width: '100%',
+    height: '46px',
+    padding: '0 14px',
+    fontSize: '15px',
+    borderRadius: '14px',
+    border: 'none',
+    background: isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)',
+    color: 'var(--color-text-primary)',
+    outline: 'none',
+    boxSizing: 'border-box',
+  }
+}
+
+export function glassInputLabelStyle(): CSSProperties {
+  return {
+    fontSize: '12px',
+    fontWeight: 700,
+    color: 'var(--color-text-secondary)',
+    marginBottom: '6px',
+    display: 'block',
   }
 }
 

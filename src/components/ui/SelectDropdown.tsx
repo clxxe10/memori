@@ -14,14 +14,19 @@ type Props = {
   multiple?: boolean
   selectedValues?: string[]
   onMultiChange?: (vals: string[]) => void
+  /** Match form input height / glass fill (new folder, edit sheets) */
+  variant?: 'default' | 'field'
 }
 
 export default function SelectDropdown({
   value, onChange, options, placeholder,
   multiple = false, selectedValues = [], onMultiChange,
+  variant = 'default',
 }: Props) {
   const { t, lang } = useTranslation()
   const defaultPlaceholder = placeholder ?? (lang === 'en' ? 'Select' : '선택')
+  const isField = variant === 'field'
+  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -76,7 +81,22 @@ export default function SelectDropdown({
           }
           setOpen(p => !p)
         }}
-        style={{
+        style={isField ? {
+          width: '100%',
+          height: '46px',
+          padding: '0 14px',
+          background: isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)',
+          border: 'none',
+          borderRadius: '14px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          cursor: 'pointer',
+          fontSize: '15px',
+          color: 'var(--color-text-primary)',
+          whiteSpace: 'nowrap',
+          boxSizing: 'border-box' as const,
+        } : {
           height: '40px', padding: '0 14px',
           background: 'var(--color-surface)',
           border: '1.5px solid var(--color-border)',

@@ -12,6 +12,15 @@ import Coachmark from '@/components/ui/Coachmark'
 import DailyGoalModal from '@/components/DailyGoalModal'
 import { showToast } from '@/components/ui/Toast'
 import { useTranslation } from '@/lib/i18n'
+import {
+  GLASS_BTN_PRESS_CSS,
+  glassBottomSheetStyle,
+  glassButtonSecondary,
+  glassDimStyle,
+  glassGrabberStyle,
+  glassSheetDescStyle,
+  glassSheetTitleStyle,
+} from '@/lib/glassModalStyles'
 
 export default function HomePage() {
   const router = useRouter()
@@ -51,7 +60,21 @@ export default function HomePage() {
 
       const rawGoal = user.user_metadata?.daily_goal
       const parsedGoal = typeof rawGoal === 'number' ? rawGoal : Number(rawGoal)
-      setDailyGoal(Number.isFinite(parsedGoal) && parsedGoal > 0 ? parsedGoal : null)
+      if (Number.isFinite(parsedGoal) && parsedGoal > 0) {
+        setDailyGoal(parsedGoal)
+        localStorage.removeItem('daily_goal')
+      } else {
+        const savedLocal = localStorage.getItem('daily_goal')
+        const localGoal = Number(savedLocal)
+        if (savedLocal && Number.isFinite(localGoal) && localGoal > 0) {
+          setDailyGoal(localGoal)
+          const { data } = await supabase.auth.updateUser({ data: { daily_goal: localGoal } })
+          if (data.user) setUser(data.user)
+          localStorage.removeItem('daily_goal')
+        } else {
+          setDailyGoal(null)
+        }
+      }
 
       const now = new Date()
       const today = new Date().toLocaleDateString('en-CA')
@@ -228,6 +251,7 @@ export default function HomePage() {
     }
     setDailyGoal(goal)
     if (data.user) setUser(data.user)
+    localStorage.removeItem('daily_goal')
     setShowGoalModal(false)
     showToast(t.home.goalSaveToast)
   }
@@ -241,6 +265,7 @@ export default function HomePage() {
     }
     setDailyGoal(null)
     if (data.user) setUser(data.user)
+    localStorage.removeItem('daily_goal')
     setShowGoalModal(false)
   }
 
@@ -696,25 +721,12 @@ export default function HomePage() {
       </PullToRefresh>
       {showSpeedSheet && (
         <>
-          <div onClick={() => setShowSpeedSheet(false)} style={{
-            position: 'fixed', inset: 0, zIndex: 200,
-            background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.25)',
-          }} />
-          <div style={{
-            position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-            width: 'min(340px, calc(100vw - 40px))', zIndex: 201,
-            background: isDark ? 'rgba(30,30,32,0.82)' : 'rgba(255,255,255,0.88)',
-            backdropFilter: 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 20px 40px rgba(0,0,0,0.15)',
-            border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.5)',
-            borderRadius: '28px',
-            padding: '24px 20px 20px',
-            maxHeight: '70vh', overflowY: 'auto' as const,
-            animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
-          }}>
-            <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '6px', textAlign: 'center' }}>{t.study.selectFolder}</h3>
-            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px', textAlign: 'center' }}>{t.study.selectFolderDesc}</p>
+          <style>{GLASS_BTN_PRESS_CSS}</style>
+          <div onClick={() => setShowSpeedSheet(false)} style={glassDimStyle(isDark)} />
+          <div className="glass-surface" style={glassBottomSheetStyle(isDark, { maxHeight: '70vh' })}>
+            <div style={glassGrabberStyle(isDark)} />
+            <h3 style={{ ...glassSheetTitleStyle(isDark), textAlign: 'center' }}>{t.study.selectFolder}</h3>
+            <p style={{ ...glassSheetDescStyle(isDark), textAlign: 'center' }}>{t.study.selectFolderDesc}</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
               <button onClick={() => { setShowSpeedSheet(false); router.push('/study/speed') }}
                 style={{ width: '100%', background: 'rgba(28,28,30,0.06)', borderRadius: '16px', padding: '14px 16px', border: '1.5px solid rgba(28,28,30,0.12)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textAlign: 'left' as const }}>
@@ -741,13 +753,13 @@ export default function HomePage() {
                 </button>
               ))}
             </div>
-            <button onClick={() => setShowSpeedSheet(false)} style={{
-              width: '100%', padding: '14px',
-              borderRadius: '9999px', border: 'none',
-              background: 'var(--color-surface-2)',
-              color: 'var(--color-text-primary)',
-              fontSize: '16px', fontWeight: 600, cursor: 'pointer',
-            }}>{t.common.cancel}</button>
+            <button
+              className="no-press-anim glass-press"
+              onClick={() => setShowSpeedSheet(false)}
+              style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
+            >
+              {t.common.cancel}
+            </button>
           </div>
         </>
       )}

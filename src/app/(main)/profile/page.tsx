@@ -8,8 +8,20 @@ import { applyMyColor } from '@/lib/colorUtils'
 import { usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import AlertModal from '@/components/AlertModal'
+import DailyGoalModal from '@/components/DailyGoalModal'
 import { showAlert } from '@/components/ui/AlertHost'
+import { showToast } from '@/components/ui/Toast'
 import { useTranslation } from '@/lib/i18n'
+import {
+  GLASS_BTN_PRESS_CSS,
+  glassBottomSheetStyle,
+  glassButtonPrimary,
+  glassDimStyle,
+  glassGrabberStyle,
+  glassInputStyle,
+  glassSheetDescStyle,
+  glassSheetTitleStyle,
+} from '@/lib/glassModalStyles'
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -29,11 +41,11 @@ export default function ProfilePage() {
   const [showThemeSheet, setShowThemeSheet] = useState(false)
   const [showColorSheet, setShowColorSheet] = useState(false)
   const [showLangSheet, setShowLangSheet] = useState(false)
-  const [showGoalSheet, setShowGoalSheet] = useState(false)
+  const [showGoalModal, setShowGoalModal] = useState(false)
   const [showNotifSheet, setShowNotifSheet] = useState(false)
   const [showDeleteSheet, setShowDeleteSheet] = useState(false)
   const [showLogoutSheet, setShowLogoutSheet] = useState(false)
-  const [dailyGoal, setDailyGoal] = useState(10)
+  const [dailyGoal, setDailyGoal] = useState<number | null>(null)
   const [notificationTime, setNotificationTime] = useState('09:00')
   const [notificationEnabled, setNotificationEnabled] = useState(false)
   const [nickname, setNickname] = useState('')
@@ -87,15 +99,32 @@ export default function ProfilePage() {
 
       const savedTheme = localStorage.getItem('app_theme') || '시스템'
       const savedColor = localStorage.getItem('app_my_color') || '#1C1C1E'
-      const savedGoal = localStorage.getItem('daily_goal')
       const savedNotif = localStorage.getItem('notification_enabled')
       const savedNotifTime = localStorage.getItem('notification_time')
       setTheme(savedTheme)
       setMyColor(savedColor)
       applyMyColor(savedColor)
-      if (savedGoal) setDailyGoal(Number(savedGoal))
       if (savedNotif !== null) setNotificationEnabled(savedNotif === 'true')
       if (savedNotifTime) setNotificationTime(savedNotifTime)
+
+      // Unify daily goal to user_metadata.daily_goal (one-time migrate from localStorage)
+      const rawMeta = user.user_metadata?.daily_goal
+      const metaGoal = Number(rawMeta)
+      if (Number.isFinite(metaGoal) && metaGoal > 0) {
+        setDailyGoal(metaGoal)
+        localStorage.removeItem('daily_goal')
+      } else {
+        const savedGoal = localStorage.getItem('daily_goal')
+        const localGoal = Number(savedGoal)
+        if (savedGoal && Number.isFinite(localGoal) && localGoal > 0) {
+          setDailyGoal(localGoal)
+          const { data } = await supabase.auth.updateUser({ data: { daily_goal: localGoal } })
+          if (data.user) setUser(data.user)
+          localStorage.removeItem('daily_goal')
+        } else {
+          setDailyGoal(null)
+        }
+      }
       setLoading(false)
       } catch (e) {
         console.error('프로필 로딩 오류:', e)
@@ -330,9 +359,14 @@ export default function ProfilePage() {
         {/* 학습 및 화면 */}
         <p style={groupTitleStyle}>{t.profile.learningScreen}</p>
         <div style={groupCardStyle}>
-          <div style={menuRowStyle()} onClick={() => setShowGoalSheet(true)}>
+          <div style={menuRowStyle()} onClick={() => setShowGoalModal(true)}>
             <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{t.profile.dailyGoal}</span>
-            <ChevronRight size={16} color="var(--color-text-tertiary)" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '14px', color: 'var(--color-text-tertiary)' }}>
+                {dailyGoal != null && dailyGoal > 0 ? t.profile.goalCount(dailyGoal) : t.profile.goalNotSet}
+              </span>
+              <ChevronRight size={16} color="var(--color-text-tertiary)" />
+            </div>
           </div>
           <div style={menuRowStyle()} onClick={() => setShowNotifSheet(true)}>
             <span style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-primary)' }}>{t.profile.notifications}</span>
@@ -416,28 +450,46 @@ export default function ProfilePage() {
         />
       )}
 
-      {/* 테마 모달 */}
+      {showGoalModal && (
+        <DailyGoalModal
+          initialGoal={dailyGoal}
+          onSave={async (goal) => {
+            const supabase = createClient()
+            const { data, error } = await supabase.auth.updateUser({ data: { daily_goal: goal } })
+            if (error) {
+              console.error('목표 저장 실패:', error)
+              return
+            }
+            setDailyGoal(goal)
+            if (data.user) setUser(data.user)
+            localStorage.removeItem('daily_goal')
+            setShowGoalModal(false)
+            showToast(lang === 'en' ? 'Daily goal saved' : '목표가 저장됐어요')
+          }}
+          onTurnOff={async () => {
+            const supabase = createClient()
+            const { data, error } = await supabase.auth.updateUser({ data: { daily_goal: null } })
+            if (error) {
+              console.error('목표 해제 실패:', error)
+              return
+            }
+            setDailyGoal(null)
+            if (data.user) setUser(data.user)
+            localStorage.removeItem('daily_goal')
+            setShowGoalModal(false)
+          }}
+          onCancel={() => setShowGoalModal(false)}
+        />
+      )}
+
+      {/* 테마 플로팅 시트 */}
       {showThemeSheet && (
         <>
-          <div onClick={() => setShowThemeSheet(false)} style={{
-            position: 'fixed', inset: 0, zIndex: 200,
-            background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.25)',
-          }} />
-          <div style={{
-            position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-            width: 'min(340px, calc(100vw - 40px))', zIndex: 201,
-            background: isDark ? 'rgba(30,30,32,0.82)' : 'rgba(255,255,255,0.88)',
-            backdropFilter: 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 20px 40px rgba(0,0,0,0.15)',
-            border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.5)',
-            borderRadius: '28px',
-            padding: '24px 20px 20px',
-            maxHeight: '80vh', overflowY: 'auto' as const,
-            animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
-          }}>
-            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.theme}</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div onClick={() => setShowThemeSheet(false)} style={glassDimStyle(isDark)} />
+          <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
+            <div style={glassGrabberStyle(isDark)} />
+            <h3 style={glassSheetTitleStyle(isDark)}>{t.profile.theme}</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {[
                 { value: '시스템', label: t.profile.system },
                 { value: '라이트', label: t.profile.light },
@@ -457,30 +509,21 @@ export default function ProfilePage() {
         </>
       )}
 
-      {/* 마이컬러 모달 */}
+      {/* 마이컬러 플로팅 시트 */}
       {showColorSheet && (
         <>
-          <div onClick={() => setShowColorSheet(false)} style={{
-            position: 'fixed', inset: 0, zIndex: 200,
-            background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.25)',
-          }} />
-          <div style={{
-            position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-            width: 'min(340px, calc(100vw - 40px))', zIndex: 201,
-            background: isDark ? 'rgba(30,30,32,0.82)' : 'rgba(255,255,255,0.88)',
-            backdropFilter: 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 20px 40px rgba(0,0,0,0.15)',
-            border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.5)',
-            borderRadius: '28px',
-            padding: '24px 20px 20px',
-            maxHeight: '80vh', overflowY: 'auto' as const,
-            animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
-          }}>
-            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.myColor}</h3>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', padding: '14px 16px', background: 'var(--color-surface-2)', borderRadius: '14px' }}>
+          <div onClick={() => setShowColorSheet(false)} style={glassDimStyle(isDark)} />
+          <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
+            <div style={glassGrabberStyle(isDark)} />
+            <h3 style={glassSheetTitleStyle(isDark)}>{t.profile.myColor}</h3>
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              height: '56px', marginBottom: '16px', padding: '0 14px',
+              background: isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)',
+              borderRadius: '14px', boxSizing: 'border-box',
+            }}>
               <div>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)' }}>{t.profile.defaultMode}</div>
+                <div style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)' }}>{t.profile.defaultMode}</div>
                 <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>{t.profile.defaultModeDesc}</div>
               </div>
               <div onClick={handleDefaultToggle} style={{
@@ -525,144 +568,59 @@ export default function ProfilePage() {
               </div>
             </div>
             )}
-            <p style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>
-              밝은 색상 선택 시 텍스트가 자동으로 검정색으로 바뀌어요
-            </p>
+            <p style={glassSheetDescStyle(isDark)}>{t.profile.brightColorNote}</p>
           </div>
         </>
       )}
 
-      {/* 언어 설정 모달 */}
+      {/* 언어 플로팅 시트 */}
       {showLangSheet && (
         <>
-          <div onClick={() => setShowLangSheet(false)} style={{
-            position: 'fixed', inset: 0, zIndex: 200,
-            background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.25)',
-          }} />
-          <div style={{
-            position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-            width: 'min(340px, calc(100vw - 40px))', zIndex: 201,
-            background: isDark ? 'rgba(30,30,32,0.82)' : 'rgba(255,255,255,0.88)',
-            backdropFilter: 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 20px 40px rgba(0,0,0,0.15)',
-            border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.5)',
-            borderRadius: '28px',
-            padding: '24px 20px 20px',
-            maxHeight: '80vh', overflowY: 'auto' as const,
-            animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
-          }}>
-            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.language}</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
-              {['한국어', 'English'].map(language => (
-                <div
-                  key={language}
-                  onClick={() => {
-                    const newLang = language === 'English' ? 'en' : 'ko'
-                    setLang(newLang)
-                    setShowLangSheet(false)
-                  }}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '14px 16px',
-                    borderRadius: '14px',
-                    cursor: 'pointer',
-                    background: (language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en') ? 'var(--color-text-primary)' : 'var(--color-surface-2)',
-                    border: `1.5px solid ${(language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en') ? 'var(--color-text-primary)' : 'var(--color-border)'}`,
-                  }}
-                >
-                  <span style={{
-                    fontSize: '15px',
-                    fontWeight: 600,
-                    color: (language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en') ? 'var(--color-bg)' : 'var(--color-text-primary)',
-                  }}>
-                    {language}
-                  </span>
-                  {((language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en')) &&
-                    <Check size={18} color="var(--color-bg)" />
-                  }
-                </div>
-              ))}
+          <div onClick={() => setShowLangSheet(false)} style={glassDimStyle(isDark)} />
+          <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
+            <div style={glassGrabberStyle(isDark)} />
+            <h3 style={glassSheetTitleStyle(isDark)}>{t.profile.language}</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
+              {['한국어', 'English'].map(language => {
+                const selected = (language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en')
+                return (
+                  <div
+                    key={language}
+                    onClick={() => {
+                      const newLang = language === 'English' ? 'en' : 'ko'
+                      setLang(newLang)
+                      setShowLangSheet(false)
+                    }}
+                    className={`setting-option${selected ? ' selected' : ''}`}
+                  >
+                    <span>{language}</span>
+                    {selected && <Check size={18} className="check-icon" color="currentColor" />}
+                  </div>
+                )
+              })}
             </div>
-            <p style={{ fontSize: '12px', color: 'var(--color-text-tertiary)', textAlign: 'center' }}>
+            <p style={{ ...glassSheetDescStyle(isDark), margin: 0, textAlign: 'center' }}>
               {t.profile.multiLangNote}
             </p>
           </div>
         </>
       )}
 
-      {/* 학습 목표 모달 */}
-      {showGoalSheet && (
-        <>
-          <div onClick={() => setShowGoalSheet(false)} style={{
-            position: 'fixed', inset: 0, zIndex: 200,
-            background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.25)',
-          }} />
-          <div style={{
-            position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-            width: 'min(340px, calc(100vw - 40px))', zIndex: 201,
-            background: isDark ? 'rgba(30,30,32,0.82)' : 'rgba(255,255,255,0.88)',
-            backdropFilter: 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 20px 40px rgba(0,0,0,0.15)',
-            border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.5)',
-            borderRadius: '28px',
-            padding: '24px 20px 20px',
-            maxHeight: '80vh', overflowY: 'auto' as const,
-            animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
-          }}>
-            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.dailyGoal}</h3>
-            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>{t.profile.goalQuestion}</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '20px' }}>
-              {[5, 10, 15, 20, 30, 50].map(n => (
-                <button
-                  key={n}
-                  onClick={() => setDailyGoal(n)}
-                  className={`goal-option${dailyGoal === n ? ' selected' : ''}`}
-                >
-                  {lang === 'en' ? n : `${n}개`}
-                </button>
-              ))}
-            </div>
-            <button
-              className="btn-neutral-solid"
-              onClick={() => {
-                localStorage.setItem('daily_goal', String(dailyGoal))
-                setShowGoalSheet(false)
-              }}
-              style={{ width: '100%', height: '52px', borderRadius: '14px', fontSize: '15px' }}
-            >
-              {t.profile.saveGoal}
-            </button>
-          </div>
-        </>
-      )}
-
-      {/* 알림 설정 모달 */}
+      {/* 알림 플로팅 시트 */}
       {showNotifSheet && (
         <>
-          <div onClick={() => setShowNotifSheet(false)} style={{
-            position: 'fixed', inset: 0, zIndex: 200,
-            background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.25)',
-          }} />
-          <div style={{
-            position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-            width: 'min(340px, calc(100vw - 40px))', zIndex: 201,
-            background: isDark ? 'rgba(30,30,32,0.82)' : 'rgba(255,255,255,0.88)',
-            backdropFilter: 'blur(40px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 20px 40px rgba(0,0,0,0.15)',
-            border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.5)',
-            borderRadius: '28px',
-            padding: '24px 20px 20px',
-            maxHeight: '80vh', overflowY: 'auto' as const,
-            animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
-          }}>
-            <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{t.profile.notifications}</h3>
+          <style>{GLASS_BTN_PRESS_CSS}</style>
+          <div onClick={() => setShowNotifSheet(false)} style={glassDimStyle(isDark)} />
+          <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
+            <div style={glassGrabberStyle(isDark)} />
+            <h3 style={glassSheetTitleStyle(isDark)}>{t.profile.notifications}</h3>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: 'var(--color-surface-2)', borderRadius: '14px', marginBottom: '16px' }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              height: '56px', padding: '0 14px',
+              background: isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)',
+              borderRadius: '14px', marginBottom: '16px', boxSizing: 'border-box',
+            }}>
               <div>
                 <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>{t.profile.dailyReminder}</p>
                 <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>{t.profile.dailyReminderDesc}</p>
@@ -679,8 +637,8 @@ export default function ProfilePage() {
             </div>
 
             {notificationEnabled && (
-              <div style={{ marginBottom: '20px' }}>
-                <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '8px' }}>{t.profile.notifTime}</p>
+              <div style={{ marginBottom: '16px' }}>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>{t.profile.notifTime}</p>
                 <input
                   type="time"
                   value={notificationTime}
@@ -688,23 +646,15 @@ export default function ProfilePage() {
                     setNotificationTime(e.target.value)
                     localStorage.setItem('notification_time', e.target.value)
                   }}
-                  style={{
-                    width: '100%', height: '52px',
-                    background: 'var(--color-surface-2)',
-                    border: '1px solid var(--color-border)',
-                    borderRadius: '14px', padding: '0 16px',
-                    fontSize: '18px', fontWeight: 700,
-                    color: 'var(--color-text-primary)', outline: 'none',
-                    boxSizing: 'border-box' as const,
-                  }}
+                  style={{ ...glassInputStyle(isDark), fontWeight: 700 }}
                 />
               </div>
             )}
 
             <button
-              className="btn-neutral-solid"
+              className="no-press-anim glass-press"
               onClick={() => setShowNotifSheet(false)}
-              style={{ width: '100%', height: '52px', borderRadius: '14px', fontSize: '15px' }}
+              style={{ ...glassButtonPrimary(isDark), width: '100%', flex: 'none' }}
             >
               {t.common.done}
             </button>
