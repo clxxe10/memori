@@ -13,6 +13,14 @@ import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
 import { ADMOB_REWARD_PHOTO_EXTRACT } from '@/lib/adConfig'
 import { showRewardAd } from '@/lib/rewardAd'
+import {
+  GLASS_BTN_PRESS_CSS,
+  glassBottomSheetStyle,
+  glassButtonPrimary,
+  glassButtonSecondary,
+  glassDimStyle,
+  glassGrabberStyle,
+} from '@/lib/glassModalStyles'
 
 export default function CameraPage() {
   const { t } = useTranslation()
@@ -40,7 +48,16 @@ export default function CameraPage() {
   const [loadingMsg, setLoadingMsg] = useState('')
   const [showPhotoGate, setShowPhotoGate] = useState(false)
   const [adLoading, setAdLoading] = useState(false)
+  const [isDark, setIsDark] = useState(false)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    const update = () => setIsDark(document.documentElement.classList.contains('dark'))
+    update()
+    const observer = new MutationObserver(update)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => observer.disconnect()
+  }, [])
 
   const handleWatchPhotoAd = async () => {
     if (adLoading) return
@@ -542,24 +559,19 @@ export default function CameraPage() {
       </div>
       {showPhotoGate && (
         <>
+          <style>{GLASS_BTN_PRESS_CSS}</style>
+          <div onClick={() => setShowPhotoGate(false)} style={glassDimStyle(isDark, 200)} />
           <div
-            onClick={() => setShowPhotoGate(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200 }}
-          />
-          <div
+            className="glass-surface"
             style={{
-              position: 'fixed',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              background: 'var(--color-surface)',
-              borderRadius: '24px 24px 0 0',
-              padding: '24px 20px 80px',
-              zIndex: 201,
+              ...glassBottomSheetStyle(isDark, {
+                zIndex: 201,
+                padding: '16px 20px max(28px, calc(env(safe-area-inset-bottom) + 16px))',
+              }),
               textAlign: 'center',
             }}
           >
-            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 20px' }} />
+            <div style={glassGrabberStyle(isDark)} />
             <div style={{ fontSize: '44px', marginBottom: '12px' }}>📸</div>
             <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px' }}>
               {t.vocab.dailyLimit}
@@ -569,23 +581,15 @@ export default function CameraPage() {
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
+                className="no-press-anim glass-press"
                 onClick={() => { void handleWatchPhotoAd() }}
                 disabled={adLoading}
                 style={{
-                  width: '100%',
-                  height: '52px',
-                  background: 'var(--color-neutral)',
-                  color: 'var(--color-neutral-contrast)',
-                  border: 'none',
-                  borderRadius: '14px',
-                  fontSize: '15px',
-                  fontWeight: 700,
-                  cursor: adLoading ? 'not-allowed' : 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
+                  ...glassButtonPrimary(isDark),
+                  width: '100%', flex: 'none',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                   opacity: adLoading ? 0.7 : 1,
+                  cursor: adLoading ? 'not-allowed' : 'pointer',
                 }}
               >
                 {adLoading ? (
@@ -598,18 +602,9 @@ export default function CameraPage() {
                 )}
               </button>
               <button
+                className="no-press-anim glass-press"
                 onClick={() => { setShowPhotoGate(false); router.push('/profile/premium') }}
-                style={{
-                  width: '100%',
-                  height: '52px',
-                  background: 'var(--color-surface-2)',
-                  color: 'var(--color-text-primary)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: '14px',
-                  fontSize: '15px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}
+                style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
               >
                 👑 프리미엄 구독하기 (월 4,900원)
               </button>

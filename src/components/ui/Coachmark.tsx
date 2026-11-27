@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '@/lib/i18n'
+import { glassCoachmarkStyle, glassSurface } from '@/lib/glassModalStyles'
 
 type Props = {
   id: string
@@ -111,9 +112,8 @@ export default function Coachmark({ id, targetRef, text, placement = 'bottom' }:
 
   if (!mounted || !active) return null
 
-  const bg = isDark ? '#2C2C2E' : '#FFFFFF'
   const textColor = isDark ? '#FFFFFF' : '#1C1C1E'
-  const shadow = isDark ? '0 8px 24px rgba(0,0,0,0.40)' : '0 8px 24px rgba(0,0,0,0.10)'
+  const arrowBg = glassSurface(isDark)
 
   return createPortal(
     <>
@@ -135,6 +135,7 @@ export default function Coachmark({ id, targetRef, text, placement = 'bottom' }:
       />
       <div
         ref={bubbleRef}
+        className="glass-surface"
         onClick={e => e.stopPropagation()}
         style={{
           position: 'fixed',
@@ -144,10 +145,8 @@ export default function Coachmark({ id, targetRef, text, placement = 'bottom' }:
           maxWidth: 'min(280px, calc(100vw - 32px))',
           boxSizing: 'border-box',
           zIndex: 301,
-          borderRadius: '18px',
           padding: '14px 16px',
-          background: bg,
-          boxShadow: shadow,
+          ...glassCoachmarkStyle(isDark),
           visibility: ready ? 'visible' : 'hidden',
           animation: ready && !reduceMotion
             ? 'coachmarkIn 0.25s cubic-bezier(0.32, 0.72, 0, 1) both'
@@ -160,7 +159,7 @@ export default function Coachmark({ id, targetRef, text, placement = 'bottom' }:
             position: 'absolute',
             width: '12px',
             height: '12px',
-            background: bg,
+            background: arrowBg,
             borderRadius: '2px',
             transform: 'rotate(45deg)',
             left: pos?.arrowLeft ?? 16,

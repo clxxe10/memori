@@ -46,6 +46,7 @@ export default function AlertModal({
     <div onClick={onCancel} style={glassOverlayStyle(isDark)}>
       <style>{GLASS_BTN_PRESS_CSS}</style>
       <div
+        className="glass-surface"
         onClick={e => e.stopPropagation()}
         style={{
           ...glassPanelStyle(isDark),

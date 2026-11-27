@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { glassToastStyle } from '@/lib/glassModalStyles'
 
 type ToastType = 'success' | 'error' | 'info'
 type Toast = { id: string; message: string; type: ToastType }
@@ -13,6 +14,15 @@ export function showToast(message: string, type: ToastType = 'success') {
 
 export default function ToastContainer() {
   const [toasts, setToasts] = useState<Toast[]>([])
+  const [isDark, setIsDark] = useState(false)
+
+  useEffect(() => {
+    const update = () => setIsDark(document.documentElement.classList.contains('dark'))
+    update()
+    const observer = new MutationObserver(update)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     const listener = (toast: Toast) => {
@@ -25,44 +35,56 @@ export default function ToastContainer() {
     return () => { toastListeners = toastListeners.filter(l => l !== listener) }
   }, [])
 
-  const getStyle = (type: ToastType) => {
-    if (type === 'success') return { bg: '#1C1C1E', icon: '✓' }
-    if (type === 'error') return { bg: '#E24B4A', icon: '✕' }
-    return { bg: '#3A3A3C', icon: 'ℹ' }
+  const iconFor = (type: ToastType) => {
+    if (type === 'success') return '✓'
+    if (type === 'error') return '✕'
+    return 'ℹ'
+  }
+
+  const iconBg = (type: ToastType) => {
+    if (type === 'error') return 'rgba(255,59,48,0.18)'
+    if (type === 'success') return isDark ? 'rgba(255,255,255,0.14)' : 'rgba(28,28,30,0.1)'
+    return isDark ? 'rgba(255,255,255,0.12)' : 'rgba(28,28,30,0.08)'
+  }
+
+  const iconColor = (type: ToastType) => {
+    if (type === 'error') return '#FF3B30'
+    return 'var(--color-text-primary)'
   }
 
   return (
     <div style={{
-      position: 'fixed', bottom: '100px', left: '50%',
+      position: 'fixed',
+      bottom: '100px',
+      left: '50%',
       transform: 'translateX(-50%)',
-      zIndex: 9999, display: 'flex',
-      flexDirection: 'column', gap: '8px',
-      alignItems: 'center', pointerEvents: 'none',
+      zIndex: 9999,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '8px',
+      alignItems: 'center',
+      pointerEvents: 'none',
     }}>
-      {toasts.map(toast => {
-        const s = getStyle(toast.type)
-        return (
-          <div key={toast.id} style={{
-            background: s.bg, color: '#FFFFFF',
-            padding: '10px 18px', borderRadius: '20px',
-            fontSize: '14px', fontWeight: 600,
-            display: 'flex', alignItems: 'center', gap: '8px',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-            whiteSpace: 'nowrap',
-            fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+      {toasts.map(toast => (
+        <div key={toast.id} className="glass-surface" style={glassToastStyle(isDark)}>
+          <span style={{
+            fontSize: '12px',
+            width: '22px',
+            height: '22px',
+            borderRadius: '50%',
+            background: iconBg(toast.type),
+            color: iconColor(toast.type),
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            fontWeight: 700,
           }}>
-            <span style={{
-              fontSize: '12px', width: '18px', height: '18px',
-              borderRadius: '50%', background: 'rgba(255,255,255,0.2)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
-            }}>
-              {s.icon}
-            </span>
-            {toast.message}
-          </div>
-        )
-      })}
+            {iconFor(toast.type)}
+          </span>
+          {toast.message}
+        </div>
+      ))}
     </div>
   )
 }

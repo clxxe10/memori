@@ -428,14 +428,14 @@ export default function StudyPage() {
         <>
           <div onClick={() => setShowFolderSheet(false)} style={{
             position: 'fixed', inset: 0, zIndex: 199,
-            background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.18)',
+            background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.25)',
           }} />
           <div style={{
             position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
             width: 'min(340px, calc(100vw - 40px))', zIndex: 200,
-            background: isDark ? 'rgba(30,30,32,0.72)' : 'rgba(255,255,255,0.72)',
-            backdropFilter: 'blur(30px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(30px) saturate(180%)',
+            background: isDark ? 'rgba(30,30,32,0.82)' : 'rgba(255,255,255,0.88)',
+            backdropFilter: 'blur(40px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 20px 40px rgba(0,0,0,0.15)',
             border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.5)',
             borderRadius: '28px',

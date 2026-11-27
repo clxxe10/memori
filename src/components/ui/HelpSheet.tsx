@@ -1,6 +1,13 @@
 'use client'
+import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
+import {
+  GLASS_BTN_PRESS_CSS,
+  glassButtonSecondary,
+  glassDimStyle,
+  glassFixedPanelStyle,
+} from '@/lib/glassModalStyles'
 
 type Props = { mode: string; onClose: () => void }
 
@@ -160,33 +167,34 @@ const getHelpContent = (lang: string) => ({
 })
 
 export default function HelpSheet({ mode, onClose }: Props) {
-  const { lang } = useTranslation()
+  const { lang, t } = useTranslation()
   const HELP_CONTENT = getHelpContent(lang) as Record<string, { title: string; steps: string[]; tips: string[] }>
   const content = HELP_CONTENT[mode]
-  if (!content) return null
+  const [isDark, setIsDark] = useState(false)
 
-  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  useEffect(() => {
+    const update = () => setIsDark(document.documentElement.classList.contains('dark'))
+    update()
+    const observer = new MutationObserver(update)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => observer.disconnect()
+  }, [])
+
+  if (!content) return null
 
   return (
     <>
-      <div onClick={onClose} style={{
-        position: 'fixed', inset: 0, zIndex: 999,
-        background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.18)',
-      }} />
-      <div style={{
-        position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-        width: 'min(340px, calc(100vw - 40px))', zIndex: 1000,
-        background: isDark ? 'rgba(30,30,32,0.72)' : 'rgba(255,255,255,0.72)',
-        backdropFilter: 'blur(30px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(30px) saturate(180%)',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 20px 40px rgba(0,0,0,0.15)',
-        border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.5)',
-        borderRadius: '28px',
-        padding: '24px 20px 20px',
-        maxHeight: '75vh', overflowY: 'auto' as const,
-        fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
-        animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
-      }}>
+      <style>{GLASS_BTN_PRESS_CSS}</style>
+      <div onClick={onClose} style={glassDimStyle(isDark, 999)} />
+      <div
+        className="glass-surface"
+        style={glassFixedPanelStyle(isDark, {
+          zIndex: 1000,
+          maxHeight: '75vh',
+          overflowY: 'auto',
+          padding: '28px 20px 20px',
+        })}
+      >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
           <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
             {content.title} {lang === 'en' ? 'Guide' : '사용법'}
@@ -214,9 +222,9 @@ export default function HelpSheet({ mode, onClose }: Props) {
         </div>
 
         <div style={{
-          background: 'var(--color-surface-2)',
+          background: isDark ? 'rgba(120,120,128,0.2)' : 'rgba(120,120,128,0.12)',
           borderRadius: '14px', padding: '14px 16px',
-          border: '1px solid var(--color-border)',
+          marginBottom: '16px',
         }}>
           <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '10px', letterSpacing: '0.3px' }}>
             {lang === 'en' ? '💡 Tips' : '💡 꿀팁'}
@@ -230,6 +238,14 @@ export default function HelpSheet({ mode, onClose }: Props) {
             ))}
           </div>
         </div>
+
+        <button
+          className="no-press-anim glass-press"
+          onClick={onClose}
+          style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
+        >
+          {t.common.confirm}
+        </button>
       </div>
     </>
   )

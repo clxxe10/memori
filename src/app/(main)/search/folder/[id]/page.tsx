@@ -47,6 +47,15 @@ import { showToast } from '@/components/ui/Toast'
 import { showAlert } from '@/components/ui/AlertHost'
 import { useTranslation } from '@/lib/i18n'
 import AlertModal from '@/components/AlertModal'
+import {
+  GLASS_BTN_PRESS_CSS,
+  glassBottomSheetStyle,
+  glassButtonSecondary,
+  glassDimStyle,
+  glassGrabberStyle,
+  glassPopoverItemStyle,
+  glassPopoverStyle,
+} from '@/lib/glassModalStyles'
 
 type Folder = {
   id: string
@@ -97,7 +106,16 @@ export default function PublicFolderPage() {
   const [showReportSheet, setShowReportSheet] = useState(false)
   const [showBlockConfirm, setShowBlockConfirm] = useState(false)
   const [actionBusy, setActionBusy] = useState(false)
+  const [isDark, setIsDark] = useState(false)
   const { t, lang } = useTranslation()
+
+  useEffect(() => {
+    const update = () => setIsDark(document.documentElement.classList.contains('dark'))
+    update()
+    const observer = new MutationObserver(update)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => observer.disconnect()
+  }, [])
 
   const REPORT_REASONS = [
     { key: 'inappropriate', label: t.search.reportReasonInappropriate },
@@ -426,53 +444,32 @@ export default function PublicFolderPage() {
         )}
       </div>
 
-      {/* ⋯ 메뉴 */}
+      {/* ⋯ 팝오버 메뉴 */}
       {showMoreMenu && (
         <>
+          <style>{GLASS_BTN_PRESS_CSS}</style>
+          <div onClick={() => setShowMoreMenu(false)} style={glassDimStyle(isDark, 300)} />
           <div
-            onClick={() => setShowMoreMenu(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 300 }}
-          />
-          <div style={{
-            position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 301,
-            background: 'var(--color-surface)',
-            borderRadius: '24px 24px 0 0',
-            padding: '12px 20px max(32px, calc(env(safe-area-inset-bottom) + 16px))',
-          }}>
-            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 16px' }} />
+            className="glass-surface"
+            style={{
+              ...glassPopoverStyle(isDark, { zIndex: 301, width: '200px' }),
+              top: 'max(72px, calc(env(safe-area-inset-top) + 52px))',
+              right: '16px',
+            }}
+          >
             <button
               type="button"
               onClick={() => { setShowMoreMenu(false); setShowReportSheet(true) }}
-              style={{
-                width: '100%', height: '52px', background: 'none', border: 'none',
-                borderBottom: '1px solid var(--color-border)',
-                fontSize: '16px', fontWeight: 600, color: 'var(--color-text-primary)',
-                cursor: 'pointer', textAlign: 'left', padding: '0 4px',
-              }}
+              style={glassPopoverItemStyle({ isDark })}
             >
               {t.search.report}
             </button>
             <button
               type="button"
               onClick={() => { setShowMoreMenu(false); setShowBlockConfirm(true) }}
-              style={{
-                width: '100%', height: '52px', background: 'none', border: 'none',
-                fontSize: '16px', fontWeight: 600, color: '#FF3B30',
-                cursor: 'pointer', textAlign: 'left', padding: '0 4px',
-              }}
+              style={glassPopoverItemStyle({ destructive: true, last: true, isDark })}
             >
               {t.search.blockUser}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowMoreMenu(false)}
-              style={{
-                width: '100%', height: '48px', marginTop: '8px',
-                background: 'var(--color-surface-2)', border: 'none', borderRadius: '14px',
-                fontSize: '15px', fontWeight: 600, color: 'var(--color-text-secondary)', cursor: 'pointer',
-              }}
-            >
-              {t.common.cancel}
             </button>
           </div>
         </>
@@ -481,17 +478,10 @@ export default function PublicFolderPage() {
       {/* 신고 사유 선택 */}
       {showReportSheet && (
         <>
-          <div
-            onClick={() => setShowReportSheet(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 300 }}
-          />
-          <div style={{
-            position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 301,
-            background: 'var(--color-surface)',
-            borderRadius: '24px 24px 0 0',
-            padding: '12px 20px max(32px, calc(env(safe-area-inset-bottom) + 16px))',
-          }}>
-            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 16px' }} />
+          <style>{GLASS_BTN_PRESS_CSS}</style>
+          <div onClick={() => setShowReportSheet(false)} style={glassDimStyle(isDark, 300)} />
+          <div className="glass-surface" style={glassBottomSheetStyle(isDark, { zIndex: 301 })}>
+            <div style={glassGrabberStyle(isDark)} />
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', margin: '0 0 4px', textAlign: 'center' }}>
               {t.search.reportTitle}
             </h3>
@@ -505,11 +495,10 @@ export default function PublicFolderPage() {
                 disabled={actionBusy}
                 onClick={() => handleReport(r.key)}
                 style={{
-                  width: '100%', height: '52px', background: 'none', border: 'none',
-                  borderBottom: i < REPORT_REASONS.length - 1 ? '1px solid var(--color-border)' : 'none',
-                  fontSize: '16px', fontWeight: 600, color: 'var(--color-text-primary)',
-                  cursor: actionBusy ? 'not-allowed' : 'pointer', textAlign: 'left', padding: '0 4px',
+                  ...glassPopoverItemStyle({ last: i === REPORT_REASONS.length - 1, isDark }),
                   opacity: actionBusy ? 0.6 : 1,
+                  cursor: actionBusy ? 'not-allowed' : 'pointer',
+                  padding: '0 4px',
                 }}
               >
                 {r.label}
@@ -517,12 +506,9 @@ export default function PublicFolderPage() {
             ))}
             <button
               type="button"
+              className="no-press-anim glass-press"
               onClick={() => setShowReportSheet(false)}
-              style={{
-                width: '100%', height: '48px', marginTop: '12px',
-                background: 'var(--color-surface-2)', border: 'none', borderRadius: '14px',
-                fontSize: '15px', fontWeight: 600, color: 'var(--color-text-secondary)', cursor: 'pointer',
-              }}
+              style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none', marginTop: '12px' }}
             >
               {t.common.cancel}
             </button>
@@ -546,8 +532,8 @@ export default function PublicFolderPage() {
       {showCommentSheet && (
         <>
           <div className="comment-sheet-overlay" onClick={() => setShowCommentSheet(false)} />
-          <div className="comment-sheet">
-            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 16px' }} />
+          <div className="comment-sheet glass-surface">
+            <div style={glassGrabberStyle(isDark)} />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', margin: 0 }}>
                 댓글 {comments.length}개

@@ -17,6 +17,14 @@ import { useTranslation } from '@/lib/i18n'
 import { findBlockedInList, type BlockHit } from '@/lib/contentFilter'
 import { speak } from '@/lib/tts'
 import AlertModal from '@/components/AlertModal'
+import {
+  GLASS_BTN_PRESS_CSS,
+  glassBottomSheetStyle,
+  glassButtonPrimary,
+  glassDestructive,
+  glassDimStyle,
+  glassGrabberStyle,
+} from '@/lib/glassModalStyles'
 
 type Word = {
   id: string
@@ -555,21 +563,21 @@ export default function VocabularyDetailPage() {
 
       {showEditSheet && (
         <>
+          <style>{GLASS_BTN_PRESS_CSS}</style>
           <div
             onClick={() => setShowEditSheet(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 49 }}
+            style={glassDimStyle(isDark, 49)}
           />
-          <div style={{
-            position: 'fixed', bottom: 0, left: 0, right: 0,
-            background: 'var(--color-surface)',
-            borderRadius: '24px 24px 0 0',
-            borderTop: '1px solid var(--color-border)',
-            boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12)',
-            padding: '12px 20px 120px', zIndex: 50,
-            maxHeight: '85vh', overflowY: 'auto',
-            animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
-          }}>
-            <div style={{ width: '36px', height: '4px', background: 'var(--color-track)', borderRadius: '4px', margin: '0 auto 16px' }} />
+          <div
+            className="glass-surface"
+            style={{
+              ...glassBottomSheetStyle(isDark, {
+                zIndex: 50,
+                padding: '12px 20px max(100px, calc(env(safe-area-inset-bottom) + 80px))',
+              }),
+            }}
+          >
+            <div style={glassGrabberStyle(isDark)} />
             <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '20px' }}>{lang === 'en' ? 'Edit Vocabulary' : '단어장 편집'}</h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -620,13 +628,25 @@ export default function VocabularyDetailPage() {
                 </div>
               </div>
 
-              <button onClick={handleEditSave} disabled={isSaving || !editForm.name.trim()}
-                style={{ width: '100%', height: '50px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', opacity: (isSaving || !editForm.name.trim()) ? 0.5 : 1 }}>
+              <button
+                className="no-press-anim glass-press"
+                onClick={handleEditSave}
+                disabled={isSaving || !editForm.name.trim()}
+                style={{
+                  ...glassButtonPrimary(isDark),
+                  width: '100%', flex: 'none',
+                  opacity: (isSaving || !editForm.name.trim()) ? 0.5 : 1,
+                }}
+              >
                 {isSaving ? (lang === 'en' ? 'Saving...' : '저장 중...') : t.common.save}
               </button>
 
-              <button onClick={handleFolderDelete} disabled={isDeleting}
-                style={{ width: '100%', height: '50px', background: 'rgba(226,75,74,0.08)', color: '#E24B4A', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>
+              <button
+                className="no-press-anim glass-press"
+                onClick={handleFolderDelete}
+                disabled={isDeleting}
+                style={{ ...glassDestructive(), width: '100%', flex: 'none' }}
+              >
                 {lang === 'en' ? 'Delete Vocabulary' : '단어장 삭제'}
               </button>
 
@@ -650,14 +670,14 @@ export default function VocabularyDetailPage() {
         <>
           <div onClick={() => setShowAddSheet(false)} style={{
             position: 'fixed', inset: 0, zIndex: 200,
-            background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.18)',
+            background: isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.25)',
           }} />
           <div style={{
             position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
             width: 'min(340px, calc(100vw - 40px))', zIndex: 201,
-            background: isDark ? 'rgba(30,30,32,0.72)' : 'rgba(255,255,255,0.72)',
-            backdropFilter: 'blur(30px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(30px) saturate(180%)',
+            background: isDark ? 'rgba(30,30,32,0.82)' : 'rgba(255,255,255,0.88)',
+            backdropFilter: 'blur(40px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(40px) saturate(180%)',
             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6), 0 20px 40px rgba(0,0,0,0.15)',
             border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.5)',
             borderRadius: '28px',

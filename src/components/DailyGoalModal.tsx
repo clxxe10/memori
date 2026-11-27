@@ -90,6 +90,7 @@ export default function DailyGoalModal({ initialGoal, onSave, onTurnOff, onCance
         }
       `}</style>
       <div
+        className="glass-surface"
         onClick={e => e.stopPropagation()}
         style={{
           ...glassPanelStyle(isDark),
