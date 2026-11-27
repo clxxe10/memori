@@ -13,16 +13,11 @@ import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
 import { ADMOB_REWARD_PHOTO_EXTRACT } from '@/lib/adConfig'
 import { showRewardAd } from '@/lib/rewardAd'
-import OverlayPortal from '@/components/ui/OverlayPortal'
+import CenterModal from '@/components/ui/CenterModal'
+import { useIsDark } from '@/hooks/useIsDark'
 import {
-  GLASS_BTN_PRESS_CSS,
-  glassBottomSheetStyle,
   glassButtonPrimary,
   glassButtonSecondary,
-  glassDimStyle,
-  glassGrabberStyle,
-  glassSheetFooterStyle,
-  glassSheetScrollStyle,
 } from '@/lib/glassModalStyles'
 
 export default function CameraPage() {
@@ -51,16 +46,8 @@ export default function CameraPage() {
   const [loadingMsg, setLoadingMsg] = useState('')
   const [showPhotoGate, setShowPhotoGate] = useState(false)
   const [adLoading, setAdLoading] = useState(false)
-  const [isDark, setIsDark] = useState(false)
+  const isDark = useIsDark()
   const timerRef = useRef<NodeJS.Timeout | null>(null)
-
-  useEffect(() => {
-    const update = () => setIsDark(document.documentElement.classList.contains('dark'))
-    update()
-    const observer = new MutationObserver(update)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => observer.disconnect()
-  }, [])
 
   const handleWatchPhotoAd = async () => {
     if (adLoading) return
@@ -561,27 +548,12 @@ export default function CameraPage() {
         )}
       </div>
       {showPhotoGate && (
-        <OverlayPortal>
-          <style>{GLASS_BTN_PRESS_CSS}</style>
-          <div onClick={() => setShowPhotoGate(false)} style={glassDimStyle(isDark)} />
-          <div
-            className="glass-surface"
-            style={{
-              ...glassBottomSheetStyle(isDark),
-              textAlign: 'center',
-            }}
-          >
-            <div style={glassGrabberStyle(isDark)} />
-            <div style={glassSheetScrollStyle()}>
-              <div style={{ fontSize: '44px', marginBottom: '12px' }}>📸</div>
-              <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>
-                {t.vocab.dailyLimit}
-              </h3>
-              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '4px', lineHeight: 1.6 }}>
-                {t.vocab.watchAdDesc}
-              </p>
-            </div>
-            <div style={{ ...glassSheetFooterStyle(), display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <CenterModal
+          onClose={() => setShowPhotoGate(false)}
+          title={t.vocab.dailyLimit}
+          description={t.vocab.watchAdDesc}
+          footer={
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
                 className="no-press-anim glass-press"
                 onClick={() => { void handleWatchPhotoAd() }}
@@ -617,8 +589,10 @@ export default function CameraPage() {
                 {t.common.cancel}
               </button>
             </div>
-          </div>
-        </OverlayPortal>
+          }
+        >
+          <div style={{ fontSize: '44px', textAlign: 'center' }}>📸</div>
+        </CenterModal>
       )}
       {isAnalyzing && (
         <div

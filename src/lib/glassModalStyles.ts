@@ -276,7 +276,7 @@ export function glassOptionRowStyle(isDark: boolean, selected: boolean): CSSProp
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: '48px',
+    height: '44px',
     padding: '0 14px',
     borderRadius: '14px',
     cursor: 'pointer',

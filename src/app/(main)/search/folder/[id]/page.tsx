@@ -48,17 +48,16 @@ import { showAlert } from '@/components/ui/AlertHost'
 import { useTranslation } from '@/lib/i18n'
 import AlertModal from '@/components/AlertModal'
 import OverlayPortal from '@/components/ui/OverlayPortal'
+import CenterModal, { ModalOptionList, ModalOptionRow } from '@/components/ui/CenterModal'
+import FloatingSheet from '@/components/ui/FloatingSheet'
 import {
   GLASS_BTN_PRESS_CSS,
-  glassBottomSheetStyle,
   glassButtonSecondary,
   glassDimStyle,
-  glassGrabberStyle,
   glassPopoverItemStyle,
   glassPopoverStyle,
-  glassSheetFooterStyle,
-  glassSheetScrollStyle,
 } from '@/lib/glassModalStyles'
+import { useIsDark } from '@/hooks/useIsDark'
 
 type Folder = {
   id: string
@@ -109,16 +108,8 @@ export default function PublicFolderPage() {
   const [showReportSheet, setShowReportSheet] = useState(false)
   const [showBlockConfirm, setShowBlockConfirm] = useState(false)
   const [actionBusy, setActionBusy] = useState(false)
-  const [isDark, setIsDark] = useState(false)
+  const isDark = useIsDark()
   const { t, lang } = useTranslation()
-
-  useEffect(() => {
-    const update = () => setIsDark(document.documentElement.classList.contains('dark'))
-    update()
-    const observer = new MutationObserver(update)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => observer.disconnect()
-  }, [])
 
   const REPORT_REASONS = [
     { key: 'inappropriate', label: t.search.reportReasonInappropriate },
@@ -480,47 +471,33 @@ export default function PublicFolderPage() {
 
       {/* 신고 사유 선택 */}
       {showReportSheet && (
-        <OverlayPortal>
-          <style>{GLASS_BTN_PRESS_CSS}</style>
-          <div onClick={() => setShowReportSheet(false)} style={glassDimStyle(isDark)} />
-          <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
-            <div style={glassGrabberStyle(isDark)} />
-            <div style={glassSheetScrollStyle()}>
-              <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', margin: '0 0 6px', textAlign: 'center' }}>
-                {t.search.reportTitle}
-              </h3>
-              <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '0 0 16px', textAlign: 'center' }}>
-                {t.search.reportDesc}
-              </p>
-              {REPORT_REASONS.map((r, i) => (
-                <button
-                  key={r.key}
-                  type="button"
-                  disabled={actionBusy}
-                  onClick={() => handleReport(r.key)}
-                  style={{
-                    ...glassPopoverItemStyle({ last: i === REPORT_REASONS.length - 1, isDark }),
-                    opacity: actionBusy ? 0.6 : 1,
-                    cursor: actionBusy ? 'not-allowed' : 'pointer',
-                    padding: '0 4px',
-                  }}
-                >
-                  {r.label}
-                </button>
-              ))}
-            </div>
-            <div style={glassSheetFooterStyle()}>
-              <button
-                type="button"
-                className="no-press-anim glass-press"
-                onClick={() => setShowReportSheet(false)}
-                style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
+        <CenterModal
+          onClose={() => setShowReportSheet(false)}
+          title={t.search.reportTitle}
+          description={t.search.reportDesc}
+          footer={
+            <button
+              type="button"
+              className="no-press-anim glass-press"
+              onClick={() => setShowReportSheet(false)}
+              style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
+            >
+              {t.common.cancel}
+            </button>
+          }
+        >
+          <ModalOptionList>
+            {REPORT_REASONS.map(r => (
+              <ModalOptionRow
+                key={r.key}
+                selected={false}
+                onClick={() => { if (!actionBusy) handleReport(r.key) }}
               >
-                {t.common.cancel}
-              </button>
-            </div>
-          </div>
-        </OverlayPortal>
+                {r.label}
+              </ModalOptionRow>
+            ))}
+          </ModalOptionList>
+        </CenterModal>
       )}
 
       {showBlockConfirm && (
@@ -537,61 +514,9 @@ export default function PublicFolderPage() {
 
       {/* 댓글 바텀시트 */}
       {showCommentSheet && (
-        <OverlayPortal>
-          <div className="comment-sheet-overlay" onClick={() => setShowCommentSheet(false)} />
-          <div className="comment-sheet glass-surface">
-            <div style={glassGrabberStyle(isDark)} />
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexShrink: 0 }}>
-              <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
-                댓글 {comments.length}개
-              </h3>
-              <button
-                onClick={() => setShowCommentSheet(false)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex' }}
-                type="button"
-              >
-                <X size={20} color="var(--color-text-secondary)" />
-              </button>
-            </div>
-
-            <div style={{ flex: 1, overflowY: 'auto', overscrollBehavior: 'contain', display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px', minHeight: 0 }}>
-              {comments.length === 0 ? (
-                <p style={{ fontSize: '13px', color: 'var(--color-text-tertiary)', textAlign: 'center', padding: '28px 0' }}>
-                  첫 댓글을 남겨보세요 😊
-                </p>
-              ) : (
-                comments.map(comment => (
-                  <div key={comment.id} style={{ display: 'flex', gap: '10px', background: 'var(--color-surface-2)', borderRadius: '12px', padding: '12px 14px' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#E8EAF0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '13px', fontWeight: 700, color: 'var(--color-text-secondary)' }}>
-                      {(comment.nickname || '?')[0].toUpperCase()}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
-                        <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{comment.nickname || '익명'}</span>
-                        <span style={{ fontSize: '11px', color: 'var(--color-text-tertiary)' }}>
-                          {new Date(comment.created_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
-                        </span>
-                      </div>
-                      <p style={{ fontSize: '13px', color: 'var(--color-text-primary)', margin: 0 }}>{comment.content}</p>
-                    </div>
-                    {comment.user_id === myUserId && (
-                      <button
-                        onClick={async () => {
-                          const supabase = createClient()
-                          await supabase.from('folder_comments').delete().eq('id', comment.id)
-                          setComments(prev => prev.filter(c => c.id !== comment.id))
-                        }}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-tertiary)', fontSize: '11px', padding: '0 4px', flexShrink: 0 }}
-                        type="button"
-                      >
-                        {t.common.delete}
-                      </button>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
-
+        <FloatingSheet
+          onClose={() => setShowCommentSheet(false)}
+          footer={
             <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
               <input
                 value={commentText}
@@ -621,8 +546,59 @@ export default function PublicFolderPage() {
                 <Send size={16} color={commentText.trim() ? '#FFFFFF' : 'var(--color-text-tertiary)'} />
               </button>
             </div>
+            }
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexShrink: 0 }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
+              댓글 {comments.length}개
+            </h3>
+            <button
+              onClick={() => setShowCommentSheet(false)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex' }}
+              type="button"
+            >
+              <X size={20} color="var(--color-text-secondary)" />
+            </button>
           </div>
-        </OverlayPortal>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {comments.length === 0 ? (
+              <p style={{ fontSize: '13px', color: 'var(--color-text-tertiary)', textAlign: 'center', padding: '28px 0' }}>
+                첫 댓글을 남겨보세요 😊
+              </p>
+            ) : (
+              comments.map(comment => (
+                <div key={comment.id} style={{ display: 'flex', gap: '10px', background: 'var(--color-surface-2)', borderRadius: '12px', padding: '12px 14px' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#E8EAF0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '13px', fontWeight: 700, color: 'var(--color-text-secondary)' }}>
+                    {(comment.nickname || '?')[0].toUpperCase()}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
+                      <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{comment.nickname || '익명'}</span>
+                      <span style={{ fontSize: '11px', color: 'var(--color-text-tertiary)' }}>
+                        {new Date(comment.created_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: '13px', color: 'var(--color-text-primary)', margin: 0 }}>{comment.content}</p>
+                  </div>
+                  {comment.user_id === myUserId && (
+                    <button
+                      onClick={async () => {
+                        const supabase = createClient()
+                        await supabase.from('folder_comments').delete().eq('id', comment.id)
+                        setComments(prev => prev.filter(c => c.id !== comment.id))
+                      }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-tertiary)', fontSize: '11px', padding: '0 4px', flexShrink: 0 }}
+                      type="button"
+                    >
+                      {t.common.delete}
+                    </button>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </FloatingSheet>
       )}
     </main>
   )

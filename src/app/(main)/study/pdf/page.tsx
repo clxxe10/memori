@@ -11,16 +11,11 @@ import { showAlert } from '@/components/ui/AlertHost'
 import { showToast } from '@/components/ui/Toast'
 import { ADMOB_REWARD_PDF_EXAM } from '@/lib/adConfig'
 import { showRewardAd } from '@/lib/rewardAd'
-import OverlayPortal from '@/components/ui/OverlayPortal'
+import CenterModal from '@/components/ui/CenterModal'
+import { useIsDark } from '@/hooks/useIsDark'
 import {
-  GLASS_BTN_PRESS_CSS,
-  glassBottomSheetStyle,
-  glassSheetFooterStyle,
-  glassSheetScrollStyle,
   glassButtonPrimary,
   glassButtonSecondary,
-  glassDimStyle,
-  glassGrabberStyle,
 } from '@/lib/glassModalStyles'
 
 type Folder = {
@@ -55,15 +50,7 @@ export default function PDFPage() {
   const [examType, setExamType] = useState<ExamType>('word-to-meaning')
   const [showPdfGate, setShowPdfGate] = useState(false)
   const [adLoading, setAdLoading] = useState(false)
-  const [isDark, setIsDark] = useState(false)
-
-  useEffect(() => {
-    const update = () => setIsDark(document.documentElement.classList.contains('dark'))
-    update()
-    const observer = new MutationObserver(update)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => observer.disconnect()
-  }, [])
+  const isDark = useIsDark()
 
   useEffect(() => {
     const fetchFolders = async () => {
@@ -556,27 +543,12 @@ export default function PDFPage() {
       </div>
 
       {showPdfGate && (
-        <OverlayPortal>
-          <style>{GLASS_BTN_PRESS_CSS}</style>
-          <div onClick={() => setShowPdfGate(false)} style={glassDimStyle(isDark)} />
-          <div
-            className="glass-surface"
-            style={{
-              ...glassBottomSheetStyle(isDark),
-              textAlign: 'center',
-            }}
-          >
-            <div style={glassGrabberStyle(isDark)} />
-            <div style={glassSheetScrollStyle()}>
-              <div style={{ fontSize: '44px', marginBottom: '12px' }}>📄</div>
-              <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>
-                {t.study.freeOnce}
-              </h3>
-              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '4px', lineHeight: 1.6 }}>
-                {t.vocab.watchAdDesc}
-              </p>
-            </div>
-            <div style={{ ...glassSheetFooterStyle(), display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <CenterModal
+          onClose={() => setShowPdfGate(false)}
+          title={t.study.freeOnce}
+          description={t.vocab.watchAdDesc}
+          footer={
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
                 className="no-press-anim glass-press"
                 onClick={() => { void handleWatchPdfAd() }}
@@ -612,8 +584,10 @@ export default function PDFPage() {
                 {t.common.cancel}
               </button>
             </div>
-          </div>
-        </OverlayPortal>
+          }
+        >
+          <div style={{ fontSize: '44px', textAlign: 'center' }}>📄</div>
+        </CenterModal>
       )}
     </main>
   )

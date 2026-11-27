@@ -10,21 +10,13 @@ import { usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import { useTranslation } from '@/lib/i18n'
 import { showAlert } from '@/components/ui/AlertHost'
-import OverlayPortal from '@/components/ui/OverlayPortal'
-import {
-  glassBottomSheetStyle,
-  glassButtonSecondary,
-  glassDimStyle,
-  glassGrabberStyle,
-  glassSheetDescStyle,
-  glassSheetFooterStyle,
-  glassSheetScrollStyle,
-  glassSheetTitleStyle,
-  GLASS_BTN_PRESS_CSS,
-} from '@/lib/glassModalStyles'
+import CenterModal from '@/components/ui/CenterModal'
+import { useIsDark } from '@/hooks/useIsDark'
+import { glassButtonSecondary } from '@/lib/glassModalStyles'
 
 export default function StudyPage() {
   const router = useRouter()
+  const isDark = useIsDark()
   const { t, lang } = useTranslation()
   const [tab, setTab] = useState<'favorites' | 'all'>('favorites')
   const [favorites, setFavorites] = useState<string[]>(['flashcard', 'blink', 'typing'])
@@ -253,8 +245,6 @@ export default function StudyPage() {
     </main>
   )
 
-  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
-
   return (
     <main style={{
       minHeight: '100vh',
@@ -437,97 +427,88 @@ export default function StudyPage() {
       </div>
 
       {showFolderSheet && (
-        <OverlayPortal>
-          <style>{GLASS_BTN_PRESS_CSS}</style>
-          <div onClick={() => setShowFolderSheet(false)} style={glassDimStyle(isDark)} />
-          <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
-            <div style={glassGrabberStyle(isDark)} />
-            <div style={glassSheetScrollStyle()}>
-            <h3 style={{ ...glassSheetTitleStyle(isDark), textAlign: 'center' }}>
-              {selectedMode === 'review' ? t.home.reviewStart : t.study.selectFolder}
-            </h3>
-            <p style={{ ...glassSheetDescStyle(isDark), textAlign: 'center' }}>
-              {selectedMode === 'review' ? (lang === 'en' ? 'Which words to review?' : '어떤 단어를 복습할까요?') : t.study.selectFolderDesc}
-            </p>
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-              <button
-                onClick={() => setDirection('word-to-meaning')}
-                style={{
-                  flex: 1, height: '40px', borderRadius: '10px', border: '1.5px solid',
-                  borderColor: direction === 'word-to-meaning' ? 'var(--color-my)' : 'var(--color-border)',
-                  background: direction === 'word-to-meaning' ? 'var(--color-my)' : 'var(--color-surface-2)',
-                  color: direction === 'word-to-meaning' ? 'var(--color-my-contrast)' : 'var(--color-text-secondary)',
-                  fontSize: '13px', fontWeight: 600, cursor: 'pointer',
-                }}
-              >
-                {lang === 'en' ? 'Word → Meaning' : '단어 → 뜻'}
-              </button>
-              <button
-                onClick={() => setDirection('meaning-to-word')}
-                style={{
-                  flex: 1, height: '40px', borderRadius: '10px', border: '1.5px solid',
-                  borderColor: direction === 'meaning-to-word' ? 'var(--color-my)' : 'var(--color-border)',
-                  background: direction === 'meaning-to-word' ? 'var(--color-my)' : 'var(--color-surface-2)',
-                  color: direction === 'meaning-to-word' ? 'var(--color-my-contrast)' : 'var(--color-text-secondary)',
-                  fontSize: '13px', fontWeight: 600, cursor: 'pointer',
-                }}
-              >
-                {lang === 'en' ? 'Meaning → Word' : '뜻 → 단어'}
-              </button>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
-              <button onClick={() => handleStart()}
-                disabled={isStarting}
-                style={{ width: '100%', background: 'rgba(28,28,30,0.06)', borderRadius: '16px', padding: '14px 16px', border: '1.5px solid rgba(28,28,30,0.15)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textAlign: 'left' as const, opacity: isStarting ? 0.5 : 1 }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                    {selectedMode === 'review' ? (lang === 'en' ? 'Full Review' : '전체 복습') : t.study.allWords}
-                  </div>
-                  <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
-                    {selectedMode === 'review' ? (lang === 'en' ? 'Review all incorrect words' : '틀린 단어 전체를 복습해요') : t.study.allWordsDesc}
-                  </div>
-                </div>
-              </button>
-              {loadingFolders ? (
-                <div style={{ textAlign: 'center', padding: '20px', color: 'var(--color-text-secondary)', fontSize: '14px' }}>불러오는 중...</div>
-              ) : folders.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '32px 0' }}>
-                  <div style={{ fontSize: '36px', marginBottom: '12px' }}>📚</div>
-                  <p style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>{t.study.noWords}</p>
-                  <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>{t.study.noWordsDesc}</p>
-                  <button onClick={() => { setShowFolderSheet(false); router.push('/vocabulary') }}
-                    style={{ padding: '10px 24px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '20px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
-                    {t.vocab.createFolder}
-                  </button>
-                </div>
-              ) : (
-                folders.map(folder => (
-                  <button key={folder.id}
-                    onClick={() => (folder.word_count || 0) > 0 ? handleStart(folder.id) : undefined}
-                    disabled={isStarting}
-                    style={{ width: '100%', background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '12px', cursor: (folder.word_count || 0) === 0 ? 'not-allowed' : 'pointer', textAlign: 'left' as const, opacity: isStarting ? 0.5 : ((folder.word_count || 0) === 0 ? 0.4 : 1) }}>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{folder.name}</div>
-                      <div style={{ fontSize: '12px', color: (folder.word_count || 0) === 0 ? '#E24B4A' : 'var(--color-text-secondary)', marginTop: '2px' }}>
-                        {(folder.word_count || 0) === 0 ? t.home.noWord : (lang === 'en' ? `${folder.word_count} words` : `${folder.word_count}개 단어`)}
-                      </div>
-                    </div>
-                  </button>
-                ))
-              )}
-            </div>
-            </div>
-            <div style={glassSheetFooterStyle()}>
-              <button
-                className="no-press-anim glass-press"
-                onClick={() => setShowFolderSheet(false)}
-                style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
-              >
-                {t.common.cancel}
-              </button>
-            </div>
+        <CenterModal
+          onClose={() => setShowFolderSheet(false)}
+          title={selectedMode === 'review' ? t.home.reviewStart : t.study.selectFolder}
+          description={selectedMode === 'review' ? (lang === 'en' ? 'Which words to review?' : '어떤 단어를 복습할까요?') : t.study.selectFolderDesc}
+          footer={
+            <button
+              className="no-press-anim glass-press"
+              onClick={() => setShowFolderSheet(false)}
+              style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
+            >
+              {t.common.cancel}
+            </button>
+          }
+        >
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+            <button
+              onClick={() => setDirection('word-to-meaning')}
+              style={{
+                flex: 1, height: '40px', borderRadius: '10px', border: '1.5px solid',
+                borderColor: direction === 'word-to-meaning' ? 'var(--color-my)' : 'var(--color-border)',
+                background: direction === 'word-to-meaning' ? 'var(--color-my)' : 'var(--color-surface-2)',
+                color: direction === 'word-to-meaning' ? 'var(--color-my-contrast)' : 'var(--color-text-secondary)',
+                fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+              }}
+            >
+              {lang === 'en' ? 'Word → Meaning' : '단어 → 뜻'}
+            </button>
+            <button
+              onClick={() => setDirection('meaning-to-word')}
+              style={{
+                flex: 1, height: '40px', borderRadius: '10px', border: '1.5px solid',
+                borderColor: direction === 'meaning-to-word' ? 'var(--color-my)' : 'var(--color-border)',
+                background: direction === 'meaning-to-word' ? 'var(--color-my)' : 'var(--color-surface-2)',
+                color: direction === 'meaning-to-word' ? 'var(--color-my-contrast)' : 'var(--color-text-secondary)',
+                fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+              }}
+            >
+              {lang === 'en' ? 'Meaning → Word' : '뜻 → 단어'}
+            </button>
           </div>
-        </OverlayPortal>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
+            <button onClick={() => handleStart()}
+              disabled={isStarting}
+              style={{ width: '100%', background: 'rgba(28,28,30,0.06)', borderRadius: '16px', padding: '14px 16px', border: '1.5px solid rgba(28,28,30,0.15)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textAlign: 'left' as const, opacity: isStarting ? 0.5 : 1 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                  {selectedMode === 'review' ? (lang === 'en' ? 'Full Review' : '전체 복습') : t.study.allWords}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
+                  {selectedMode === 'review' ? (lang === 'en' ? 'Review all incorrect words' : '틀린 단어 전체를 복습해요') : t.study.allWordsDesc}
+                </div>
+              </div>
+            </button>
+            {loadingFolders ? (
+              <div style={{ textAlign: 'center', padding: '20px', color: 'var(--color-text-secondary)', fontSize: '14px' }}>불러오는 중...</div>
+            ) : folders.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '32px 0' }}>
+                <div style={{ fontSize: '36px', marginBottom: '12px' }}>📚</div>
+                <p style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>{t.study.noWords}</p>
+                <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px' }}>{t.study.noWordsDesc}</p>
+                <button onClick={() => { setShowFolderSheet(false); router.push('/vocabulary') }}
+                  style={{ padding: '10px 24px', background: 'var(--color-neutral)', color: 'var(--color-neutral-contrast)', border: 'none', borderRadius: '20px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
+                  {t.vocab.createFolder}
+                </button>
+              </div>
+            ) : (
+              folders.map(folder => (
+                <button key={folder.id}
+                  onClick={() => (folder.word_count || 0) > 0 ? handleStart(folder.id) : undefined}
+                  disabled={isStarting}
+                  style={{ width: '100%', background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '12px', cursor: (folder.word_count || 0) === 0 ? 'not-allowed' : 'pointer', textAlign: 'left' as const, opacity: isStarting ? 0.5 : ((folder.word_count || 0) === 0 ? 0.4 : 1) }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{folder.name}</div>
+                    <div style={{ fontSize: '12px', color: (folder.word_count || 0) === 0 ? '#E24B4A' : 'var(--color-text-secondary)', marginTop: '2px' }}>
+                      {(folder.word_count || 0) === 0 ? t.home.noWord : (lang === 'en' ? `${folder.word_count} words` : `${folder.word_count}개 단어`)}
+                    </div>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        </CenterModal>
       )}
 
       {helpMode && (

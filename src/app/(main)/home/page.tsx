@@ -12,21 +12,13 @@ import Coachmark from '@/components/ui/Coachmark'
 import DailyGoalModal from '@/components/DailyGoalModal'
 import { showToast } from '@/components/ui/Toast'
 import { useTranslation } from '@/lib/i18n'
-import OverlayPortal from '@/components/ui/OverlayPortal'
-import {
-  GLASS_BTN_PRESS_CSS,
-  glassBottomSheetStyle,
-  glassButtonSecondary,
-  glassDimStyle,
-  glassGrabberStyle,
-  glassSheetDescStyle,
-  glassSheetFooterStyle,
-  glassSheetScrollStyle,
-  glassSheetTitleStyle,
-} from '@/lib/glassModalStyles'
+import CenterModal from '@/components/ui/CenterModal'
+import { useIsDark } from '@/hooks/useIsDark'
+import { glassButtonSecondary } from '@/lib/glassModalStyles'
 
 export default function HomePage() {
   const router = useRouter()
+  const isDark = useIsDark()
   const { t, lang } = useTranslation()
   const MONTHS_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
   const [user, setUser] = useState<any>(null)
@@ -308,8 +300,6 @@ export default function HomePage() {
       `}</style>
     </main>
   )
-
-  const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
 
   return (
     <main style={{
@@ -723,52 +713,47 @@ export default function HomePage() {
       </div>
       </PullToRefresh>
       {showSpeedSheet && (
-        <OverlayPortal>
-          <style>{GLASS_BTN_PRESS_CSS}</style>
-          <div onClick={() => setShowSpeedSheet(false)} style={glassDimStyle(isDark)} />
-          <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
-            <div style={glassGrabberStyle(isDark)} />
-            <div style={glassSheetScrollStyle()}>
-            <h3 style={{ ...glassSheetTitleStyle(isDark), textAlign: 'center' }}>{t.study.selectFolder}</h3>
-            <p style={{ ...glassSheetDescStyle(isDark), textAlign: 'center' }}>{t.study.selectFolderDesc}</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '4px' }}>
-              <button onClick={() => { setShowSpeedSheet(false); router.push('/study/speed') }}
-                style={{ width: '100%', background: 'rgba(28,28,30,0.06)', borderRadius: '16px', padding: '14px 16px', border: '1.5px solid rgba(28,28,30,0.12)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textAlign: 'left' as const }}>
-                <div style={{ width: '42px', height: '42px', borderRadius: '13px', background: 'rgba(28,28,30,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>📚</div>
+        <CenterModal
+          onClose={() => setShowSpeedSheet(false)}
+          title={t.study.selectFolder}
+          description={t.study.selectFolderDesc}
+          footer={
+            <button
+              className="no-press-anim glass-press"
+              onClick={() => setShowSpeedSheet(false)}
+              style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
+            >
+              {t.common.cancel}
+            </button>
+          }
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '4px' }}>
+            <button onClick={() => { setShowSpeedSheet(false); router.push('/study/speed') }}
+              style={{ width: '100%', background: 'rgba(28,28,30,0.06)', borderRadius: '16px', padding: '14px 16px', border: '1.5px solid rgba(28,28,30,0.12)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textAlign: 'left' as const }}>
+              <div style={{ width: '42px', height: '42px', borderRadius: '13px', background: 'rgba(28,28,30,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>📚</div>
+              <div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{t.study.allWords}</div>
+                <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>{t.study.allWordsDesc}</div>
+              </div>
+            </button>
+            {speedFolders.map(f => (
+              <button key={f.id}
+                onClick={() => { setShowSpeedSheet(false); router.push(`/study/speed?folderId=${f.id}`) }}
+                disabled={f.word_count === 0}
+                style={{ width: '100%', background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '12px', cursor: f.word_count === 0 ? 'not-allowed' : 'pointer', textAlign: 'left' as const, opacity: f.word_count === 0 ? 0.4 : 1 }}>
+                <div style={{ width: '42px', height: '42px', borderRadius: '13px', background: f.color ? `${f.color}60` : 'rgba(28,28,30,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>
+                  {f.icon || '📚'}
+                </div>
                 <div>
-                  <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{t.study.allWords}</div>
-                  <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>{t.study.allWordsDesc}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{f.name}</div>
+                  <div style={{ fontSize: '12px', color: f.word_count === 0 ? '#E24B4A' : 'var(--color-text-secondary)' }}>
+                    {f.word_count === 0 ? t.home.noWord : t.home.wordCount.replace('{count}', String(f.word_count))}
+                  </div>
                 </div>
               </button>
-              {speedFolders.map(f => (
-                <button key={f.id}
-                  onClick={() => { setShowSpeedSheet(false); router.push(`/study/speed?folderId=${f.id}`) }}
-                  disabled={f.word_count === 0}
-                  style={{ width: '100%', background: 'var(--color-surface)', borderRadius: '16px', padding: '14px 16px', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '12px', cursor: f.word_count === 0 ? 'not-allowed' : 'pointer', textAlign: 'left' as const, opacity: f.word_count === 0 ? 0.4 : 1 }}>
-                  <div style={{ width: '42px', height: '42px', borderRadius: '13px', background: f.color ? `${f.color}60` : 'rgba(28,28,30,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>
-                    {f.icon || '📚'}
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{f.name}</div>
-                    <div style={{ fontSize: '12px', color: f.word_count === 0 ? '#E24B4A' : 'var(--color-text-secondary)' }}>
-                      {f.word_count === 0 ? t.home.noWord : t.home.wordCount.replace('{count}', String(f.word_count))}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-            </div>
-            <div style={glassSheetFooterStyle()}>
-              <button
-                className="no-press-anim glass-press"
-                onClick={() => setShowSpeedSheet(false)}
-                style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
-              >
-                {t.common.cancel}
-              </button>
-            </div>
+            ))}
           </div>
-        </OverlayPortal>
+        </CenterModal>
       )}
       {showGoalModal && (
         <DailyGoalModal
