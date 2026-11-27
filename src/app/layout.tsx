@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import TimeTracker from '@/components/providers/TimeTracker'
+import NativeAuthListener from '@/components/NativeAuthListener'
 import { TranslationProvider } from '@/lib/i18n'
 
 import './globals.css'
@@ -46,6 +47,7 @@ export default function RootLayout({
         <ThemeProvider>
           <TranslationProvider>
             <TimeTracker />
+            <NativeAuthListener />
             {children}
           </TranslationProvider>
         </ThemeProvider>

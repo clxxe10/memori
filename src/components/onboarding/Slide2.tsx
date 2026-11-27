@@ -1,8 +1,8 @@
 'use client'
 import { useEffect, useState, type ReactNode } from 'react'
-import { Browser } from '@capacitor/browser'
 import { ChevronLeft, ChevronRight, Eye, EyeOff, Mail } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { signInWithProvider } from '@/lib/oauth'
 import { useTranslation } from '@/lib/i18n'
 import { useKeyboard } from '@/hooks/useKeyboard'
 import {
@@ -29,6 +29,8 @@ interface Props {
   setEmail: (v: string) => void
   name: string
   setName: (v: string) => void
+  initialError?: string
+  onClearInitialError?: () => void
 }
 
 type Stage = 'select' | 'method' | 'email' | 'password'
@@ -124,14 +126,17 @@ function WordCardsIllust({ photoLabel }: { photoLabel: string }) {
   )
 }
 
-export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name }: Props) {
+export default function Slide2({
+  onNext, onBack, onLogin, email, setEmail, name,
+  initialError, onClearInitialError,
+}: Props) {
   const { t, lang } = useTranslation()
   const { keyboardHeight, isKeyboardOpen } = useKeyboard()
-  const [mode, setMode] = useState<'select' | 'signup' | 'login'>('select')
+  const [mode, setMode] = useState<'select' | 'signup' | 'login'>(initialError ? 'signup' : 'select')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError] = useState(initialError || '')
   const [emailStep, setEmailStep] = useState<'method' | 'email' | 'password'>('method')
   const [stepDir, setStepDir] = useState<'forward' | 'back'>('forward')
   const [emailFocused, setEmailFocused] = useState(false)
@@ -143,6 +148,14 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
     document.head.appendChild(style)
     return () => { document.head.removeChild(style) }
   }, [])
+
+  useEffect(() => {
+    if (!initialError) return
+    setError(initialError)
+    setMode('signup')
+    setEmailStep('method')
+    onClearInitialError?.()
+  }, [initialError, onClearInitialError])
 
   const stage: Stage = mode === 'select'
     ? 'select'
@@ -199,49 +212,23 @@ export default function Slide2({ onNext, onBack, onLogin, email, setEmail, name 
     } finally { setLoading(false) }
   }
 
-  const handleGoogle = async () => {
-    const supabase = createClient()
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: 'https://memori-seven.vercel.app/auth/callback',
-        skipBrowserRedirect: true,
-      }
-    })
-    if (error || !data?.url) return
-    await Browser.open({ url: data.url, windowName: '_self' })
-  }
-
-  const handleKakao = async () => {
-    const supabase = createClient()
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'kakao',
-      options: {
-        redirectTo: 'https://memori-seven.vercel.app/auth/callback',
-        scopes: 'profile_nickname profile_image',
-        skipBrowserRedirect: true,
-      }
-    })
-    if (error || !data?.url) return
-    await Browser.open({ url: data.url, windowName: '_self' })
-  }
-
-  const handleApple = async () => {
+  const handleOAuth = async (provider: 'google' | 'kakao' | 'apple') => {
+    setError('')
+    setLoading(true)
     try {
-      const supabase = createClient()
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'apple',
-        options: {
-          redirectTo: 'https://memori-seven.vercel.app/auth/callback',
-          skipBrowserRedirect: true,
-        }
-      })
-      if (error || !data?.url) return
-      await Browser.open({ url: data.url, windowName: '_self' })
+      await signInWithProvider(provider)
     } catch (e) {
-      console.error('Apple 로그인 실패:', e)
+      console.error(`${provider} 로그인 실패:`, e)
+      const msg = e instanceof Error ? e.message : (lang === 'en' ? 'Sign-in failed. Please try again.' : '로그인에 실패했어요. 다시 시도해주세요.')
+      setError(msg)
+    } finally {
+      setLoading(false)
     }
   }
+
+  const handleGoogle = () => { void handleOAuth('google') }
+  const handleKakao = () => { void handleOAuth('kakao') }
+  const handleApple = () => { void handleOAuth('apple') }
 
   const handleBack = () => {
     if (emailStep === 'password') { goBack(() => { setEmailStep('email'); setError('') }) }

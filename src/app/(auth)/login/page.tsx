@@ -36,24 +36,22 @@ export default function LoginPage() {
     router.push('/home')
   }
 
-  const handleGoogle = async () => {
-    const supabase = createClient()
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` }
-    })
+  const handleOAuth = async (provider: 'google' | 'kakao') => {
+    setError('')
+    setLoading(true)
+    try {
+      const { signInWithProvider } = await import('@/lib/oauth')
+      await signInWithProvider(provider)
+    } catch (e) {
+      console.error(`${provider} 로그인 실패:`, e)
+      setError(e instanceof Error ? e.message : '로그인에 실패했어요. 다시 시도해주세요.')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleKakao = async () => {
-    const supabase = createClient()
-    await supabase.auth.signInWithOAuth({
-      provider: 'kakao',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-        scopes: 'profile_nickname profile_image',
-      }
-    })
-  }
+  const handleGoogle = () => { void handleOAuth('google') }
+  const handleKakao = () => { void handleOAuth('kakao') }
 
   const inputStyle = {
     width: '100%',

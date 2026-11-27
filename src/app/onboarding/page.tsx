@@ -11,12 +11,27 @@ import { onboardingDarkVars, onboardingLightVars } from '@/lib/onboardingBtnStyl
 function OnboardingContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const initialStep = Number(searchParams.get('step')) || 1
-  const [step, setStep] = useState(Math.min(initialStep, 5))
+  const oauthErrorParam = searchParams.get('oauth_error')
+  const initialStep = oauthErrorParam
+    ? 2
+    : Math.min(Number(searchParams.get('step')) || 1, 5)
+  const [step, setStep] = useState(initialStep)
   const [direction, setDirection] = useState<'forward' | 'back'>('forward')
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
+  const [oauthError, setOauthError] = useState(oauthErrorParam || '')
   const [themeVars, setThemeVars] = useState<Record<string, string>>(onboardingLightVars)
+
+  useEffect(() => {
+    if (!oauthErrorParam) return
+    setOauthError(oauthErrorParam)
+    setStep(2)
+    try {
+      sessionStorage.removeItem('oauth_error')
+    } catch {
+      // ignore
+    }
+  }, [oauthErrorParam])
 
   useEffect(() => {
     const apply = () => {
@@ -78,6 +93,8 @@ function OnboardingContent() {
             setEmail={setEmail}
             name={name}
             setName={setName}
+            initialError={oauthError}
+            onClearInitialError={() => setOauthError('')}
           />
         )}
         {step === 3 && (

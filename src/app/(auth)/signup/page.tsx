@@ -52,11 +52,17 @@ export default function SignupPage() {
   }
 
   const handleGoogle = async () => {
-    const supabase = createClient()
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` }
-    })
+    setError('')
+    setLoading(true)
+    try {
+      const { signInWithProvider } = await import('@/lib/oauth')
+      await signInWithProvider('google')
+    } catch (e) {
+      console.error('Google 로그인 실패:', e)
+      setError(e instanceof Error ? e.message : '로그인에 실패했어요. 다시 시도해주세요.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const inputStyle = {
