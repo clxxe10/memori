@@ -147,6 +147,7 @@ export default function VocabularyDetailPage() {
   const padding = usePagePadding()
   const bp = useBreakpoint()
   const { t, lang } = useTranslation()
+  const isDark = useIsDark()
 
   const [folder, setFolder] = useState<Folder | null>(null)
   const [words, setWords] = useState<Word[]>([])
@@ -379,8 +380,6 @@ export default function VocabularyDetailPage() {
     if (diff === 'easy') return { bg: 'rgba(52,199,89,0.10)', color: '#1A7F3C', label: lang === 'en' ? 'Easy' : '잘 알아요' }
     return { bg: 'rgba(142,142,147,0.10)', color: 'var(--color-text-secondary)', label: lang === 'en' ? 'Normal' : '보통' }
   }
-
-  const isDark = useIsDark()
 
   return (
     <main style={{

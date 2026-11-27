@@ -55,6 +55,7 @@ type Folder = {
 export default function VocabularyPage() {
   const router = useRouter()
   const { t, lang } = useTranslation()
+  const isDark = useIsDark()
   const [folders, setFolders] = useState<Folder[]>([])
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -244,8 +245,6 @@ export default function VocabularyPage() {
       </button>
     </main>
   )
-
-  const isDark = useIsDark()
 
   return (
     <main
