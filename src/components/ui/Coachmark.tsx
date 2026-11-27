@@ -129,7 +129,7 @@ export default function Coachmark({ id, targetRef, text, placement = 'bottom' }:
           position: 'fixed',
           inset: 0,
           background: 'transparent',
-          zIndex: 300,
+          zIndex: 'var(--z-coachmark)' as unknown as number,
           visibility: ready ? 'visible' : 'hidden',
         }}
       />
@@ -144,7 +144,7 @@ export default function Coachmark({ id, targetRef, text, placement = 'bottom' }:
           width: 'min(280px, calc(100vw - 32px))',
           maxWidth: 'min(280px, calc(100vw - 32px))',
           boxSizing: 'border-box',
-          zIndex: 301,
+          zIndex: 'var(--z-coachmark)' as unknown as number,
           padding: '14px 16px',
           ...glassCoachmarkStyle(isDark),
           visibility: ready ? 'visible' : 'hidden',

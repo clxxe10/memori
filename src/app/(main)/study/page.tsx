@@ -10,12 +10,15 @@ import { usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import { useTranslation } from '@/lib/i18n'
 import { showAlert } from '@/components/ui/AlertHost'
+import OverlayPortal from '@/components/ui/OverlayPortal'
 import {
   glassBottomSheetStyle,
   glassButtonSecondary,
   glassDimStyle,
   glassGrabberStyle,
   glassSheetDescStyle,
+  glassSheetFooterStyle,
+  glassSheetScrollStyle,
   glassSheetTitleStyle,
   GLASS_BTN_PRESS_CSS,
 } from '@/lib/glassModalStyles'
@@ -434,11 +437,12 @@ export default function StudyPage() {
       </div>
 
       {showFolderSheet && (
-        <>
+        <OverlayPortal>
           <style>{GLASS_BTN_PRESS_CSS}</style>
-          <div onClick={() => setShowFolderSheet(false)} style={glassDimStyle(isDark, 199)} />
-          <div className="glass-surface" style={glassBottomSheetStyle(isDark, { zIndex: 200, maxHeight: '70vh' })}>
+          <div onClick={() => setShowFolderSheet(false)} style={glassDimStyle(isDark)} />
+          <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
             <div style={glassGrabberStyle(isDark)} />
+            <div style={glassSheetScrollStyle()}>
             <h3 style={{ ...glassSheetTitleStyle(isDark), textAlign: 'center' }}>
               {selectedMode === 'review' ? t.home.reviewStart : t.study.selectFolder}
             </h3>
@@ -512,15 +516,18 @@ export default function StudyPage() {
                 ))
               )}
             </div>
-            <button
-              className="no-press-anim glass-press"
-              onClick={() => setShowFolderSheet(false)}
-              style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
-            >
-              {t.common.cancel}
-            </button>
+            </div>
+            <div style={glassSheetFooterStyle()}>
+              <button
+                className="no-press-anim glass-press"
+                onClick={() => setShowFolderSheet(false)}
+                style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
+              >
+                {t.common.cancel}
+              </button>
+            </div>
           </div>
-        </>
+        </OverlayPortal>
       )}
 
       {helpMode && (

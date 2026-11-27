@@ -2,12 +2,15 @@
 import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n'
+import OverlayPortal from '@/components/ui/OverlayPortal'
 import {
   GLASS_BTN_PRESS_CSS,
   glassBottomSheetStyle,
   glassButtonSecondary,
   glassDimStyle,
   glassGrabberStyle,
+  glassSheetFooterStyle,
+  glassSheetScrollStyle,
   glassSheetTitleStyle,
 } from '@/lib/glassModalStyles'
 
@@ -185,69 +188,67 @@ export default function HelpSheet({ mode, onClose }: Props) {
   if (!content) return null
 
   return (
-    <>
+    <OverlayPortal>
       <style>{GLASS_BTN_PRESS_CSS}</style>
-      <div onClick={onClose} style={glassDimStyle(isDark, 999)} />
-      <div
-        className="glass-surface"
-        style={glassBottomSheetStyle(isDark, {
-          zIndex: 1000,
-          maxHeight: '75vh',
-        })}
-      >
+      <div onClick={onClose} style={glassDimStyle(isDark)} />
+      <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
         <div style={glassGrabberStyle(isDark)} />
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-          <h3 style={{ ...glassSheetTitleStyle(isDark), margin: 0 }}>
-            {content.title} {lang === 'en' ? 'Guide' : '사용법'}
-          </h3>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>
-            <X size={20} color="var(--color-text-secondary)" />
-          </button>
-        </div>
+        <div style={glassSheetScrollStyle()}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <h3 style={{ ...glassSheetTitleStyle(isDark), margin: 0 }}>
+              {content.title} {lang === 'en' ? 'Guide' : '사용법'}
+            </h3>
+            <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>
+              <X size={20} color="var(--color-text-secondary)" />
+            </button>
+          </div>
 
-        <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '10px', letterSpacing: '0.3px' }}>
-          {lang === 'en' ? 'How to Use' : '사용 방법'}
-        </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
-          {content.steps.map((step, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-              <div style={{
-                width: '22px', height: '22px', borderRadius: '50%',
-                background: 'var(--color-text-primary)', color: 'var(--color-bg)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '11px', fontWeight: 700, flexShrink: 0,
-              }}>{i + 1}</div>
-              <p style={{ fontSize: '14px', color: 'var(--color-text-primary)', lineHeight: 1.5, margin: 0, paddingTop: '2px' }}>{step}</p>
-            </div>
-          ))}
-        </div>
-
-        <div style={{
-          background: isDark ? 'rgba(120,120,128,0.2)' : 'rgba(120,120,128,0.12)',
-          borderRadius: '14px', padding: '14px 16px',
-          marginBottom: '16px',
-        }}>
           <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '10px', letterSpacing: '0.3px' }}>
-            {lang === 'en' ? '💡 Tips' : '💡 꿀팁'}
+            {lang === 'en' ? 'How to Use' : '사용 방법'}
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {content.tips.map((tip, i) => (
-              <div key={i} style={{ display: 'flex', gap: '8px' }}>
-                <span style={{ color: 'var(--color-text-tertiary)', flexShrink: 0 }}>•</span>
-                <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: 0 }}>{tip}</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
+            {content.steps.map((step, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                <div style={{
+                  width: '22px', height: '22px', borderRadius: '50%',
+                  background: 'var(--color-text-primary)', color: 'var(--color-bg)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '11px', fontWeight: 700, flexShrink: 0,
+                }}>{i + 1}</div>
+                <p style={{ fontSize: '14px', color: 'var(--color-text-primary)', lineHeight: 1.5, margin: 0, paddingTop: '2px' }}>{step}</p>
               </div>
             ))}
           </div>
+
+          <div style={{
+            background: isDark ? 'rgba(120,120,128,0.2)' : 'rgba(120,120,128,0.12)',
+            borderRadius: '14px', padding: '14px 16px',
+            marginBottom: '4px',
+          }}>
+            <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '10px', letterSpacing: '0.3px' }}>
+              {lang === 'en' ? '💡 Tips' : '💡 꿀팁'}
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {content.tips.map((tip, i) => (
+                <div key={i} style={{ display: 'flex', gap: '8px' }}>
+                  <span style={{ color: 'var(--color-text-tertiary)', flexShrink: 0 }}>•</span>
+                  <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', lineHeight: 1.5, margin: 0 }}>{tip}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
-        <button
-          className="no-press-anim glass-press"
-          onClick={onClose}
-          style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
-        >
-          {t.common.confirm}
-        </button>
+        <div style={glassSheetFooterStyle()}>
+          <button
+            className="no-press-anim glass-press"
+            onClick={onClose}
+            style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
+          >
+            {t.common.confirm}
+          </button>
+        </div>
       </div>
-    </>
+    </OverlayPortal>
   )
 }

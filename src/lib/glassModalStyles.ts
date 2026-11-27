@@ -123,8 +123,11 @@ export const GLASS_BTN_PRESS_CSS = `
   }
 `
 
-/** Dim overlay behind modals / sheets */
-export function glassDimStyle(isDark: boolean, zIndex = 200): CSSProperties {
+/** Dim overlay behind modals / sheets — covers full viewport including tab bar */
+export function glassDimStyle(
+  isDark: boolean,
+  zIndex: number | string = 'var(--z-overlay-dim)',
+): CSSProperties {
   return {
     position: 'fixed',
     inset: 0,
@@ -133,10 +136,10 @@ export function glassDimStyle(isDark: boolean, zIndex = 200): CSSProperties {
   }
 }
 
-/** Flex-centered fullscreen overlay host */
+/** Flex-centered fullscreen overlay host (Alert / DailyGoal) */
 export function glassOverlayStyle(isDark: boolean): CSSProperties {
   return {
-    ...glassDimStyle(isDark, 9999),
+    ...glassDimStyle(isDark, 'var(--z-overlay-dim)'),
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -168,7 +171,7 @@ export function glassFixedPanelStyle(
     maxWidth?: string
     maxHeight?: string
     overflowY?: CSSProperties['overflowY']
-    zIndex?: number
+    zIndex?: number | string
     padding?: string
   },
 ): CSSProperties {
@@ -177,7 +180,7 @@ export function glassFixedPanelStyle(
     left: '50%',
     top: '50%',
     transform: 'translate(-50%, -50%)',
-    zIndex: opts?.zIndex ?? 201,
+    zIndex: opts?.zIndex ?? 'var(--z-overlay)',
     padding: opts?.padding ?? '28px 20px 20px',
     boxSizing: 'border-box',
     ...glassPanelStyle(isDark, {
@@ -192,24 +195,45 @@ export function glassFixedPanelStyle(
 
 /**
  * iOS 26 floating sheet — inset from screen edges, all corners rounded.
- * (replaces edge-stuck bottom sheets)
+ * Outer shell is flex column; put scrollable content in glassSheetScrollStyle().
  */
 export function glassBottomSheetStyle(
   isDark: boolean,
-  opts?: { zIndex?: number; padding?: string; maxHeight?: string },
+  opts?: { zIndex?: number | string; padding?: string; maxHeight?: string },
 ): CSSProperties {
   return {
     position: 'fixed',
     left: '10px',
     right: '10px',
     bottom: 'calc(10px + env(safe-area-inset-bottom, 0px))',
-    zIndex: opts?.zIndex ?? 201,
-    maxHeight: opts?.maxHeight ?? '85vh',
-    overflowY: 'auto',
+    zIndex: opts?.zIndex ?? 'var(--z-overlay)',
+    maxHeight: opts?.maxHeight ?? 'calc(100dvh - env(safe-area-inset-top, 0px) - 40px)',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
     padding: opts?.padding ?? '20px',
     boxSizing: 'border-box',
     ...glassSurfaceStyle(isDark, { borderRadius: '32px' }),
     animation: 'glassSheetUp 0.3s cubic-bezier(0.32, 0.72, 0, 1) both',
+  }
+}
+
+/** Scrollable region inside a floating sheet */
+export function glassSheetScrollStyle(): CSSProperties {
+  return {
+    flex: 1,
+    minHeight: 0,
+    overflowY: 'auto',
+    overscrollBehavior: 'contain',
+    WebkitOverflowScrolling: 'touch',
+  }
+}
+
+/** Sticky footer (primary actions) inside a floating sheet */
+export function glassSheetFooterStyle(): CSSProperties {
+  return {
+    flexShrink: 0,
+    paddingTop: '12px',
   }
 }
 
@@ -220,6 +244,7 @@ export function glassGrabberStyle(isDark: boolean): CSSProperties {
     borderRadius: '999px',
     background: isDark ? 'rgba(235,235,245,0.3)' : 'rgba(60,60,67,0.3)',
     margin: '0 auto 14px',
+    flexShrink: 0,
   }
 }
 
@@ -297,11 +322,11 @@ export function glassInputLabelStyle(): CSSProperties {
 /** Floating popover / action menu */
 export function glassPopoverStyle(
   isDark: boolean,
-  opts?: { width?: string; zIndex?: number },
+  opts?: { width?: string; zIndex?: number | string },
 ): CSSProperties {
   return {
     position: 'fixed',
-    zIndex: opts?.zIndex ?? 301,
+    zIndex: opts?.zIndex ?? 'var(--z-overlay)',
     width: opts?.width ?? '220px',
     overflow: 'hidden',
     ...glassSurfaceStyle(isDark, { borderRadius: '18px' }),

@@ -47,6 +47,7 @@ import { showToast } from '@/components/ui/Toast'
 import { showAlert } from '@/components/ui/AlertHost'
 import { useTranslation } from '@/lib/i18n'
 import AlertModal from '@/components/AlertModal'
+import OverlayPortal from '@/components/ui/OverlayPortal'
 import {
   GLASS_BTN_PRESS_CSS,
   glassBottomSheetStyle,
@@ -55,6 +56,8 @@ import {
   glassGrabberStyle,
   glassPopoverItemStyle,
   glassPopoverStyle,
+  glassSheetFooterStyle,
+  glassSheetScrollStyle,
 } from '@/lib/glassModalStyles'
 
 type Folder = {
@@ -446,13 +449,13 @@ export default function PublicFolderPage() {
 
       {/* ⋯ 팝오버 메뉴 */}
       {showMoreMenu && (
-        <>
+        <OverlayPortal>
           <style>{GLASS_BTN_PRESS_CSS}</style>
-          <div onClick={() => setShowMoreMenu(false)} style={glassDimStyle(isDark, 300)} />
+          <div onClick={() => setShowMoreMenu(false)} style={glassDimStyle(isDark)} />
           <div
             className="glass-surface"
             style={{
-              ...glassPopoverStyle(isDark, { zIndex: 301, width: '200px' }),
+              ...glassPopoverStyle(isDark, { width: '200px' }),
               top: 'max(72px, calc(env(safe-area-inset-top) + 52px))',
               right: '16px',
             }}
@@ -472,48 +475,52 @@ export default function PublicFolderPage() {
               {t.search.blockUser}
             </button>
           </div>
-        </>
+        </OverlayPortal>
       )}
 
       {/* 신고 사유 선택 */}
       {showReportSheet && (
-        <>
+        <OverlayPortal>
           <style>{GLASS_BTN_PRESS_CSS}</style>
-          <div onClick={() => setShowReportSheet(false)} style={glassDimStyle(isDark, 300)} />
-          <div className="glass-surface" style={glassBottomSheetStyle(isDark, { zIndex: 301 })}>
+          <div onClick={() => setShowReportSheet(false)} style={glassDimStyle(isDark)} />
+          <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
             <div style={glassGrabberStyle(isDark)} />
-            <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', margin: '0 0 6px', textAlign: 'center' }}>
-              {t.search.reportTitle}
-            </h3>
-            <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '0 0 16px', textAlign: 'center' }}>
-              {t.search.reportDesc}
-            </p>
-            {REPORT_REASONS.map((r, i) => (
+            <div style={glassSheetScrollStyle()}>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', margin: '0 0 6px', textAlign: 'center' }}>
+                {t.search.reportTitle}
+              </h3>
+              <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '0 0 16px', textAlign: 'center' }}>
+                {t.search.reportDesc}
+              </p>
+              {REPORT_REASONS.map((r, i) => (
+                <button
+                  key={r.key}
+                  type="button"
+                  disabled={actionBusy}
+                  onClick={() => handleReport(r.key)}
+                  style={{
+                    ...glassPopoverItemStyle({ last: i === REPORT_REASONS.length - 1, isDark }),
+                    opacity: actionBusy ? 0.6 : 1,
+                    cursor: actionBusy ? 'not-allowed' : 'pointer',
+                    padding: '0 4px',
+                  }}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+            <div style={glassSheetFooterStyle()}>
               <button
-                key={r.key}
                 type="button"
-                disabled={actionBusy}
-                onClick={() => handleReport(r.key)}
-                style={{
-                  ...glassPopoverItemStyle({ last: i === REPORT_REASONS.length - 1, isDark }),
-                  opacity: actionBusy ? 0.6 : 1,
-                  cursor: actionBusy ? 'not-allowed' : 'pointer',
-                  padding: '0 4px',
-                }}
+                className="no-press-anim glass-press"
+                onClick={() => setShowReportSheet(false)}
+                style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
               >
-                {r.label}
+                {t.common.cancel}
               </button>
-            ))}
-            <button
-              type="button"
-              className="no-press-anim glass-press"
-              onClick={() => setShowReportSheet(false)}
-              style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none', marginTop: '12px' }}
-            >
-              {t.common.cancel}
-            </button>
+            </div>
           </div>
-        </>
+        </OverlayPortal>
       )}
 
       {showBlockConfirm && (
@@ -530,11 +537,11 @@ export default function PublicFolderPage() {
 
       {/* 댓글 바텀시트 */}
       {showCommentSheet && (
-        <>
+        <OverlayPortal>
           <div className="comment-sheet-overlay" onClick={() => setShowCommentSheet(false)} />
           <div className="comment-sheet glass-surface">
             <div style={glassGrabberStyle(isDark)} />
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexShrink: 0 }}>
               <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', margin: 0 }}>
                 댓글 {comments.length}개
               </h3>
@@ -547,7 +554,7 @@ export default function PublicFolderPage() {
               </button>
             </div>
 
-            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px', minHeight: 0 }}>
+            <div style={{ flex: 1, overflowY: 'auto', overscrollBehavior: 'contain', display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px', minHeight: 0 }}>
               {comments.length === 0 ? (
                 <p style={{ fontSize: '13px', color: 'var(--color-text-tertiary)', textAlign: 'center', padding: '28px 0' }}>
                   첫 댓글을 남겨보세요 😊
@@ -585,7 +592,7 @@ export default function PublicFolderPage() {
               )}
             </div>
 
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
               <input
                 value={commentText}
                 onChange={e => setCommentText(e.target.value)}
@@ -615,7 +622,7 @@ export default function PublicFolderPage() {
               </button>
             </div>
           </div>
-        </>
+        </OverlayPortal>
       )}
     </main>
   )

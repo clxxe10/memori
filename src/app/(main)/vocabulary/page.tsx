@@ -31,6 +31,7 @@ import PullToRefresh from '@/components/ui/PullToRefresh'
 import Coachmark from '@/components/ui/Coachmark'
 import { useTranslation } from '@/lib/i18n'
 import { findBlockedInList } from '@/lib/contentFilter'
+import OverlayPortal from '@/components/ui/OverlayPortal'
 import {
   GLASS_BTN_PRESS_CSS,
   glassBottomSheetStyle,
@@ -39,6 +40,8 @@ import {
   glassGrabberStyle,
   glassInputLabelStyle,
   glassInputStyle,
+  glassSheetFooterStyle,
+  glassSheetScrollStyle,
   glassSheetTitleStyle,
 } from '@/lib/glassModalStyles'
 
@@ -113,16 +116,6 @@ export default function VocabularyPage() {
     window.addEventListener('focus', handleFocus)
     return () => window.removeEventListener('focus', handleFocus)
   }, [])
-
-  useEffect(() => {
-    const tabBar = document.getElementById('tab-bar')
-    if (tabBar) {
-      tabBar.style.display = showModal ? 'none' : ''
-    }
-    return () => {
-      if (tabBar) tabBar.style.display = ''
-    }
-  }, [showModal])
 
   const handleCreate = async () => {
     if (!newFolder.name.trim()) return
@@ -411,94 +404,97 @@ export default function VocabularyPage() {
           alignItems: 'center',
           justifyContent: 'center',
           boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-          zIndex: 40,
+          zIndex: 'var(--z-tab)' as unknown as number,
         }}
       >
         <Plus size={22} color="var(--color-text-primary)" />
       </button>
 
       {showModal && (
-        <>
+        <OverlayPortal>
           <style>{GLASS_BTN_PRESS_CSS}</style>
           <div onClick={() => setShowModal(false)} style={glassDimStyle(isDark)} />
           <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
             <div style={glassGrabberStyle(isDark)} />
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <h2 style={{ ...glassSheetTitleStyle(isDark), margin: 0 }}>{t.vocab.newFolder}</h2>
-              <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>
-                <X size={20} color="var(--color-text-secondary)" />
+            <div style={glassSheetScrollStyle()}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <h2 style={{ ...glassSheetTitleStyle(isDark), margin: 0 }}>{t.vocab.newFolder}</h2>
+                <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>
+                  <X size={20} color="var(--color-text-secondary)" />
+                </button>
+              </div>
+
+              <div style={{ marginBottom: '16px' }}>
+                <label style={glassInputLabelStyle()}>{t.vocab.folderName}</label>
+                <input value={newFolder.name} onChange={e => setNewFolder(f => ({ ...f, name: e.target.value }))}
+                  placeholder={lang === 'en' ? 'e.g. TOEIC Essential Words' : '예: 토익 필수 단어'}
+                  style={glassInputStyle(isDark)} />
+              </div>
+
+              <div style={{ marginBottom: '16px' }}>
+                <label style={glassInputLabelStyle()}>
+                  {t.vocab.folderDesc} <span style={{ fontWeight: 400, color: 'var(--color-text-tertiary)' }}>{lang === 'en' ? '(optional)' : '(선택)'}</span>
+                </label>
+                <input value={newFolder.description} onChange={e => setNewFolder(f => ({ ...f, description: e.target.value }))}
+                  placeholder={lang === 'en' ? 'Brief description' : '이 단어장에 대한 간단한 설명'}
+                  style={glassInputStyle(isDark)} />
+              </div>
+
+              <div style={{ marginBottom: '16px' }}>
+                <label style={glassInputLabelStyle()}>{t.vocab.category}</label>
+                <SelectDropdown
+                  variant="field"
+                  value={newFolder.category}
+                  onChange={val => setNewFolder(f => ({ ...f, category: val }))}
+                  options={[
+                    { value: '수능', label: lang === 'en' ? 'CSAT' : '수능' },
+                    { value: '토익', label: lang === 'en' ? 'TOEIC' : '토익' },
+                    { value: '일상', label: lang === 'en' ? 'Daily' : '일상' },
+                    { value: '비즈니스', label: lang === 'en' ? 'Business' : '비즈니스' },
+                    { value: '기타', label: lang === 'en' ? 'Other' : '기타' },
+                  ]}
+                  placeholder={lang === 'en' ? 'Select category' : '카테고리 선택'}
+                />
+              </div>
+
+              <div style={{
+                background: isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)',
+                borderRadius: '14px', height: '56px', padding: '0 14px',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                boxSizing: 'border-box',
+              }}>
+                <div>
+                  <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>{t.vocab.isPublic}</p>
+                  <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: '2px 0 0' }}>{t.vocab.isPublicDesc}</p>
+                </div>
+                <div onClick={() => setNewFolder(f => ({ ...f, is_public: !f.is_public }))} style={{
+                  width: '44px', height: '26px', borderRadius: '20px',
+                  background: newFolder.is_public ? 'var(--color-neutral)' : 'var(--color-track)',
+                  position: 'relative', cursor: 'pointer', flexShrink: 0,
+                }}>
+                  <div style={{
+                    width: '20px', height: '20px', borderRadius: '50%', background: '#fff',
+                    position: 'absolute', top: '3px', left: newFolder.is_public ? '21px' : '3px', transition: 'left 0.2s',
+                  }} />
+                </div>
+              </div>
+            </div>
+            <div style={glassSheetFooterStyle()}>
+              <button
+                className="no-press-anim glass-press"
+                onClick={handleCreate}
+                disabled={creating || !newFolder.name.trim()}
+                style={{
+                  ...glassButtonPrimary(isDark),
+                  width: '100%', flex: 'none',
+                  opacity: (creating || !newFolder.name.trim()) ? 0.5 : 1,
+                }}
+              >
+                {creating ? t.vocab.creating : t.vocab.createFolder}
               </button>
             </div>
-
-            <div style={{ marginBottom: '16px' }}>
-              <label style={glassInputLabelStyle()}>{t.vocab.folderName}</label>
-              <input value={newFolder.name} onChange={e => setNewFolder(f => ({ ...f, name: e.target.value }))}
-                placeholder={lang === 'en' ? 'e.g. TOEIC Essential Words' : '예: 토익 필수 단어'}
-                style={glassInputStyle(isDark)} />
-            </div>
-
-            <div style={{ marginBottom: '16px' }}>
-              <label style={glassInputLabelStyle()}>
-                {t.vocab.folderDesc} <span style={{ fontWeight: 400, color: 'var(--color-text-tertiary)' }}>{lang === 'en' ? '(optional)' : '(선택)'}</span>
-              </label>
-              <input value={newFolder.description} onChange={e => setNewFolder(f => ({ ...f, description: e.target.value }))}
-                placeholder={lang === 'en' ? 'Brief description' : '이 단어장에 대한 간단한 설명'}
-                style={glassInputStyle(isDark)} />
-            </div>
-
-            <div style={{ marginBottom: '16px' }}>
-              <label style={glassInputLabelStyle()}>{t.vocab.category}</label>
-              <SelectDropdown
-                variant="field"
-                value={newFolder.category}
-                onChange={val => setNewFolder(f => ({ ...f, category: val }))}
-                options={[
-                  { value: '수능', label: lang === 'en' ? 'CSAT' : '수능' },
-                  { value: '토익', label: lang === 'en' ? 'TOEIC' : '토익' },
-                  { value: '일상', label: lang === 'en' ? 'Daily' : '일상' },
-                  { value: '비즈니스', label: lang === 'en' ? 'Business' : '비즈니스' },
-                  { value: '기타', label: lang === 'en' ? 'Other' : '기타' },
-                ]}
-                placeholder={lang === 'en' ? 'Select category' : '카테고리 선택'}
-              />
-            </div>
-
-            <div style={{
-              background: isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)',
-              borderRadius: '14px', height: '56px', padding: '0 14px', marginBottom: '16px',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              boxSizing: 'border-box',
-            }}>
-              <div>
-                <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>{t.vocab.isPublic}</p>
-                <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: '2px 0 0' }}>{t.vocab.isPublicDesc}</p>
-              </div>
-              <div onClick={() => setNewFolder(f => ({ ...f, is_public: !f.is_public }))} style={{
-                width: '44px', height: '26px', borderRadius: '20px',
-                background: newFolder.is_public ? 'var(--color-neutral)' : 'var(--color-track)',
-                position: 'relative', cursor: 'pointer', flexShrink: 0,
-              }}>
-                <div style={{
-                  width: '20px', height: '20px', borderRadius: '50%', background: '#fff',
-                  position: 'absolute', top: '3px', left: newFolder.is_public ? '21px' : '3px', transition: 'left 0.2s',
-                }} />
-              </div>
-            </div>
-
-            <button
-              className="no-press-anim glass-press"
-              onClick={handleCreate}
-              disabled={creating || !newFolder.name.trim()}
-              style={{
-                ...glassButtonPrimary(isDark),
-                width: '100%', flex: 'none',
-                opacity: (creating || !newFolder.name.trim()) ? 0.5 : 1,
-              }}
-            >
-              {creating ? t.vocab.creating : t.vocab.createFolder}
-            </button>
           </div>
-        </>
+        </OverlayPortal>
       )}
       <Coachmark
         id="vocab"

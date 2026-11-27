@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '@/lib/i18n'
+import OverlayPortal from '@/components/ui/OverlayPortal'
 import {
   GLASS_BTN_PRESS_CSS,
   glassCircleBtnStyle,
@@ -80,6 +81,7 @@ export default function DailyGoalModal({ initialGoal, onSave, onTurnOff, onCance
   const secondaryFill = isDark ? 'rgba(120,120,128,0.32)' : 'rgba(120,120,128,0.16)'
 
   return (
+    <OverlayPortal>
     <div onClick={onCancel} style={glassOverlayStyle(isDark)}>
       <style>{`
         ${GLASS_BTN_PRESS_CSS}
@@ -94,6 +96,8 @@ export default function DailyGoalModal({ initialGoal, onSave, onTurnOff, onCance
         onClick={e => e.stopPropagation()}
         style={{
           ...glassPanelStyle(isDark),
+          position: 'relative',
+          zIndex: 'var(--z-overlay)' as unknown as number,
           padding: '24px 16px 16px',
           boxSizing: 'border-box',
         }}
@@ -245,5 +249,6 @@ export default function DailyGoalModal({ initialGoal, onSave, onTurnOff, onCance
         </div>
       </div>
     </div>
+    </OverlayPortal>
   )
 }

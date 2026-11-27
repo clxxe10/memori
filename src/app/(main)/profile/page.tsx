@@ -10,6 +10,7 @@ import { useBreakpoint } from '@/hooks/useBreakpoint'
 import AlertModal from '@/components/AlertModal'
 import DailyGoalModal from '@/components/DailyGoalModal'
 import { showAlert } from '@/components/ui/AlertHost'
+import OverlayPortal from '@/components/ui/OverlayPortal'
 import { showToast } from '@/components/ui/Toast'
 import { useTranslation } from '@/lib/i18n'
 import {
@@ -20,6 +21,8 @@ import {
   glassGrabberStyle,
   glassInputStyle,
   glassSheetDescStyle,
+  glassSheetFooterStyle,
+  glassSheetScrollStyle,
   glassSheetTitleStyle,
 } from '@/lib/glassModalStyles'
 
@@ -484,182 +487,190 @@ export default function ProfilePage() {
 
       {/* 테마 플로팅 시트 */}
       {showThemeSheet && (
-        <>
+        <OverlayPortal>
           <div onClick={() => setShowThemeSheet(false)} style={glassDimStyle(isDark)} />
           <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
             <div style={glassGrabberStyle(isDark)} />
-            <h3 style={glassSheetTitleStyle(isDark)}>{t.profile.theme}</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              {[
-                { value: '시스템', label: t.profile.system },
-                { value: '라이트', label: t.profile.light },
-                { value: '다크', label: t.profile.dark },
-              ].map(opt => (
-                <div
-                  key={opt.value}
-                  onClick={() => handleThemeChange(opt.value)}
-                  className={`setting-option${theme === opt.value ? ' selected' : ''}`}
-                >
-                  <span>{opt.label}</span>
-                  {theme === opt.value && <Check size={18} className="check-icon" color="currentColor" />}
-                </div>
-              ))}
+            <div style={glassSheetScrollStyle()}>
+              <h3 style={glassSheetTitleStyle(isDark)}>{t.profile.theme}</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {[
+                  { value: '시스템', label: t.profile.system },
+                  { value: '라이트', label: t.profile.light },
+                  { value: '다크', label: t.profile.dark },
+                ].map(opt => (
+                  <div
+                    key={opt.value}
+                    onClick={() => handleThemeChange(opt.value)}
+                    className={`setting-option${theme === opt.value ? ' selected' : ''}`}
+                  >
+                    <span>{opt.label}</span>
+                    {theme === opt.value && <Check size={18} className="check-icon" color="currentColor" />}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </>
+        </OverlayPortal>
       )}
 
       {/* 마이컬러 플로팅 시트 */}
       {showColorSheet && (
-        <>
+        <OverlayPortal>
           <div onClick={() => setShowColorSheet(false)} style={glassDimStyle(isDark)} />
           <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
             <div style={glassGrabberStyle(isDark)} />
-            <h3 style={glassSheetTitleStyle(isDark)}>{t.profile.myColor}</h3>
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              height: '56px', marginBottom: '16px', padding: '0 14px',
-              background: isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)',
-              borderRadius: '14px', boxSizing: 'border-box',
-            }}>
-              <div>
-                <div style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)' }}>{t.profile.defaultMode}</div>
-                <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>{t.profile.defaultModeDesc}</div>
-              </div>
-              <div onClick={handleDefaultToggle} style={{
-                width: '44px', height: '24px', borderRadius: '20px',
-                background: useDefaultColor ? 'var(--color-text-primary)' : 'var(--color-border)',
-                position: 'relative', cursor: 'pointer', transition: 'background 0.2s', flexShrink: 0,
+            <div style={glassSheetScrollStyle()}>
+              <h3 style={glassSheetTitleStyle(isDark)}>{t.profile.myColor}</h3>
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                height: '56px', marginBottom: '16px', padding: '0 14px',
+                background: isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)',
+                borderRadius: '14px', boxSizing: 'border-box',
               }}>
-                <div style={{
-                  position: 'absolute', top: '3px',
-                  left: useDefaultColor ? '23px' : '3px',
-                  width: '18px', height: '18px', borderRadius: '50%',
-                  background: useDefaultColor ? 'var(--color-bg)' : 'var(--color-surface)',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.2)', transition: 'left 0.2s',
-                }} />
-              </div>
-            </div>
-            {!useDefaultColor && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-              <div style={{ position: 'relative', width: '52px', height: '52px' }}>
-                <input
-                  type="color"
-                  value={myColor}
-                  onChange={e => handleColorChange(e.target.value)}
-                  style={{
-                    width: '52px', height: '52px', borderRadius: '50%',
-                    border: 'none', cursor: 'pointer', padding: 0,
-                    position: 'absolute', inset: 0, opacity: 0, zIndex: 1,
-                  }}
-                />
-                <div style={{
-                  width: '52px', height: '52px', borderRadius: '50%',
-                  background: 'conic-gradient(#ffb3c6, #ffd6a5, #fdffb6, #caffbf, #a0c4ff, #bdb2ff, #ffb3c6)',
-                  border: '2px solid var(--color-border)', cursor: 'pointer',
-                }} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '4px' }}>{t.profile.colorSelect}</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: myColor, border: '1px solid rgba(0,0,0,0.1)' }} />
-                  <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>{myColor}</span>
+                <div>
+                  <div style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)' }}>{t.profile.defaultMode}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>{t.profile.defaultModeDesc}</div>
+                </div>
+                <div onClick={handleDefaultToggle} style={{
+                  width: '44px', height: '24px', borderRadius: '20px',
+                  background: useDefaultColor ? 'var(--color-text-primary)' : 'var(--color-border)',
+                  position: 'relative', cursor: 'pointer', transition: 'background 0.2s', flexShrink: 0,
+                }}>
+                  <div style={{
+                    position: 'absolute', top: '3px',
+                    left: useDefaultColor ? '23px' : '3px',
+                    width: '18px', height: '18px', borderRadius: '50%',
+                    background: useDefaultColor ? 'var(--color-bg)' : 'var(--color-surface)',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.2)', transition: 'left 0.2s',
+                  }} />
                 </div>
               </div>
+              {!useDefaultColor && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                <div style={{ position: 'relative', width: '52px', height: '52px' }}>
+                  <input
+                    type="color"
+                    value={myColor}
+                    onChange={e => handleColorChange(e.target.value)}
+                    style={{
+                      width: '52px', height: '52px', borderRadius: '50%',
+                      border: 'none', cursor: 'pointer', padding: 0,
+                      position: 'absolute', inset: 0, opacity: 0, zIndex: 1,
+                    }}
+                  />
+                  <div style={{
+                    width: '52px', height: '52px', borderRadius: '50%',
+                    background: 'conic-gradient(#ffb3c6, #ffd6a5, #fdffb6, #caffbf, #a0c4ff, #bdb2ff, #ffb3c6)',
+                    border: '2px solid var(--color-border)', cursor: 'pointer',
+                  }} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '4px' }}>{t.profile.colorSelect}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: myColor, border: '1px solid rgba(0,0,0,0.1)' }} />
+                    <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>{myColor}</span>
+                  </div>
+                </div>
+              </div>
+              )}
+              <p style={{ ...glassSheetDescStyle(isDark), marginBottom: 0 }}>{t.profile.brightColorNote}</p>
             </div>
-            )}
-            <p style={glassSheetDescStyle(isDark)}>{t.profile.brightColorNote}</p>
           </div>
-        </>
+        </OverlayPortal>
       )}
 
       {/* 언어 플로팅 시트 */}
       {showLangSheet && (
-        <>
+        <OverlayPortal>
           <div onClick={() => setShowLangSheet(false)} style={glassDimStyle(isDark)} />
           <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
             <div style={glassGrabberStyle(isDark)} />
-            <h3 style={glassSheetTitleStyle(isDark)}>{t.profile.language}</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
-              {['한국어', 'English'].map(language => {
-                const selected = (language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en')
-                return (
-                  <div
-                    key={language}
-                    onClick={() => {
-                      const newLang = language === 'English' ? 'en' : 'ko'
-                      setLang(newLang)
-                      setShowLangSheet(false)
-                    }}
-                    className={`setting-option${selected ? ' selected' : ''}`}
-                  >
-                    <span>{language}</span>
-                    {selected && <Check size={18} className="check-icon" color="currentColor" />}
-                  </div>
-                )
-              })}
+            <div style={glassSheetScrollStyle()}>
+              <h3 style={glassSheetTitleStyle(isDark)}>{t.profile.language}</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
+                {['한국어', 'English'].map(language => {
+                  const selected = (language === '한국어' && lang === 'ko') || (language === 'English' && lang === 'en')
+                  return (
+                    <div
+                      key={language}
+                      onClick={() => {
+                        const newLang = language === 'English' ? 'en' : 'ko'
+                        setLang(newLang)
+                        setShowLangSheet(false)
+                      }}
+                      className={`setting-option${selected ? ' selected' : ''}`}
+                    >
+                      <span>{language}</span>
+                      {selected && <Check size={18} className="check-icon" color="currentColor" />}
+                    </div>
+                  )
+                })}
+              </div>
+              <p style={{ ...glassSheetDescStyle(isDark), margin: 0, textAlign: 'center' }}>
+                {t.profile.multiLangNote}
+              </p>
             </div>
-            <p style={{ ...glassSheetDescStyle(isDark), margin: 0, textAlign: 'center' }}>
-              {t.profile.multiLangNote}
-            </p>
           </div>
-        </>
+        </OverlayPortal>
       )}
 
       {/* 알림 플로팅 시트 */}
       {showNotifSheet && (
-        <>
+        <OverlayPortal>
           <style>{GLASS_BTN_PRESS_CSS}</style>
           <div onClick={() => setShowNotifSheet(false)} style={glassDimStyle(isDark)} />
           <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
             <div style={glassGrabberStyle(isDark)} />
-            <h3 style={glassSheetTitleStyle(isDark)}>{t.profile.notifications}</h3>
+            <div style={glassSheetScrollStyle()}>
+              <h3 style={glassSheetTitleStyle(isDark)}>{t.profile.notifications}</h3>
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                height: '56px', padding: '0 14px',
+                background: isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)',
+                borderRadius: '14px', marginBottom: '16px', boxSizing: 'border-box',
+              }}>
+                <div>
+                  <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>{t.profile.dailyReminder}</p>
+                  <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>{t.profile.dailyReminderDesc}</p>
+                </div>
+                <div onClick={() => {
+                  const next = !notificationEnabled
+                  setNotificationEnabled(next)
+                  localStorage.setItem('notification_enabled', String(next))
+                }}
+                  className={notificationEnabled ? 'toggle-on' : undefined}
+                  style={{ width: '44px', height: '26px', borderRadius: '20px', background: notificationEnabled ? undefined : 'var(--color-track)', position: 'relative', cursor: 'pointer', transition: 'background 0.2s', flexShrink: 0 }}>
+                  <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#fff', position: 'absolute', top: '3px', left: notificationEnabled ? '21px' : '3px', transition: 'left 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
+                </div>
+              </div>
 
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              height: '56px', padding: '0 14px',
-              background: isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)',
-              borderRadius: '14px', marginBottom: '16px', boxSizing: 'border-box',
-            }}>
-              <div>
-                <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>{t.profile.dailyReminder}</p>
-                <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>{t.profile.dailyReminderDesc}</p>
-              </div>
-              <div onClick={() => {
-                const next = !notificationEnabled
-                setNotificationEnabled(next)
-                localStorage.setItem('notification_enabled', String(next))
-              }}
-                className={notificationEnabled ? 'toggle-on' : undefined}
-                style={{ width: '44px', height: '26px', borderRadius: '20px', background: notificationEnabled ? undefined : 'var(--color-track)', position: 'relative', cursor: 'pointer', transition: 'background 0.2s', flexShrink: 0 }}>
-                <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#fff', position: 'absolute', top: '3px', left: notificationEnabled ? '21px' : '3px', transition: 'left 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }} />
-              </div>
+              {notificationEnabled && (
+                <div>
+                  <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>{t.profile.notifTime}</p>
+                  <input
+                    type="time"
+                    value={notificationTime}
+                    onChange={e => {
+                      setNotificationTime(e.target.value)
+                      localStorage.setItem('notification_time', e.target.value)
+                    }}
+                    style={{ ...glassInputStyle(isDark), fontWeight: 700 }}
+                  />
+                </div>
+              )}
             </div>
-
-            {notificationEnabled && (
-              <div style={{ marginBottom: '16px' }}>
-                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>{t.profile.notifTime}</p>
-                <input
-                  type="time"
-                  value={notificationTime}
-                  onChange={e => {
-                    setNotificationTime(e.target.value)
-                    localStorage.setItem('notification_time', e.target.value)
-                  }}
-                  style={{ ...glassInputStyle(isDark), fontWeight: 700 }}
-                />
-              </div>
-            )}
-
-            <button
-              className="no-press-anim glass-press"
-              onClick={() => setShowNotifSheet(false)}
-              style={{ ...glassButtonPrimary(isDark), width: '100%', flex: 'none' }}
-            >
-              {t.common.done}
-            </button>
+            <div style={glassSheetFooterStyle()}>
+              <button
+                className="no-press-anim glass-press"
+                onClick={() => setShowNotifSheet(false)}
+                style={{ ...glassButtonPrimary(isDark), width: '100%', flex: 'none' }}
+              >
+                {t.common.done}
+              </button>
+            </div>
           </div>
-        </>
+        </OverlayPortal>
       )}
 
       {/* 계정 탈퇴 바텀시트 */}

@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useTranslation } from '@/lib/i18n'
+import OverlayPortal from '@/components/ui/OverlayPortal'
 import {
   GLASS_BTN_PRESS_CSS,
   glassOverlayStyle,
@@ -43,6 +44,7 @@ export default function AlertModal({
   }, [])
 
   return (
+    <OverlayPortal>
     <div onClick={onCancel} style={glassOverlayStyle(isDark)}>
       <style>{GLASS_BTN_PRESS_CSS}</style>
       <div
@@ -50,6 +52,8 @@ export default function AlertModal({
         onClick={e => e.stopPropagation()}
         style={{
           ...glassPanelStyle(isDark),
+          position: 'relative',
+          zIndex: 'var(--z-overlay)' as unknown as number,
           padding: '24px 16px 16px',
           boxSizing: 'border-box',
         }}
@@ -101,5 +105,6 @@ export default function AlertModal({
         </div>
       </div>
     </div>
+    </OverlayPortal>
   )
 }

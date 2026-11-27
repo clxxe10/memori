@@ -124,7 +124,7 @@ export default function SelectDropdown({
           border: '1px solid var(--color-border)',
           borderRadius: '14px', overflow: 'hidden',
           boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-          zIndex: 9999,
+          zIndex: 'calc(var(--z-overlay) + 10)' as unknown as number,
           maxHeight: '240px', overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
         }}>

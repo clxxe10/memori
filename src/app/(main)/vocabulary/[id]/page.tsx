@@ -17,14 +17,18 @@ import { useTranslation } from '@/lib/i18n'
 import { findBlockedInList, type BlockHit } from '@/lib/contentFilter'
 import { speak } from '@/lib/tts'
 import AlertModal from '@/components/AlertModal'
+import OverlayPortal from '@/components/ui/OverlayPortal'
 import {
   GLASS_BTN_PRESS_CSS,
   glassBottomSheetStyle,
   glassButtonPrimary,
+  glassButtonSecondary,
   glassDestructive,
   glassDimStyle,
   glassGrabberStyle,
   glassInputStyle,
+  glassSheetFooterStyle,
+  glassSheetScrollStyle,
 } from '@/lib/glassModalStyles'
 
 type Word = {
@@ -556,80 +560,75 @@ export default function VocabularyDetailPage() {
           alignItems: 'center',
           justifyContent: 'center',
           boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
-          zIndex: 40,
+          zIndex: 'var(--z-tab)' as unknown as number,
         }}
       >
         <Plus size={22} color="var(--color-text-primary)" />
       </button>
 
       {showEditSheet && (
-        <>
+        <OverlayPortal>
           <style>{GLASS_BTN_PRESS_CSS}</style>
-          <div
-            onClick={() => setShowEditSheet(false)}
-            style={glassDimStyle(isDark, 49)}
-          />
-          <div
-            className="glass-surface"
-            style={glassBottomSheetStyle(isDark, { zIndex: 50 })}
-          >
+          <div onClick={() => setShowEditSheet(false)} style={glassDimStyle(isDark)} />
+          <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
             <div style={glassGrabberStyle(isDark)} />
-            <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '16px' }}>{lang === 'en' ? 'Edit Vocabulary' : '단어장 편집'}</h3>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-              <div>
-                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>{lang === 'en' ? 'Name' : '단어장 이름'}</p>
-                <input
-                  value={editForm.name}
-                  onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
-                  style={glassInputStyle(isDark)}
-                />
-              </div>
-
-              <div>
-                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>{lang === 'en' ? 'Description' : '설명'} <span style={{ fontWeight: 400, color: 'var(--color-text-tertiary)' }}>{lang === 'en' ? '(optional)' : '(선택)'}</span></p>
-                <input
-                  value={editForm.description}
-                  onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
-                  placeholder={lang === 'en' ? 'Brief description' : '이 단어장에 대한 간단한 설명'}
-                  style={glassInputStyle(isDark)}
-                />
-              </div>
-
-              <div>
-                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>{lang === 'en' ? 'Category' : '카테고리'}</p>
-                <SelectDropdown
-                  variant="field"
-                  value={editForm.category}
-                  onChange={val => setEditForm(f => ({ ...f, category: val }))}
-                  options={[
-                    { value: '수능', label: lang === 'en' ? 'CSAT' : '수능' },
-                    { value: '토익', label: lang === 'en' ? 'TOEIC' : '토익' },
-                    { value: '일상', label: lang === 'en' ? 'Daily' : '일상' },
-                    { value: '비즈니스', label: lang === 'en' ? 'Business' : '비즈니스' },
-                    { value: '기타', label: lang === 'en' ? 'Other' : '기타' },
-                  ]}
-                  placeholder={lang === 'en' ? 'Select category' : '카테고리 선택'}
-                />
-              </div>
-
-              <div style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                height: '56px', padding: '0 14px',
-                background: isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)',
-                borderRadius: '14px', boxSizing: 'border-box',
-              }}>
+            <div style={glassSheetScrollStyle()}>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '16px' }}>{lang === 'en' ? 'Edit Vocabulary' : '단어장 편집'}</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div>
-                  <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>공개</p>
-                  <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>다른 사용자에게 공개</p>
+                  <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>{lang === 'en' ? 'Name' : '단어장 이름'}</p>
+                  <input
+                    value={editForm.name}
+                    onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
+                    style={glassInputStyle(isDark)}
+                  />
                 </div>
-                <div onClick={() => setEditForm(f => ({ ...f, is_public: !f.is_public }))}
-                  style={{ width: '44px', height: '26px', borderRadius: '20px', background: editForm.is_public ? 'var(--color-neutral)' : 'var(--color-track)', position: 'relative', cursor: 'pointer', transition: 'background 0.2s', flexShrink: 0 }}>
-                  <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#fff', position: 'absolute', top: '3px', left: editForm.is_public ? '21px' : '3px', transition: 'left 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }} />
+
+                <div>
+                  <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>{lang === 'en' ? 'Description' : '설명'} <span style={{ fontWeight: 400, color: 'var(--color-text-tertiary)' }}>{lang === 'en' ? '(optional)' : '(선택)'}</span></p>
+                  <input
+                    value={editForm.description}
+                    onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
+                    placeholder={lang === 'en' ? 'Brief description' : '이 단어장에 대한 간단한 설명'}
+                    style={glassInputStyle(isDark)}
+                  />
+                </div>
+
+                <div>
+                  <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>{lang === 'en' ? 'Category' : '카테고리'}</p>
+                  <SelectDropdown
+                    variant="field"
+                    value={editForm.category}
+                    onChange={val => setEditForm(f => ({ ...f, category: val }))}
+                    options={[
+                      { value: '수능', label: lang === 'en' ? 'CSAT' : '수능' },
+                      { value: '토익', label: lang === 'en' ? 'TOEIC' : '토익' },
+                      { value: '일상', label: lang === 'en' ? 'Daily' : '일상' },
+                      { value: '비즈니스', label: lang === 'en' ? 'Business' : '비즈니스' },
+                      { value: '기타', label: lang === 'en' ? 'Other' : '기타' },
+                    ]}
+                    placeholder={lang === 'en' ? 'Select category' : '카테고리 선택'}
+                  />
+                </div>
+
+                <div style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  height: '56px', padding: '0 14px',
+                  background: isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)',
+                  borderRadius: '14px', boxSizing: 'border-box',
+                }}>
+                  <div>
+                    <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text-primary)', margin: 0 }}>공개</p>
+                    <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', margin: 0 }}>다른 사용자에게 공개</p>
+                  </div>
+                  <div onClick={() => setEditForm(f => ({ ...f, is_public: !f.is_public }))}
+                    style={{ width: '44px', height: '26px', borderRadius: '20px', background: editForm.is_public ? 'var(--color-neutral)' : 'var(--color-track)', position: 'relative', cursor: 'pointer', transition: 'background 0.2s', flexShrink: 0 }}>
+                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#fff', position: 'absolute', top: '3px', left: editForm.is_public ? '21px' : '3px', transition: 'left 0.2s', boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }} />
+                  </div>
                 </div>
               </div>
-
+            </div>
+            <div style={{ ...glassSheetFooterStyle(), display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <button
                 className="no-press-anim glass-press"
                 onClick={handleEditSave}
@@ -642,7 +641,6 @@ export default function VocabularyDetailPage() {
               >
                 {isSaving ? (lang === 'en' ? 'Saving...' : '저장 중...') : t.common.save}
               </button>
-
               <button
                 className="no-press-anim glass-press"
                 onClick={handleFolderDelete}
@@ -651,10 +649,9 @@ export default function VocabularyDetailPage() {
               >
                 {lang === 'en' ? 'Delete Vocabulary' : '단어장 삭제'}
               </button>
-
             </div>
           </div>
-        </>
+        </OverlayPortal>
       )}
 
       {filterAlert && (
@@ -669,63 +666,66 @@ export default function VocabularyDetailPage() {
       )}
 
       {showAddSheet && (
-        <>
+        <OverlayPortal>
           <div onClick={() => setShowAddSheet(false)} style={glassDimStyle(isDark)} />
           <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
             <div style={glassGrabberStyle(isDark)} />
-            <p style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 16px', color: 'var(--color-text-primary)', textAlign: 'center' }}>
-              {t.vocab.addWord}
-            </p>
+            <div style={glassSheetScrollStyle()}>
+              <p style={{ fontSize: '17px', fontWeight: 700, margin: '0 0 16px', color: 'var(--color-text-primary)', textAlign: 'center' }}>
+                {t.vocab.addWord}
+              </p>
 
-            <button onClick={() => router.push(`/vocabulary/${folderId}/camera`)} style={{
-              width: '100%', height: '64px',
-              background: 'var(--color-bg)', border: '1px solid var(--color-border)',
-              borderRadius: '16px', display: 'flex', alignItems: 'center',
-              gap: '14px', padding: '0 16px', cursor: 'pointer', marginBottom: '8px',
-              textAlign: 'left' as const,
-            }}>
-              <div style={{
-                width: '40px', height: '40px', borderRadius: '50%',
-                background: 'var(--color-neutral-soft)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              <button onClick={() => router.push(`/vocabulary/${folderId}/camera`)} style={{
+                width: '100%', height: '64px',
+                background: isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)', border: 'none',
+                borderRadius: '16px', display: 'flex', alignItems: 'center',
+                gap: '14px', padding: '0 16px', cursor: 'pointer', marginBottom: '8px',
+                textAlign: 'left' as const,
               }}>
-                <Camera size={18} color="var(--color-neutral)" />
-              </div>
-              <div>
-                <p style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{t.vocab.addByPhoto}</p>
-                <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-text-secondary)' }}>{t.vocab.addByPhotoDesc}</p>
-              </div>
-            </button>
+                <div style={{
+                  width: '40px', height: '40px', borderRadius: '50%',
+                  background: 'var(--color-neutral-soft)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                }}>
+                  <Camera size={18} color="var(--color-neutral)" />
+                </div>
+                <div>
+                  <p style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{t.vocab.addByPhoto}</p>
+                  <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-text-secondary)' }}>{t.vocab.addByPhotoDesc}</p>
+                </div>
+              </button>
 
-            <button onClick={() => router.push(`/vocabulary/${folderId}/add`)} style={{
-              width: '100%', height: '64px',
-              background: 'var(--color-bg)', border: '1px solid var(--color-border)',
-              borderRadius: '16px', display: 'flex', alignItems: 'center',
-              gap: '14px', padding: '0 16px', cursor: 'pointer', marginBottom: '12px',
-              textAlign: 'left' as const,
-            }}>
-              <div style={{
-                width: '40px', height: '40px', borderRadius: '50%',
-                background: 'var(--color-neutral-soft)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              <button onClick={() => router.push(`/vocabulary/${folderId}/add`)} style={{
+                width: '100%', height: '64px',
+                background: isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)', border: 'none',
+                borderRadius: '16px', display: 'flex', alignItems: 'center',
+                gap: '14px', padding: '0 16px', cursor: 'pointer', marginBottom: '4px',
+                textAlign: 'left' as const,
               }}>
-                <Plus size={18} color="var(--color-neutral)" />
-              </div>
-              <div>
-                <p style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{t.vocab.addManual}</p>
-                <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-text-secondary)' }}>{t.vocab.addManualDesc}</p>
-              </div>
-            </button>
-
-            <button onClick={() => setShowAddSheet(false)} style={{
-              width: '100%', padding: '14px',
-              borderRadius: '9999px', border: 'none',
-              background: 'var(--color-surface-2)',
-              color: 'var(--color-text-primary)',
-              fontSize: '16px', fontWeight: 600, cursor: 'pointer',
-            }}>{t.common.cancel}</button>
+                <div style={{
+                  width: '40px', height: '40px', borderRadius: '50%',
+                  background: 'var(--color-neutral-soft)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                }}>
+                  <Plus size={18} color="var(--color-neutral)" />
+                </div>
+                <div>
+                  <p style={{ margin: 0, fontSize: '15px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{t.vocab.addManual}</p>
+                  <p style={{ margin: 0, fontSize: '12px', color: 'var(--color-text-secondary)' }}>{t.vocab.addManualDesc}</p>
+                </div>
+              </button>
+            </div>
+            <div style={glassSheetFooterStyle()}>
+              <button
+                className="no-press-anim glass-press"
+                onClick={() => setShowAddSheet(false)}
+                style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
+              >
+                {t.common.cancel}
+              </button>
+            </div>
           </div>
-        </>
+        </OverlayPortal>
       )}
     </main>
   )

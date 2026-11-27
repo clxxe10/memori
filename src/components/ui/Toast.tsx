@@ -58,7 +58,7 @@ export default function ToastContainer() {
       bottom: '100px',
       left: '50%',
       transform: 'translateX(-50%)',
-      zIndex: 9999,
+      zIndex: 'var(--z-toast)' as unknown as number,
       display: 'flex',
       flexDirection: 'column',
       gap: '8px',

@@ -62,7 +62,7 @@ export default function TabBar() {
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', gap: '8px',
         padding: '16px 8px',
-        zIndex: 100,
+        zIndex: 'var(--z-tab)' as unknown as number,
         fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
       }} className="tab-bar-container">
         {TABS.map(tab => {
@@ -106,7 +106,7 @@ export default function TabBar() {
       display: 'flex', flexDirection: 'row', flexWrap: 'nowrap',
       justifyContent: 'space-around',
       alignItems: 'center', gap: '4px',
-      zIndex: 100,
+      zIndex: 'var(--z-tab)' as unknown as number,
       width: 'min(calc(100vw - 48px), 387px)',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>

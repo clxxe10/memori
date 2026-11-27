@@ -12,6 +12,7 @@ import Coachmark from '@/components/ui/Coachmark'
 import DailyGoalModal from '@/components/DailyGoalModal'
 import { showToast } from '@/components/ui/Toast'
 import { useTranslation } from '@/lib/i18n'
+import OverlayPortal from '@/components/ui/OverlayPortal'
 import {
   GLASS_BTN_PRESS_CSS,
   glassBottomSheetStyle,
@@ -19,6 +20,8 @@ import {
   glassDimStyle,
   glassGrabberStyle,
   glassSheetDescStyle,
+  glassSheetFooterStyle,
+  glassSheetScrollStyle,
   glassSheetTitleStyle,
 } from '@/lib/glassModalStyles'
 
@@ -720,14 +723,15 @@ export default function HomePage() {
       </div>
       </PullToRefresh>
       {showSpeedSheet && (
-        <>
+        <OverlayPortal>
           <style>{GLASS_BTN_PRESS_CSS}</style>
           <div onClick={() => setShowSpeedSheet(false)} style={glassDimStyle(isDark)} />
-          <div className="glass-surface" style={glassBottomSheetStyle(isDark, { maxHeight: '70vh' })}>
+          <div className="glass-surface" style={glassBottomSheetStyle(isDark)}>
             <div style={glassGrabberStyle(isDark)} />
+            <div style={glassSheetScrollStyle()}>
             <h3 style={{ ...glassSheetTitleStyle(isDark), textAlign: 'center' }}>{t.study.selectFolder}</h3>
             <p style={{ ...glassSheetDescStyle(isDark), textAlign: 'center' }}>{t.study.selectFolderDesc}</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '4px' }}>
               <button onClick={() => { setShowSpeedSheet(false); router.push('/study/speed') }}
                 style={{ width: '100%', background: 'rgba(28,28,30,0.06)', borderRadius: '16px', padding: '14px 16px', border: '1.5px solid rgba(28,28,30,0.12)', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', textAlign: 'left' as const }}>
                 <div style={{ width: '42px', height: '42px', borderRadius: '13px', background: 'rgba(28,28,30,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>📚</div>
@@ -753,15 +757,18 @@ export default function HomePage() {
                 </button>
               ))}
             </div>
-            <button
-              className="no-press-anim glass-press"
-              onClick={() => setShowSpeedSheet(false)}
-              style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
-            >
-              {t.common.cancel}
-            </button>
+            </div>
+            <div style={glassSheetFooterStyle()}>
+              <button
+                className="no-press-anim glass-press"
+                onClick={() => setShowSpeedSheet(false)}
+                style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
+              >
+                {t.common.cancel}
+              </button>
+            </div>
           </div>
-        </>
+        </OverlayPortal>
       )}
       {showGoalModal && (
         <DailyGoalModal

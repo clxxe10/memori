@@ -11,9 +11,12 @@ import { showAlert } from '@/components/ui/AlertHost'
 import { showToast } from '@/components/ui/Toast'
 import { ADMOB_REWARD_PDF_EXAM } from '@/lib/adConfig'
 import { showRewardAd } from '@/lib/rewardAd'
+import OverlayPortal from '@/components/ui/OverlayPortal'
 import {
   GLASS_BTN_PRESS_CSS,
   glassBottomSheetStyle,
+  glassSheetFooterStyle,
+  glassSheetScrollStyle,
   glassButtonPrimary,
   glassButtonSecondary,
   glassDimStyle,
@@ -553,25 +556,27 @@ export default function PDFPage() {
       </div>
 
       {showPdfGate && (
-        <>
+        <OverlayPortal>
           <style>{GLASS_BTN_PRESS_CSS}</style>
-          <div onClick={() => setShowPdfGate(false)} style={glassDimStyle(isDark, 200)} />
+          <div onClick={() => setShowPdfGate(false)} style={glassDimStyle(isDark)} />
           <div
             className="glass-surface"
             style={{
-              ...glassBottomSheetStyle(isDark, { zIndex: 201 }),
+              ...glassBottomSheetStyle(isDark),
               textAlign: 'center',
             }}
           >
             <div style={glassGrabberStyle(isDark)} />
-            <div style={{ fontSize: '44px', marginBottom: '12px' }}>📄</div>
-            <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>
-              {t.study.freeOnce}
-            </h3>
-            <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '16px', lineHeight: 1.6 }}>
-              {t.vocab.watchAdDesc}
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={glassSheetScrollStyle()}>
+              <div style={{ fontSize: '44px', marginBottom: '12px' }}>📄</div>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>
+                {t.study.freeOnce}
+              </h3>
+              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '4px', lineHeight: 1.6 }}>
+                {t.vocab.watchAdDesc}
+              </p>
+            </div>
+            <div style={{ ...glassSheetFooterStyle(), display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
                 className="no-press-anim glass-press"
                 onClick={() => { void handleWatchPdfAd() }}
@@ -608,7 +613,7 @@ export default function PDFPage() {
               </button>
             </div>
           </div>
-        </>
+        </OverlayPortal>
       )}
     </main>
   )

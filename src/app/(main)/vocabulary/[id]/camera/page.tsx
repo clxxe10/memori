@@ -13,6 +13,7 @@ import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
 import { ADMOB_REWARD_PHOTO_EXTRACT } from '@/lib/adConfig'
 import { showRewardAd } from '@/lib/rewardAd'
+import OverlayPortal from '@/components/ui/OverlayPortal'
 import {
   GLASS_BTN_PRESS_CSS,
   glassBottomSheetStyle,
@@ -20,6 +21,8 @@ import {
   glassButtonSecondary,
   glassDimStyle,
   glassGrabberStyle,
+  glassSheetFooterStyle,
+  glassSheetScrollStyle,
 } from '@/lib/glassModalStyles'
 
 export default function CameraPage() {
@@ -558,25 +561,27 @@ export default function CameraPage() {
         )}
       </div>
       {showPhotoGate && (
-        <>
+        <OverlayPortal>
           <style>{GLASS_BTN_PRESS_CSS}</style>
-          <div onClick={() => setShowPhotoGate(false)} style={glassDimStyle(isDark, 200)} />
+          <div onClick={() => setShowPhotoGate(false)} style={glassDimStyle(isDark)} />
           <div
             className="glass-surface"
             style={{
-              ...glassBottomSheetStyle(isDark, { zIndex: 201 }),
+              ...glassBottomSheetStyle(isDark),
               textAlign: 'center',
             }}
           >
             <div style={glassGrabberStyle(isDark)} />
-            <div style={{ fontSize: '44px', marginBottom: '12px' }}>📸</div>
-            <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>
-              {t.vocab.dailyLimit}
-            </h3>
-            <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '16px', lineHeight: 1.6 }}>
-              {t.vocab.watchAdDesc}
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={glassSheetScrollStyle()}>
+              <div style={{ fontSize: '44px', marginBottom: '12px' }}>📸</div>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: '6px' }}>
+                {t.vocab.dailyLimit}
+              </h3>
+              <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '4px', lineHeight: 1.6 }}>
+                {t.vocab.watchAdDesc}
+              </p>
+            </div>
+            <div style={{ ...glassSheetFooterStyle(), display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
                 className="no-press-anim glass-press"
                 onClick={() => { void handleWatchPhotoAd() }}
@@ -613,7 +618,7 @@ export default function CameraPage() {
               </button>
             </div>
           </div>
-        </>
+        </OverlayPortal>
       )}
       {isAnalyzing && (
         <div
