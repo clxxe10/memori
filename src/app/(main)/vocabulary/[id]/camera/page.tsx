@@ -12,7 +12,7 @@ import { addExtractBonus, canUsePhotoExtract, incrementExtractCount } from '@/li
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
 import { ADMOB_REWARD_PHOTO_EXTRACT } from '@/lib/adConfig'
-import { AdMob, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob'
+import { showRewardAd } from '@/lib/rewardAd'
 
 export default function CameraPage() {
   const { t } = useTranslation()
@@ -39,7 +39,27 @@ export default function CameraPage() {
   const [elapsed, setElapsed] = useState(0)
   const [loadingMsg, setLoadingMsg] = useState('')
   const [showPhotoGate, setShowPhotoGate] = useState(false)
+  const [adLoading, setAdLoading] = useState(false)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+
+  const handleWatchPhotoAd = async () => {
+    if (adLoading) return
+    setAdLoading(true)
+    try {
+      const result = await showRewardAd(ADMOB_REWARD_PHOTO_EXTRACT)
+      if (result === 'rewarded') {
+        addExtractBonus()
+        setShowPhotoGate(false)
+        showToast(t.study.adComplete)
+      } else if (result === 'dismissed') {
+        await showAlert(t.study.adWatchToUnlock)
+      } else {
+        await showAlert(t.alert.adLoadFailed)
+      }
+    } finally {
+      setAdLoading(false)
+    }
+  }
 
   const LOADING_MESSAGES = [
     '사진을 분석하고 있어요...',
@@ -549,25 +569,8 @@ export default function CameraPage() {
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
-                onClick={async () => {
-                  try {
-                    const options = {
-                      adId: ADMOB_REWARD_PHOTO_EXTRACT,
-                    }
-                    await AdMob.prepareRewardVideoAd(options)
-
-                    AdMob.addListener(RewardAdPluginEvents.Rewarded, async (_reward: AdMobRewardItem) => {
-                      addExtractBonus()
-                      setShowPhotoGate(false)
-                      showToast(t.study.adComplete)
-                    })
-
-                    await AdMob.showRewardVideoAd()
-                  } catch (e) {
-                    console.error('광고 로드 실패:', e)
-                    await showAlert(t.alert.adLoadFailed)
-                  }
-                }}
+                onClick={() => { void handleWatchPhotoAd() }}
+                disabled={adLoading}
                 style={{
                   width: '100%',
                   height: '52px',
@@ -577,14 +580,22 @@ export default function CameraPage() {
                   borderRadius: '14px',
                   fontSize: '15px',
                   fontWeight: 700,
-                  cursor: 'pointer',
+                  cursor: adLoading ? 'not-allowed' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
+                  opacity: adLoading ? 0.7 : 1,
                 }}
               >
-                {t.vocab.watchAd}
+                {adLoading ? (
+                  <>
+                    <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
+                    {t.study.adLoading}
+                  </>
+                ) : (
+                  t.vocab.watchAd
+                )}
               </button>
               <button
                 onClick={() => { setShowPhotoGate(false); router.push('/profile/premium') }}

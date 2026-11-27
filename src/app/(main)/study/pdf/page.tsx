@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, ChevronRight, Check, Download, Share2 } from 'lucide-react'
+import { ArrowLeft, ChevronRight, Check, Download, Share2, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { canUsePdfExtract, incrementPdfCount } from '@/lib/premium'
+import { addPdfBonus, canUsePdfExtract, incrementPdfCount } from '@/lib/premium'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
 import { showAlert } from '@/components/ui/AlertHost'
+import { showToast } from '@/components/ui/Toast'
 import { ADMOB_REWARD_PDF_EXAM } from '@/lib/adConfig'
-import { AdMob, RewardAdPluginEvents, AdMobRewardItem } from '@capacitor-community/admob'
+import { showRewardAd } from '@/lib/rewardAd'
 
 type Folder = {
   id: string
@@ -42,6 +43,7 @@ export default function PDFPage() {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const [examType, setExamType] = useState<ExamType>('word-to-meaning')
   const [showPdfGate, setShowPdfGate] = useState(false)
+  const [adLoading, setAdLoading] = useState(false)
 
   useEffect(() => {
     const fetchFolders = async () => {
@@ -209,6 +211,27 @@ export default function PDFPage() {
       await showAlert(t.study.pdfGenFailed)
     } finally {
       setGenerating(false)
+    }
+  }
+
+  const handleWatchPdfAd = async () => {
+    if (adLoading) return
+    setAdLoading(true)
+    try {
+      const result = await showRewardAd(ADMOB_REWARD_PDF_EXAM)
+      if (result === 'rewarded') {
+        addPdfBonus()
+        setShowPdfGate(false)
+        showToast(t.study.adComplete)
+        incrementPdfCount()
+        await generatePDF()
+      } else if (result === 'dismissed') {
+        await showAlert(t.study.adWatchToUnlock)
+      } else {
+        await showAlert(t.alert.adLoadFailed)
+      }
+    } finally {
+      setAdLoading(false)
     }
   }
 
@@ -541,23 +564,8 @@ export default function PDFPage() {
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
-                onClick={async () => {
-                  try {
-                    const options = { adId: ADMOB_REWARD_PDF_EXAM }
-                    await AdMob.prepareRewardVideoAd(options)
-
-                    AdMob.addListener(RewardAdPluginEvents.Rewarded, async (_reward: AdMobRewardItem) => {
-                      incrementPdfCount()
-                      setShowPdfGate(false)
-                      generatePDF()
-                    })
-
-                    await AdMob.showRewardVideoAd()
-                  } catch (e) {
-                    console.error('광고 로드 실패:', e)
-                    await showAlert(t.alert.adLoadFailed)
-                  }
-                }}
+                onClick={() => { void handleWatchPdfAd() }}
+                disabled={adLoading}
                 style={{
                   width: '100%',
                   height: '52px',
@@ -567,14 +575,22 @@ export default function PDFPage() {
                   borderRadius: '14px',
                   fontSize: '15px',
                   fontWeight: 700,
-                  cursor: 'pointer',
+                  cursor: adLoading ? 'not-allowed' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
+                  opacity: adLoading ? 0.7 : 1,
                 }}
               >
-                {t.vocab.watchAd}
+                {adLoading ? (
+                  <>
+                    <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} />
+                    {t.study.adLoading}
+                  </>
+                ) : (
+                  t.vocab.watchAd
+                )}
               </button>
               <button
                 onClick={() => { setShowPdfGate(false); router.push('/profile/premium') }}

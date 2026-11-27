@@ -45,14 +45,28 @@ export function addExtractBonus(): void {
   )
 }
 
+export const FREE_PDF_PER_DAY = 1
+
+export function getTodayKey(): string {
+  return new Date().toISOString().split('T')[0]
+}
+
 export function getTodayPdfCount(): number {
-  const today = new Date().toISOString().split('T')[0]
-  return Number(localStorage.getItem(`pdf_extract_${today}`) || 0)
+  return Number(localStorage.getItem(`pdf_extract_${getTodayKey()}`) || 0)
 }
 
 export function incrementPdfCount(): void {
-  const today = new Date().toISOString().split('T')[0]
-  localStorage.setItem(`pdf_extract_${today}`, String(getTodayPdfCount() + 1))
+  localStorage.setItem(`pdf_extract_${getTodayKey()}`, String(getTodayPdfCount() + 1))
+}
+
+/** 오늘 광고로 받은 PDF 보너스 횟수 */
+export function getTodayPdfBonus(): number {
+  return Number(localStorage.getItem(`pdf_bonus_${getTodayKey()}`) || 0)
+}
+
+/** 광고 1회 = PDF 보너스 1회 */
+export function addPdfBonus(): void {
+  localStorage.setItem(`pdf_bonus_${getTodayKey()}`, String(getTodayPdfBonus() + 1))
 }
 
 // 사진 추출 가능 여부
@@ -78,7 +92,7 @@ export async function canUsePhotoExtract(): Promise<{
   return { canUse: false, isPremiumUser: false, needAd: true, remaining: 0 }
 }
 
-// PDF 추출 가능 여부
+// PDF 추출 가능 여부 (무료 1회/일 + 광고 보너스, 프리미엄은 무제한·게이트 없음)
 export async function canUsePdfExtract(): Promise<{
   canUse: boolean
   isPremiumUser: boolean
@@ -87,6 +101,8 @@ export async function canUsePdfExtract(): Promise<{
   const premium = await isPremium()
   if (premium) return { canUse: true, isPremiumUser: true, needAd: false }
   const count = getTodayPdfCount()
-  if (count < 1) return { canUse: true, isPremiumUser: false, needAd: false }
+  const bonus = getTodayPdfBonus()
+  const limit = FREE_PDF_PER_DAY + bonus
+  if (count < limit) return { canUse: true, isPremiumUser: false, needAd: false }
   return { canUse: false, isPremiumUser: false, needAd: true }
 }
