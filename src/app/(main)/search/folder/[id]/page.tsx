@@ -58,6 +58,7 @@ import {
   glassPopoverStyle,
 } from '@/lib/glassModalStyles'
 import { useIsDark } from '@/hooks/useIsDark'
+import { findBlockedContent } from '@/lib/contentFilter'
 
 type Folder = {
   id: string
@@ -108,6 +109,10 @@ export default function PublicFolderPage() {
   const [showReportSheet, setShowReportSheet] = useState(false)
   const [showBlockConfirm, setShowBlockConfirm] = useState(false)
   const [actionBusy, setActionBusy] = useState(false)
+  const [commentMenuTarget, setCommentMenuTarget] = useState<Comment | null>(null)
+  const [commentReportTarget, setCommentReportTarget] = useState<Comment | null>(null)
+  const [commentBlockTarget, setCommentBlockTarget] = useState<Comment | null>(null)
+  const [filterAlert, setFilterAlert] = useState<{ title: string; description: string } | null>(null)
   const isDark = useIsDark()
   const { t, lang } = useTranslation()
 
@@ -172,7 +177,46 @@ export default function PublicFolderPage() {
         .select('*')
         .eq('folder_id', folderId)
         .order('created_at', { ascending: true })
-      setComments(commentData || [])
+
+      let list = commentData || []
+
+      if (user && list.length > 0) {
+        const commentIds = list.map((c) => c.id)
+
+        const [{ data: blocks }, { data: myCommentReports }, { data: allCommentReports }] = await Promise.all([
+          supabase.from('user_blocks').select('blocked_id').eq('blocker_id', user.id),
+          supabase
+            .from('reports')
+            .select('comment_id')
+            .eq('reporter_id', user.id)
+            .not('comment_id', 'is', null)
+            .in('comment_id', commentIds),
+          supabase
+            .from('reports')
+            .select('comment_id')
+            .not('comment_id', 'is', null)
+            .in('comment_id', commentIds),
+        ])
+
+        const blockedIds = new Set((blocks || []).map((b) => b.blocked_id))
+        const reportedByMe = new Set(
+          (myCommentReports || []).map((r) => r.comment_id).filter(Boolean) as string[],
+        )
+        const reportCounts = new Map<string, number>()
+        for (const r of allCommentReports || []) {
+          if (!r.comment_id) continue
+          reportCounts.set(r.comment_id, (reportCounts.get(r.comment_id) || 0) + 1)
+        }
+
+        list = list.filter((c) => {
+          if (blockedIds.has(c.user_id)) return false
+          if (reportedByMe.has(c.id)) return false
+          if ((reportCounts.get(c.id) || 0) >= 3) return false
+          return true
+        })
+      }
+
+      setComments(list)
 
       setLoading(false)
     }
@@ -242,6 +286,17 @@ export default function PublicFolderPage() {
 
   const handleComment = async () => {
     if (!commentText.trim() || !myUserId || submitting) return
+    const hit = findBlockedContent(commentText)
+    if (hit) {
+      const hitLine = t.search.cannotPublishHit
+        .replace('{term}', hit.term)
+        .replace('{source}', hit.source)
+      setFilterAlert({
+        title: t.search.cannotComment,
+        description: `${t.search.cannotCommentDesc}\n\n${hitLine}`,
+      })
+      return
+    }
     setSubmitting(true)
     const supabase = createClient()
     const { data, error } = await supabase.from('folder_comments').insert({
@@ -272,6 +327,7 @@ export default function PublicFolderPage() {
         folder_id: folder.id,
         owner_id: folder.user_id,
         reason,
+        comment_id: null,
       })
       // 23505 = already reported (unique) — still hide from list
       if (error && error.code !== '23505') {
@@ -309,6 +365,66 @@ export default function PublicFolderPage() {
       setShowMoreMenu(false)
       showToast(t.search.blockDone, 'success')
       router.replace('/search')
+    } catch (e) {
+      console.error(e)
+      showToast(t.search.blockFailed, 'error')
+    } finally {
+      setActionBusy(false)
+    }
+  }
+
+  const handleCommentReport = async (reason: string) => {
+    if (!myUserId || !folder || !commentReportTarget || actionBusy) return
+    setActionBusy(true)
+    const target = commentReportTarget
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.from('reports').insert({
+        reporter_id: myUserId,
+        folder_id: folder.id,
+        owner_id: target.user_id,
+        comment_id: target.id,
+        reason,
+      })
+      if (error && error.code !== '23505') {
+        console.error(error)
+        showToast(t.search.reportFailed, 'error')
+        return
+      }
+      setComments((prev) => prev.filter((c) => c.id !== target.id))
+      setCommentReportTarget(null)
+      setCommentMenuTarget(null)
+      showToast(t.search.reportSubmitted, 'success')
+    } catch (e) {
+      console.error(e)
+      showToast(t.search.reportFailed, 'error')
+    } finally {
+      setActionBusy(false)
+    }
+  }
+
+  const handleCommentBlock = async () => {
+    if (!myUserId || !commentBlockTarget || actionBusy) return
+    setActionBusy(true)
+    const target = commentBlockTarget
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.from('user_blocks').insert({
+        blocker_id: myUserId,
+        blocked_id: target.user_id,
+      })
+      if (error && error.code !== '23505') {
+        console.error(error)
+        showToast(t.search.blockFailed, 'error')
+        return
+      }
+      setComments((prev) => prev.filter((c) => c.user_id !== target.user_id))
+      setCommentBlockTarget(null)
+      setCommentMenuTarget(null)
+      showToast(t.search.blockDone, 'success')
+      if (folder?.user_id === target.user_id) {
+        router.replace('/search')
+      }
     } catch (e) {
       console.error(e)
       showToast(t.search.blockFailed, 'error')
@@ -568,11 +684,32 @@ export default function PublicFolderPage() {
               </p>
             ) : (
               comments.map(comment => (
-                <div key={comment.id} style={{ display: 'flex', gap: '10px', background: 'var(--color-surface-2)', borderRadius: '12px', padding: '12px 14px' }}>
+                <div
+                  key={comment.id}
+                  onContextMenu={(e) => {
+                    if (comment.user_id === myUserId || !myUserId) return
+                    e.preventDefault()
+                    setCommentMenuTarget(comment)
+                  }}
+                  onTouchStart={(e) => {
+                    if (comment.user_id === myUserId || !myUserId) return
+                    const touch = e.touches[0]
+                    const timer = window.setTimeout(() => setCommentMenuTarget(comment), 500)
+                    const clear = () => {
+                      window.clearTimeout(timer)
+                      window.removeEventListener('touchend', clear)
+                      window.removeEventListener('touchmove', clear)
+                    }
+                    window.addEventListener('touchend', clear)
+                    window.addEventListener('touchmove', clear)
+                    void touch
+                  }}
+                  style={{ display: 'flex', gap: '10px', background: 'var(--color-surface-2)', borderRadius: '12px', padding: '12px 14px' }}
+                >
                   <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#E8EAF0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '13px', fontWeight: 700, color: 'var(--color-text-secondary)' }}>
                     {(comment.nickname || '?')[0].toUpperCase()}
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
                       <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{comment.nickname || '익명'}</span>
                       <span style={{ fontSize: '11px', color: 'var(--color-text-tertiary)' }}>
@@ -581,7 +718,7 @@ export default function PublicFolderPage() {
                     </div>
                     <p style={{ fontSize: '13px', color: 'var(--color-text-primary)', margin: 0 }}>{comment.content}</p>
                   </div>
-                  {comment.user_id === myUserId && (
+                  {comment.user_id === myUserId ? (
                     <button
                       onClick={async () => {
                         const supabase = createClient()
@@ -593,12 +730,112 @@ export default function PublicFolderPage() {
                     >
                       {t.common.delete}
                     </button>
-                  )}
+                  ) : myUserId ? (
+                    <button
+                      onClick={() => setCommentMenuTarget(comment)}
+                      aria-label={t.search.more}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 2px', flexShrink: 0, display: 'flex', alignItems: 'flex-start' }}
+                      type="button"
+                    >
+                      <MoreHorizontal size={18} color="var(--color-text-tertiary)" />
+                    </button>
+                  ) : null}
                 </div>
               ))
             )}
           </div>
         </FloatingSheet>
+      )}
+
+      {commentMenuTarget && (
+        <CenterModal
+          onClose={() => setCommentMenuTarget(null)}
+          title={commentMenuTarget.nickname || (lang === 'en' ? 'Comment' : '댓글')}
+          footer={
+            <button
+              type="button"
+              className="no-press-anim glass-press"
+              onClick={() => setCommentMenuTarget(null)}
+              style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
+            >
+              {t.common.cancel}
+            </button>
+          }
+        >
+          <ModalOptionList>
+            <ModalOptionRow
+              selected={false}
+              onClick={() => {
+                setCommentReportTarget(commentMenuTarget)
+                setCommentMenuTarget(null)
+              }}
+            >
+              {t.search.reportComment}
+            </ModalOptionRow>
+            <ModalOptionRow
+              selected={false}
+              onClick={() => {
+                setCommentBlockTarget(commentMenuTarget)
+                setCommentMenuTarget(null)
+              }}
+            >
+              {t.search.blockUser}
+            </ModalOptionRow>
+          </ModalOptionList>
+        </CenterModal>
+      )}
+
+      {commentReportTarget && (
+        <CenterModal
+          onClose={() => setCommentReportTarget(null)}
+          title={t.search.reportCommentTitle}
+          description={t.search.reportDesc}
+          footer={
+            <button
+              type="button"
+              className="no-press-anim glass-press"
+              onClick={() => setCommentReportTarget(null)}
+              style={{ ...glassButtonSecondary(isDark), width: '100%', flex: 'none' }}
+            >
+              {t.common.cancel}
+            </button>
+          }
+        >
+          <ModalOptionList>
+            {REPORT_REASONS.map((r) => (
+              <ModalOptionRow
+                key={r.key}
+                selected={false}
+                onClick={() => { if (!actionBusy) handleCommentReport(r.key) }}
+              >
+                {r.label}
+              </ModalOptionRow>
+            ))}
+          </ModalOptionList>
+        </CenterModal>
+      )}
+
+      {commentBlockTarget && (
+        <AlertModal
+          title={t.search.blockTitle}
+          description={t.search.blockDesc}
+          confirmText={t.search.blockConfirm}
+          cancelText={t.common.cancel}
+          isDestructive
+          onConfirm={handleCommentBlock}
+          onCancel={() => setCommentBlockTarget(null)}
+        />
+      )}
+
+      {filterAlert && (
+        <AlertModal
+          title={filterAlert.title}
+          description={filterAlert.description}
+          confirmText={t.common.confirm}
+          showCancel={false}
+          onConfirm={() => setFilterAlert(null)}
+          onCancel={() => setFilterAlert(null)}
+        />
       )}
     </main>
   )

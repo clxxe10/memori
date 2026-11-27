@@ -237,6 +237,10 @@ const ko = {
     cannotPublishDesc: '제목·단어·뜻에서 욕설·비하 표현을 제거한 뒤 다시 시도해주세요.',
     cannotPublishHit: '걸린 표현: "{term}"\n위치: {source}',
     savePublicFailed: '공개 설정 저장에 실패했어요. 다시 시도해주세요.',
+    reportComment: '댓글 신고',
+    reportCommentTitle: '이 댓글을 신고할까요?',
+    cannotComment: '부적절한 표현이 포함되어 등록할 수 없어요',
+    cannotCommentDesc: '욕설·비하 표현을 제거한 뒤 다시 시도해주세요.',
   },
   profile: {
     title: '프로필',
@@ -597,6 +601,10 @@ const en: typeof ko = {
     cannotPublishDesc: 'Remove profanity or abusive language from the title, words, or meanings, then try again.',
     cannotPublishHit: 'Matched: "{term}"\nIn: {source}',
     savePublicFailed: 'Failed to save public setting. Please try again.',
+    reportComment: 'Report comment',
+    reportCommentTitle: 'Report this comment?',
+    cannotComment: 'Cannot post — inappropriate content found',
+    cannotCommentDesc: 'Remove profanity or abusive language, then try again.',
   },
   profile: {
     title: 'Profile',

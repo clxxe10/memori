@@ -10,6 +10,7 @@ import { useBreakpoint } from '@/hooks/useBreakpoint'
 import AlertModal from '@/components/AlertModal'
 import DailyGoalModal from '@/components/DailyGoalModal'
 import { showAlert } from '@/components/ui/AlertHost'
+import { clearAppLocalStorage } from '@/lib/clearAppStorage'
 import CenterModal, { ModalFooterButtons, ModalOptionList, ModalOptionRow } from '@/components/ui/CenterModal'
 import { showToast } from '@/components/ui/Toast'
 import { useIsDark } from '@/hooks/useIsDark'
@@ -645,22 +646,27 @@ export default function ProfilePage() {
             try {
               const supabase = createClient()
               if (!user) { await showAlert(t.alert.checkLogin); return }
-              await supabase.from('words').delete().eq('user_id', user.id)
-              await supabase.from('folders').delete().eq('user_id', user.id)
-              await supabase.from('user_learning_stats').delete().eq('user_id', user.id)
-              await supabase.from('user_daily_study').delete().eq('user_id', user.id)
               let session = (await supabase.auth.getSession()).data.session
               if (!session) {
                 const { data } = await supabase.auth.refreshSession()
                 session = data.session
               }
-              if (session?.access_token) {
-                await fetch('/api/delete-account', {
-                  method: 'DELETE',
-                  headers: { 'Authorization': `Bearer ${session.access_token}` }
-                })
+              if (!session?.access_token) {
+                await showAlert(t.alert.deleteAccountFailed)
+                return
               }
+              const res = await fetch('/api/delete-account', {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${session.access_token}` },
+              })
+              if (!res.ok) {
+                console.error('탈퇴 API 실패:', await res.text())
+                await showAlert(t.alert.deleteAccountFailed)
+                return
+              }
+              clearAppLocalStorage()
               await supabase.auth.signOut()
+              setShowDeleteSheet(false)
               router.push('/onboarding')
             } catch (e) {
               console.error('탈퇴 오류:', e)
