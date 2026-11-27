@@ -1,9 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from '@/lib/i18n'
+import {
+  GLASS_BTN_PRESS_CSS,
+  glassCircleBtnStyle,
+  glassOverlayStyle,
+  glassPanelStyle,
+  glassPrimaryBtnStyle,
+  glassSecondaryBtnStyle,
+} from '@/lib/glassModalStyles'
 
-const PRESETS = [5, 10, 20, 30, 50] as const
+const PRESETS = [10, 20, 30, 50] as const
+const STEP = 5
+const MIN = 5
+const MAX = 200
 
 interface Props {
   initialGoal: number | null
@@ -15,13 +26,15 @@ interface Props {
 export default function DailyGoalModal({ initialGoal, onSave, onTurnOff, onCancel }: Props) {
   const { t } = useTranslation()
   const [isDark, setIsDark] = useState(false)
-  const [selected, setSelected] = useState<number>(initialGoal && initialGoal > 0 ? initialGoal : 10)
-  const [custom, setCustom] = useState(
-    initialGoal && !(PRESETS as readonly number[]).includes(initialGoal)
-      ? String(initialGoal)
-      : '',
-  )
+  const [value, setValue] = useState(() => {
+    if (initialGoal && initialGoal >= MIN) return Math.min(MAX, initialGoal)
+    return 10
+  })
+  const [bumpKey, setBumpKey] = useState(0)
   const [saving, setSaving] = useState(false)
+  const holdRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const valueRef = useRef(value)
+  valueRef.current = value
 
   useEffect(() => {
     const update = () => setIsDark(document.documentElement.classList.contains('dark'))
@@ -31,154 +44,198 @@ export default function DailyGoalModal({ initialGoal, onSave, onTurnOff, onCance
     return () => observer.disconnect()
   }, [])
 
-  const separator = isDark ? 'rgba(84,84,88,0.65)' : 'rgba(60,60,67,0.29)'
-  const cancelColor = isDark ? '#0A84FF' : '#007AFF'
-  const confirmColor = isDark ? '#0A84FF' : '#007AFF'
-  const pressBg = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'
+  const applyValue = useCallback((next: number) => {
+    const clamped = Math.min(MAX, Math.max(MIN, next))
+    setValue(clamped)
+    setBumpKey(k => k + 1)
+  }, [])
 
-  const activeGoal = custom.trim() !== '' ? Number(custom) : selected
-  const canSave = Number.isFinite(activeGoal) && activeGoal >= 1 && activeGoal <= 200
+  const stopHold = useCallback(() => {
+    if (holdRef.current) {
+      clearInterval(holdRef.current)
+      holdRef.current = null
+    }
+  }, [])
+
+  const startHold = useCallback((delta: number) => {
+    stopHold()
+    applyValue(valueRef.current + delta)
+    holdRef.current = setInterval(() => {
+      applyValue(valueRef.current + delta)
+    }, 120)
+  }, [applyValue, stopHold])
+
+  useEffect(() => () => stopHold(), [stopHold])
 
   const handleSave = async () => {
-    if (!canSave || saving) return
+    if (saving) return
     setSaving(true)
     try {
-      await onSave(Math.floor(activeGoal))
+      await onSave(value)
     } finally {
       setSaving(false)
     }
   }
 
-  const pickPreset = (n: number) => {
-    setSelected(n)
-    setCustom('')
-  }
+  const secondaryFill = isDark ? 'rgba(120,120,128,0.32)' : 'rgba(120,120,128,0.16)'
 
   return (
-    <div
-      onClick={onCancel}
-      style={{
-        position: 'fixed', inset: 0, zIndex: 9999,
-        background: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.25)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif',
-        animation: 'fadeIn 0.2s ease both',
-      }}
-    >
+    <div onClick={onCancel} style={glassOverlayStyle(isDark)}>
       <style>{`
-        .goal-modal-btn:active { background: ${pressBg} !important; }
+        ${GLASS_BTN_PRESS_CSS}
+        @keyframes goalNumBump {
+          0% { transform: scale(1); }
+          40% { transform: scale(1.08); }
+          100% { transform: scale(1); }
+        }
       `}</style>
       <div
         onClick={e => e.stopPropagation()}
         style={{
-          width: '300px',
-          borderRadius: '22px',
-          overflow: 'hidden',
-          background: isDark ? 'rgba(44,44,46,0.96)' : 'rgba(242,242,247,0.96)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          animation: 'modalEnter 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
+          ...glassPanelStyle(isDark),
+          padding: '28px 16px 16px',
+          boxSizing: 'border-box',
         }}
       >
-        <div style={{ padding: '22px 18px 16px', textAlign: 'center' }}>
-          <h3 style={{
-            fontSize: '17px', fontWeight: 600, letterSpacing: '-0.3px',
-            color: isDark ? '#FFFFFF' : '#000000', margin: '0 0 16px',
-          }}>
-            {t.home.goalModalTitle}
-          </h3>
+        <h3 style={{
+          fontSize: '18px', fontWeight: 600, letterSpacing: '-0.4px',
+          color: isDark ? '#FFFFFF' : '#000000',
+          margin: '0 0 20px', textAlign: 'center',
+        }}>
+          {t.home.goalModalTitle}
+        </h3>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center', marginBottom: '12px' }}>
-            {PRESETS.map(n => {
-              const active = custom.trim() === '' && selected === n
-              return (
-                <button
-                  key={n}
-                  type="button"
-                  onClick={() => pickPreset(n)}
-                  style={{
-                    minWidth: '52px', height: '36px', padding: '0 12px',
-                    borderRadius: '10px',
-                    border: active ? 'none' : `1px solid ${isDark ? 'rgba(84,84,88,0.65)' : 'rgba(60,60,67,0.29)'}`,
-                    background: active ? 'var(--color-my)' : 'transparent',
-                    color: active ? 'var(--color-my-contrast)' : (isDark ? '#FFFFFF' : '#000000'),
-                    fontSize: '15px', fontWeight: 600, cursor: 'pointer',
-                  }}
-                >
-                  {n}
-                </button>
-              )
-            })}
-          </div>
-
-          <input
-            type="number"
-            inputMode="numeric"
-            min={1}
-            max={200}
-            placeholder={t.home.goalCustom}
-            value={custom}
-            onChange={e => {
-              const v = e.target.value.replace(/[^\d]/g, '')
-              setCustom(v)
-              if (v) {
-                const n = Number(v)
-                if ((PRESETS as readonly number[]).includes(n)) setSelected(n)
-              }
-            }}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          gap: '20px', marginBottom: '6px',
+        }}>
+          <button
+            type="button"
+            className="no-press-anim glass-press"
+            aria-label="decrease"
+            disabled={value <= MIN}
+            onPointerDown={e => { e.preventDefault(); startHold(-STEP) }}
+            onPointerUp={stopHold}
+            onPointerLeave={stopHold}
+            onPointerCancel={stopHold}
+            style={{ ...glassCircleBtnStyle(isDark), opacity: value <= MIN ? 0.4 : 1 }}
+          >
+            −
+          </button>
+          <span
+            key={bumpKey}
             style={{
-              width: '100%', height: '40px', boxSizing: 'border-box',
-              borderRadius: '10px',
-              border: `1px solid ${isDark ? 'rgba(84,84,88,0.65)' : 'rgba(60,60,67,0.29)'}`,
-              background: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.7)',
-              padding: '0 12px',
-              fontSize: '15px',
+              fontSize: '34px',
+              fontWeight: 700,
+              letterSpacing: '-0.8px',
               color: isDark ? '#FFFFFF' : '#000000',
-              outline: 'none',
+              minWidth: '72px',
               textAlign: 'center',
+              display: 'inline-block',
+              animation: 'goalNumBump 0.22s ease',
             }}
-          />
-
-          {initialGoal != null && initialGoal > 0 && (
-            <button
-              type="button"
-              onClick={async () => {
-                if (saving) return
-                setSaving(true)
-                try { await onTurnOff() } finally { setSaving(false) }
-              }}
-              style={{
-                marginTop: '12px', background: 'none', border: 'none',
-                color: isDark ? '#FF453A' : '#FF3B30',
-                fontSize: '14px', fontWeight: 500, cursor: 'pointer', padding: '4px',
-              }}
-            >
-              {t.home.goalTurnOff}
-            </button>
-          )}
+          >
+            {value}
+          </span>
+          <button
+            type="button"
+            className="no-press-anim glass-press"
+            aria-label="increase"
+            disabled={value >= MAX}
+            onPointerDown={e => { e.preventDefault(); startHold(STEP) }}
+            onPointerUp={stopHold}
+            onPointerLeave={stopHold}
+            onPointerCancel={stopHold}
+            style={{ ...glassCircleBtnStyle(isDark), opacity: value >= MAX ? 0.4 : 1 }}
+          >
+            +
+          </button>
         </div>
 
-        <div style={{ display: 'flex', borderTop: `0.5px solid ${separator}` }}>
+        <p style={{
+          textAlign: 'center',
+          fontSize: '13px',
+          color: isDark ? 'rgba(235,235,245,0.45)' : 'rgba(60,60,67,0.55)',
+          margin: '0 0 16px',
+        }}>
+          {t.home.goalUnit}
+        </p>
+
+        <div style={{
+          display: 'flex', justifyContent: 'center', gap: '8px',
+          marginBottom: initialGoal != null && initialGoal > 0 ? '12px' : '20px',
+        }}>
+          {PRESETS.map(n => {
+            const active = value === n
+            return (
+              <button
+                key={n}
+                type="button"
+                className="no-press-anim glass-press"
+                onClick={() => applyValue(n)}
+                style={{
+                  height: '28px',
+                  padding: '0 12px',
+                  borderRadius: '999px',
+                  border: 'none',
+                  background: active
+                    ? (isDark ? '#FFFFFF' : '#1C1C1E')
+                    : secondaryFill,
+                  color: active
+                    ? (isDark ? '#1C1C1E' : '#FFFFFF')
+                    : 'var(--color-text-primary)',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'transform 0.15s ease',
+                }}
+              >
+                {n}
+              </button>
+            )
+          })}
+        </div>
+
+        {initialGoal != null && initialGoal > 0 && (
           <button
-            className="no-press-anim goal-modal-btn"
-            onClick={onCancel}
-            style={{
-              flex: 1, height: '50px', background: 'transparent', border: 'none',
-              borderRight: `0.5px solid ${separator}`, borderRadius: 0,
-              fontSize: '17px', fontWeight: 400, color: cancelColor, cursor: 'pointer', padding: 0,
+            type="button"
+            onClick={async () => {
+              if (saving) return
+              setSaving(true)
+              try { await onTurnOff() } finally { setSaving(false) }
             }}
+            style={{
+              display: 'block',
+              width: '100%',
+              marginBottom: '14px',
+              background: 'none',
+              border: 'none',
+              color: isDark ? 'rgba(235,235,245,0.45)' : 'rgba(60,60,67,0.55)',
+              fontSize: '13px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              padding: '4px',
+              textAlign: 'center',
+            }}
+          >
+            {t.home.goalTurnOff}
+          </button>
+        )}
+
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            className="no-press-anim glass-press"
+            onClick={onCancel}
+            style={glassSecondaryBtnStyle(isDark)}
           >
             {t.common.cancel}
           </button>
           <button
-            className="no-press-anim goal-modal-btn"
+            className="no-press-anim glass-press"
             onClick={() => { void handleSave() }}
-            disabled={!canSave || saving}
+            disabled={saving}
             style={{
-              flex: 1, height: '50px', background: 'transparent', border: 'none', borderRadius: 0,
-              fontSize: '17px', fontWeight: 600,
-              color: canSave ? confirmColor : (isDark ? 'rgba(235,235,245,0.3)' : 'rgba(60,60,67,0.3)'),
-              cursor: canSave ? 'pointer' : 'not-allowed', padding: 0,
+              ...glassPrimaryBtnStyle(isDark),
               opacity: saving ? 0.6 : 1,
             }}
           >
