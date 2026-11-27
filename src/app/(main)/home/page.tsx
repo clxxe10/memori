@@ -3,12 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Play, BookOpen, Clock, ChevronRight } from 'lucide-react'
+import { Play, ChevronRight } from 'lucide-react'
 import { usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import { useCountUp } from '@/hooks/useCountUp'
 import PullToRefresh from '@/components/ui/PullToRefresh'
 import Coachmark from '@/components/ui/Coachmark'
+import DailyGoalModal from '@/components/DailyGoalModal'
+import { showToast } from '@/components/ui/Toast'
 import { useTranslation } from '@/lib/i18n'
 
 export default function HomePage() {
@@ -19,7 +21,9 @@ export default function HomePage() {
   const [reviewCount, setReviewCount] = useState(0)
   const [totalWords, setTotalWords] = useState(0)
   const [masteredWords, setMasteredWords] = useState(0)
-  const [totalStudyTime, setTotalStudyTime] = useState(0)
+  const [todayWordsStudied, setTodayWordsStudied] = useState(0)
+  const [dailyGoal, setDailyGoal] = useState<number | null>(null)
+  const [showGoalModal, setShowGoalModal] = useState(false)
   const [streakDays, setStreakDays] = useState(0)
   const [folders, setFolders] = useState<Array<{ id: string; name: string; icon: string; color?: string; word_count: number }>>([])
   const [showSpeedSheet, setShowSpeedSheet] = useState(false)
@@ -36,7 +40,7 @@ export default function HomePage() {
   const animatedTotalWords = useCountUp(totalWords)
   const animatedMasteredWords = useCountUp(masteredWords)
   const animatedStreakDays = useCountUp(streakDays)
-  const animatedTotalStudyTime = useCountUp(totalStudyTime)
+  const animatedTodayWords = useCountUp(todayWordsStudied)
 
   const fetchData = useCallback(async () => {
     try {
@@ -45,8 +49,12 @@ export default function HomePage() {
       if (!user) return
       setUser(user)
 
+      const rawGoal = user.user_metadata?.daily_goal
+      const parsedGoal = typeof rawGoal === 'number' ? rawGoal : Number(rawGoal)
+      setDailyGoal(Number.isFinite(parsedGoal) && parsedGoal > 0 ? parsedGoal : null)
+
       const now = new Date()
-      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+      const today = new Date().toLocaleDateString('en-CA')
 
       // 전체 단어 통계
       const { data: words } = await supabase
@@ -72,14 +80,13 @@ export default function HomePage() {
       }
 
       {
-        const today = new Date().toLocaleDateString('en-CA')
         const { data: todayStudy } = await supabase
           .from('user_daily_study')
-          .select('study_time')
+          .select('words_studied')
           .eq('user_id', user.id)
           .eq('study_date', today)
           .maybeSingle()
-        setTotalStudyTime(todayStudy?.study_time || 0)
+        setTodayWordsStudied(todayStudy?.words_studied || 0)
       }
 
       const { data: folderData } = await supabase
@@ -153,9 +160,16 @@ export default function HomePage() {
   }, [loading])
 
   useEffect(() => {
-    const handleFocus = () => fetchData()
-    window.addEventListener('focus', handleFocus)
-    return () => window.removeEventListener('focus', handleFocus)
+    const refresh = () => { void fetchData() }
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') refresh()
+    }
+    window.addEventListener('focus', refresh)
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      window.removeEventListener('focus', refresh)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
   }, [fetchData])
 
   useEffect(() => {
@@ -193,23 +207,51 @@ export default function HomePage() {
     user?.user_metadata?.full_name?.split(' ')[0] || (lang === 'en' ? 'User' : '사용자')
 
   const animatedProgress = animatedTotalWords > 0 ? Math.round((animatedMasteredWords / animatedTotalWords) * 100) : 0
+  const hasGoal = dailyGoal != null && dailyGoal > 0
+  const goalPercent = hasGoal ? Math.min(100, Math.round((todayWordsStudied / dailyGoal) * 100)) : 0
+  const goalReached = hasGoal && todayWordsStudied >= dailyGoal
 
-  const formatStudyTime = (seconds: number) => {
-    if (seconds < 60) return 'Just now'
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m`
-    const h = Math.floor(seconds / 3600)
-    const m = Math.floor((seconds % 3600) / 60)
-    return m > 0 ? `${h}h ${m}m` : `${h}h`
+  const openGoalModal = () => {
+    if (!user) {
+      router.push('/onboarding')
+      return
+    }
+    setShowGoalModal(true)
+  }
+
+  const saveDailyGoal = async (goal: number) => {
+    const supabase = createClient()
+    const { data, error } = await supabase.auth.updateUser({ data: { daily_goal: goal } })
+    if (error) {
+      console.error('목표 저장 실패:', error)
+      return
+    }
+    setDailyGoal(goal)
+    if (data.user) setUser(data.user)
+    setShowGoalModal(false)
+    showToast(t.home.goalSaveToast)
+  }
+
+  const turnOffDailyGoal = async () => {
+    const supabase = createClient()
+    const { data, error } = await supabase.auth.updateUser({ data: { daily_goal: null } })
+    if (error) {
+      console.error('목표 해제 실패:', error)
+      return
+    }
+    setDailyGoal(null)
+    if (data.user) setUser(data.user)
+    setShowGoalModal(false)
   }
 
   if (!loading && !user) return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--color-bg)', padding: '0 24px', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
       <div style={{ fontSize: '56px', marginBottom: '16px' }}>📚</div>
       <h2 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '8px', textAlign: 'center', letterSpacing: '-0.4px' }}>
-        {lang === 'en' ? 'Sign in to get started' : '로그인하고 시작해요'}
+        {t.home.signInTitle}
       </h2>
       <p style={{ fontSize: '15px', color: 'var(--color-text-secondary)', marginBottom: '32px', textAlign: 'center', lineHeight: 1.5 }}>
-        {lang === 'en' ? 'Create vocabulary lists and study with AI' : 'AI로 단어장을 만들고 학습해요'}
+        {t.home.signInDesc}
       </p>
       <button onClick={() => router.push('/onboarding')} style={{
         width: '100%', maxWidth: '320px', height: '52px',
@@ -217,7 +259,7 @@ export default function HomePage() {
         border: 'none', borderRadius: '9999px',
         fontSize: '16px', fontWeight: 700, cursor: 'pointer',
       }}>
-        {lang === 'en' ? 'Sign In' : '로그인하기'}
+        {t.home.signInCta}
       </button>
     </main>
   )
@@ -312,10 +354,10 @@ export default function HomePage() {
             <div className="progress-fill" style={{ height: '5px', borderRadius: '5px', width: `${Math.min(animatedProgress, 100)}%` }} />
           </div>
           <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: 0 }}>
-            {lang === 'en'
-              ? `${animatedMasteredWords} of ${animatedTotalWords} mastered · ${animatedProgress}%`
-              : `전체 ${animatedTotalWords}개 중 ${animatedMasteredWords}개 마스터 · ${animatedProgress}%`
-            }
+            {t.home.totalProgress
+              .replace('{total}', String(animatedTotalWords))
+              .replace('{mastered}', String(animatedMasteredWords))
+              .replace('{percent}', String(animatedProgress))}
           </p>
         </div>
 
@@ -349,18 +391,55 @@ export default function HomePage() {
 
         {/* 통계 카드 2개 */}
         <div style={{ display: 'grid', gridTemplateColumns: bp === 'mobile' ? '1fr 1fr' : '1fr 1fr 1fr 1fr', gap: '8px', marginBottom: '12px' }}>
-          {[
-            { icon: BookOpen, label: t.home.masteredWords, value: animatedMasteredWords.toString() },
-            { icon: Clock, label: t.home.today, value: formatStudyTime(animatedTotalStudyTime) },
-          ].map((item) => (
-            <div key={item.label} style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '14px', border: '1px solid var(--color-border)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-              <div style={{ width: '22px', height: '3px', background: 'var(--color-neutral)', borderRadius: '3px', marginBottom: '8px' }} />
-              <p style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.3px', marginBottom: '3px', margin: 0 }}>
-                {item.value}
-              </p>
-              <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: '4px 0 0' }}>{item.label}</p>
-            </div>
-          ))}
+          <div style={{ background: 'var(--color-surface)', borderRadius: '16px', padding: '14px', border: '1px solid var(--color-border)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+            <div style={{ width: '22px', height: '3px', background: 'var(--color-neutral)', borderRadius: '3px', marginBottom: '8px' }} />
+            <p style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.3px', margin: 0 }}>
+              {animatedMasteredWords.toString()}
+            </p>
+            <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: '4px 0 0' }}>{t.home.masteredWords}</p>
+          </div>
+
+          <button
+            type="button"
+            onClick={openGoalModal}
+            style={{
+              background: 'var(--color-surface)', borderRadius: '16px', padding: '14px',
+              border: '1px solid var(--color-border)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+              textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit',
+              display: 'flex', flexDirection: 'column', minHeight: '100%',
+            }}
+          >
+            <div style={{ width: '22px', height: '3px', background: 'var(--color-neutral)', borderRadius: '3px', marginBottom: '8px' }} />
+            {!hasGoal ? (
+              <>
+                <p style={{ fontSize: '18px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.3px', margin: 0, lineHeight: 1.2 }}>
+                  {t.home.setGoal}
+                </p>
+                <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: '4px 0 0' }}>{t.home.dailyGoal}</p>
+              </>
+            ) : (
+              <>
+                <p style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.3px', margin: 0, lineHeight: 1.1 }}>
+                  <span>{animatedTodayWords}</span>
+                  <span style={{ color: 'var(--color-text-tertiary)', fontWeight: 600 }}> / {dailyGoal}</span>
+                </p>
+                <p style={{ fontSize: '11px', color: 'var(--color-text-secondary)', margin: '4px 0 0' }}>
+                  {goalReached
+                    ? t.home.goalReached
+                    : t.home.goalProgress.replace('{percent}', String(goalPercent))}
+                </p>
+                <div style={{ marginTop: 'auto', paddingTop: '8px', height: '3px', background: 'var(--color-track)', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${goalReached ? 100 : goalPercent}%`,
+                    background: 'var(--color-my)',
+                    borderRadius: '3px',
+                    transition: 'width 0.3s ease',
+                  }} />
+                </div>
+              </>
+            )}
+          </button>
         </div>
 
         {/* 내 단어장 바로가기 */}
@@ -398,10 +477,10 @@ export default function HomePage() {
                 >
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {folder.name?.trim() || (lang === 'en' ? 'Untitled' : '이름 없음')}
+                      {folder.name?.trim() || t.home.untitled}
                     </div>
                     <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '1px' }}>
-                      {lang === 'en' ? `${folder.word_count} words` : `${folder.word_count}개 단어`}
+                      {t.home.wordCount.replace('{count}', String(folder.word_count))}
                     </div>
                   </div>
                   <ChevronRight size={14} color="var(--color-text-tertiary)" />
@@ -471,7 +550,7 @@ export default function HomePage() {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '3px', marginBottom: '4px', maxWidth: '600px', margin: '0 auto 4px' }}>
-                {(lang === 'en' ? ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] : ['월','화','수','목','금','토','일']).map(d => (
+                {t.home.days.map(d => (
                   <div key={d} style={{ textAlign: 'center', fontSize: '10px', color: 'var(--color-text-tertiary)', fontWeight: 600 }}>{d}</div>
                 ))}
               </div>
@@ -634,7 +713,7 @@ export default function HomePage() {
             maxHeight: '70vh', overflowY: 'auto' as const,
             animation: 'modalEnterCentered 0.25s cubic-bezier(0.32, 0.72, 0, 1) both',
           }}>
-            <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '6px', textAlign: 'center' }}>단어장 선택</h3>
+            <h3 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '6px', textAlign: 'center' }}>{t.study.selectFolder}</h3>
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '16px', textAlign: 'center' }}>{t.study.selectFolderDesc}</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
               <button onClick={() => { setShowSpeedSheet(false); router.push('/study/speed') }}
@@ -656,7 +735,7 @@ export default function HomePage() {
                   <div>
                     <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text-primary)' }}>{f.name}</div>
                     <div style={{ fontSize: '12px', color: f.word_count === 0 ? '#E24B4A' : 'var(--color-text-secondary)' }}>
-                      {f.word_count === 0 ? t.home.noWord : (lang === 'en' ? `${f.word_count} words` : `${f.word_count}개 단어`)}
+                      {f.word_count === 0 ? t.home.noWord : t.home.wordCount.replace('{count}', String(f.word_count))}
                     </div>
                   </div>
                 </button>
@@ -672,10 +751,18 @@ export default function HomePage() {
           </div>
         </>
       )}
+      {showGoalModal && (
+        <DailyGoalModal
+          initialGoal={dailyGoal}
+          onSave={saveDailyGoal}
+          onTurnOff={turnOffDailyGoal}
+          onCancel={() => setShowGoalModal(false)}
+        />
+      )}
       <Coachmark
         id="home"
         targetRef={reviewCardRef}
-        text={lang === 'en' ? 'Words to review today appear here' : '오늘 복습할 단어가 여기 표시돼요'}
+        text={t.home.coachmarkReview}
         placement="bottom"
       />
     </main>
