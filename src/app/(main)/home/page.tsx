@@ -15,6 +15,7 @@ import { useTranslation } from '@/lib/i18n'
 import CenterModal from '@/components/ui/CenterModal'
 import { useIsDark } from '@/hooks/useIsDark'
 import { glassButtonSecondary } from '@/lib/glassModalStyles'
+import { attachDebouncedFocusRefresh } from '@/lib/focusRefresh'
 
 export default function HomePage() {
   const router = useRouter()
@@ -72,7 +73,6 @@ export default function HomePage() {
         }
       }
 
-      const now = new Date()
       const today = new Date().toLocaleDateString('en-CA')
 
       // 전체 단어 통계
@@ -140,37 +140,16 @@ export default function HomePage() {
       } else {
         setStreakDays(0)
       }
-
-      // 이달 학습 데이터
-      const year = now.getFullYear()
-      const month = now.getMonth()
-      const firstDay = new Date(year, month, 1).toISOString().split('T')[0]
-      const lastDay = new Date(year, month + 1, 0).toISOString().split('T')[0]
-
-      const { data: monthData } = await supabase
-        .from('user_daily_study')
-        .select('study_date, words_studied')
-        .eq('user_id', user.id)
-        .gte('study_date', firstDay)
-        .lte('study_date', lastDay)
-
-      if (monthData) {
-        const dataMap: Record<string, number> = {}
-        monthData.forEach(d => {
-          dataMap[d.study_date] = d.words_studied || 0
-        })
-        setMonthlyData(dataMap)
-      }
     } catch (e) {
       console.error('홈 데이터 로딩 오류:', e)
     } finally {
       setLoading(false)
     }
-  }, [calendarMonth])
+  }, [])
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [fetchData])
 
   useEffect(() => {
     if (!loading) {
@@ -179,18 +158,10 @@ export default function HomePage() {
   }, [loading])
 
   useEffect(() => {
-    const refresh = () => { void fetchData() }
-    const onVisibility = () => {
-      if (document.visibilityState === 'visible') refresh()
-    }
-    window.addEventListener('focus', refresh)
-    document.addEventListener('visibilitychange', onVisibility)
-    return () => {
-      window.removeEventListener('focus', refresh)
-      document.removeEventListener('visibilitychange', onVisibility)
-    }
+    return attachDebouncedFocusRefresh(() => { void fetchData() })
   }, [fetchData])
 
+  // Calendar month only — not duplicated inside fetchData
   useEffect(() => {
     const fetchMonthData = async () => {
       try {
@@ -220,7 +191,7 @@ export default function HomePage() {
         console.error('월별 데이터 로딩 오류:', e)
       }
     }
-    fetchMonthData()
+    void fetchMonthData()
   }, [calendarMonth])
 
   const nickname = user?.user_metadata?.nickname ||
@@ -286,23 +257,6 @@ export default function HomePage() {
     </main>
   )
 
-  if (loading) return (
-    <main style={{ minHeight: '100vh', background: 'var(--color-bg)', padding: 'max(80px, calc(env(safe-area-inset-top) + 28px)) 20px 100px', fontFamily: '-apple-system, sans-serif' }}>
-      <div style={{ height: '28px', width: '160px', borderRadius: '8px', background: 'var(--color-surface-2)', marginBottom: '8px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
-      <div style={{ height: '20px', width: '120px', borderRadius: '8px', background: 'var(--color-surface-2)', marginBottom: '32px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
-      <div style={{ height: '120px', borderRadius: '20px', background: 'var(--color-surface-2)', marginBottom: '16px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
-      <div style={{ height: '80px', borderRadius: '20px', background: 'var(--color-surface-2)', marginBottom: '16px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
-      <div style={{ height: '80px', borderRadius: '20px', background: 'var(--color-surface-2)', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
-      <style>{`
-        @keyframes skeleton-pulse {
-          0% { opacity: 1; }
-          50% { opacity: 0.4; }
-          100% { opacity: 1; }
-        }
-      `}</style>
-    </main>
-  )
-
   return (
     <main style={{
       minHeight: '100vh',
@@ -310,6 +264,13 @@ export default function HomePage() {
       paddingBottom: '100px',
       fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     }}>
+      <style>{`
+        @keyframes skeleton-pulse {
+          0% { opacity: 1; }
+          50% { opacity: 0.4; }
+          100% { opacity: 1; }
+        }
+      `}</style>
       <PullToRefresh onRefresh={async () => { await fetchData() }}>
       <div style={{
         maxWidth: bp === 'mobile' ? '100%' : '720px',
@@ -318,18 +279,18 @@ export default function HomePage() {
         paddingTop: 'max(80px, calc(env(safe-area-inset-top) + 28px))',
       }}>
 
-        {/* 상단 인사말 */}
+        {/* 상단 인사말 — 셸 즉시 */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
           <div>
             <p style={{ fontSize: '14px', color: 'var(--color-text-secondary)', marginBottom: '4px', margin: 0 }}>{t.home.greeting} 👋</p>
             <h1 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.5px', margin: '4px 0 0' }}>
-              {nickname}님
+              {loading ? '…' : `${nickname}님`}
             </h1>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div className="streak-badge">
               <span>🔥</span>
-              <span>{animatedStreakDays}</span>
+              <span>{loading ? '–' : animatedStreakDays}</span>
             </div>
             <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#E8EAF0', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
               {user?.user_metadata?.avatar_url ? (
@@ -341,6 +302,18 @@ export default function HomePage() {
           </div>
         </div>
 
+        {loading ? (
+          <>
+            <div style={{ height: '140px', borderRadius: '28px', background: 'var(--color-surface-2)', marginBottom: '12px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
+              <div style={{ height: '80px', borderRadius: '16px', background: 'var(--color-surface-2)', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
+              <div style={{ height: '80px', borderRadius: '16px', background: 'var(--color-surface-2)', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
+            </div>
+            <div style={{ height: '100px', borderRadius: '16px', background: 'var(--color-surface-2)', marginBottom: '12px', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
+            <div style={{ height: '200px', borderRadius: '16px', background: 'var(--color-surface-2)', animation: 'skeleton-pulse 1.5s ease-in-out infinite' }} />
+          </>
+        ) : (
+        <>
         {/* 복습 배너 카드 */}
         <div
           ref={reviewCardRef}
@@ -711,6 +684,8 @@ export default function HomePage() {
             {todayWord.pronunciation && <p style={{ fontSize: '11px', color: 'var(--color-text-tertiary)', marginBottom: '2px', margin: '2px 0' }}>{todayWord.pronunciation}</p>}
             <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', margin: '4px 0 0' }}>{todayWord.meaning}</p>
           </div>
+        )}
+        </>
         )}
 
       </div>

@@ -26,6 +26,7 @@ import {
   glassDestructive,
   glassInputStyle,
 } from '@/lib/glassModalStyles'
+import { attachDebouncedFocusRefresh } from '@/lib/focusRefresh'
 
 function addRowStyle(isDark: boolean, marginBottom: string): CSSProperties {
   return {
@@ -194,9 +195,7 @@ export default function VocabularyDetailPage() {
 
   useEffect(() => {
     fetchWords()
-    const handleFocus = () => fetchWords()
-    window.addEventListener('focus', handleFocus)
-    return () => window.removeEventListener('focus', handleFocus)
+    return attachDebouncedFocusRefresh(() => { void fetchWords() })
   }, [folderId])
 
   const FILTERS = lang === 'en' ? FILTERS_EN : FILTERS_KO

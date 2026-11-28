@@ -380,7 +380,7 @@ textarea {
   align-items: center;
   gap: 4px;
   background: rgba(var(--color-my-rgb), 0.12);
-  color: var(--color-my);
+  color: var(--color-text-primary);
   padding: 7px 14px;
   border-radius: 9999px;
   font-weight: 700;
