@@ -191,9 +191,8 @@ export default function CameraPage() {
     setIsSaving(true)
     try {
       const supabase = createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (!user) { setIsSaving(false); return }
       const { error } = await supabase.from('words').insert(
         selected.map((w) => ({

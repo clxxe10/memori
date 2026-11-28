@@ -74,7 +74,8 @@ export default function VocabularyPage() {
   const fetchFolders = async () => {
     try {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (!user) { setLoading(false); return }
       setUser(user)
 
@@ -140,9 +141,8 @@ export default function VocabularyPage() {
 
     try {
       const supabase = createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (!user) return
 
       const authorNickname = user.user_metadata?.nickname ||

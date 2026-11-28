@@ -49,7 +49,8 @@ export default function HomePage() {
   const fetchData = useCallback(async () => {
     try {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (!user) return
       setUser(user)
 
@@ -194,7 +195,8 @@ export default function HomePage() {
     const fetchMonthData = async () => {
       try {
         const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
+        const { data: { session } } = await supabase.auth.getSession()
+        const user = session?.user
         if (!user) return
 
         const year = calendarMonth.getFullYear()
@@ -637,7 +639,8 @@ export default function HomePage() {
           onClick={async () => {
             try {
               const supabase = createClient()
-              const { data: { user } } = await supabase.auth.getUser()
+              const { data: { session } } = await supabase.auth.getSession()
+              const user = session?.user
               if (!user) return
               const { data } = await supabase
                 .from('folders').select('*').eq('user_id', user.id)

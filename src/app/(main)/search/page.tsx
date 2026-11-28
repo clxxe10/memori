@@ -89,7 +89,8 @@ function SearchPageContent() {
   const fetchPublicFolders = useCallback(async () => {
     try {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (user) setMyUserId(user.id)
 
       const { data: folderData, error: folderError } = await supabase
@@ -201,7 +202,8 @@ function SearchPageContent() {
     setImporting(folder.id)
     try {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (!user) { await showAlert(lang === 'en' ? 'Please sign in to import.' : '로그인이 필요해요.'); return }
 
       const { data: newFolder } = await supabase

@@ -40,7 +40,8 @@ function ListeningContent() {
   useEffect(() => {
     const fetchWords = async () => {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (!user) return
       if (folderId) {
         const { data: folder } = await supabase.from('folders').select('name').eq('id', folderId).single()

@@ -74,7 +74,8 @@ function SpeedContent() {
   useEffect(() => {
     const fetchWords = async () => {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (!user) return
       let query = supabase.from('words').select('id, word, meaning, part_of_speech').eq('user_id', user.id)
       if (folderId) query = query.eq('folder_id', folderId)

@@ -112,27 +112,22 @@ export default function StudyPage() {
   }, [])
 
   useEffect(() => {
-    const checkUser = async () => {
+    const load = async () => {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (user) setUser(user)
       setLoading(false)
-    }
-    checkUser()
-  }, [])
 
-  useEffect(() => {
-    const fetchFolders = async () => {
+      if (!user) return
+
       setLoadingFolders(true)
       try {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) { setLoadingFolders(false); return }
         const { data: folderData } = await supabase
           .from('folders').select('*')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
-        if (!folderData) { setLoadingFolders(false); return }
+        if (!folderData) return
         const foldersWithCount = await Promise.all(
           folderData.map(async (folder) => {
             const { count } = await supabase
@@ -143,14 +138,13 @@ export default function StudyPage() {
           })
         )
         setFolders(foldersWithCount)
-        setLoadingFolders(false)
       } catch (e) {
         console.error('폴더 로딩 오류:', e)
       } finally {
         setLoadingFolders(false)
       }
     }
-    fetchFolders()
+    void load()
   }, [])
 
   const toggleFavorite = (id: string, e: React.MouseEvent) => {
@@ -180,7 +174,8 @@ export default function StudyPage() {
     setIsStarting(true)
     try {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (!user) {
         router.push('/onboarding')
         return

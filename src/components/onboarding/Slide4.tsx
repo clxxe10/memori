@@ -36,7 +36,8 @@ export default function Slide4({ onNext, onBack }: { onNext: () => void; onBack:
     setSaving(true)
     try {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (user) {
         await supabase.from('user_learning_stats').upsert({
           user_id: user.id,

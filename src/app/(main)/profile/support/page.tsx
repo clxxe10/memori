@@ -55,7 +55,8 @@ export default function SupportPage() {
   useEffect(() => {
     const fetchUser = async () => {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (user?.email) setContactEmail(user.email)
     }
     fetchUser()
@@ -68,7 +69,8 @@ export default function SupportPage() {
     setIsSending(true)
     try {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
 
       const { error } = await supabase
         .from('support_requests')

@@ -53,7 +53,8 @@ function ReviewContent() {
   useEffect(() => {
     const fetchWords = async () => {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (!user) return
 
       let query = supabase.from('words').select('*').eq('user_id', user.id)

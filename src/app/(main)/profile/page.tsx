@@ -49,27 +49,8 @@ export default function ProfilePage() {
     const fetchData = async () => {
       try {
       const supabase = createClient()
-      let user = null
-
-      // 1차 시도
-      const { data: { user: user1 } } = await supabase.auth.getUser()
-      if (user1) {
-        user = user1
-      } else {
-        // 2차: refreshSession 후 재시도
-        await supabase.auth.refreshSession()
-        await new Promise(resolve => setTimeout(resolve, 300))
-        const { data: { user: user2 } } = await supabase.auth.getUser()
-        if (user2) {
-          user = user2
-        } else {
-          // 3차: getSession에서 직접 추출
-          const { data: { session } } = await supabase.auth.getSession()
-          if (session?.user) {
-            user = session.user
-          }
-        }
-      }
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user ?? null
 
       if (!user) { setLoading(false); return }
       setUser(user)

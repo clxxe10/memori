@@ -28,7 +28,8 @@ export default function MemorySetPage() {
   useEffect(() => {
     const fetchFolders = async () => {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (!user) { router.push('/login'); return }
       const { data } = await supabase.from('folders').select('id, name, description').eq('user_id', user.id)
       setFolders(data || [])

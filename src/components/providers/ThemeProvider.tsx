@@ -62,7 +62,8 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
       }
       try {
         const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
+        const { data: { session } } = await supabase.auth.getSession()
+        const user = session?.user
         await initRevenueCat(user?.id)
       } catch (e) {
         console.error('RevenueCat 초기화 실패:', e)
