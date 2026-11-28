@@ -60,7 +60,7 @@ export default function LoginPage() {
     border: 'none',
     borderRadius: '14px',
     padding: '0 16px',
-    fontSize: '15px',
+    fontSize: '16px',
     color: 'var(--color-text-primary)',
     outline: 'none',
     boxSizing: 'border-box' as const,

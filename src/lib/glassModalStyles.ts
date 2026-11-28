@@ -299,7 +299,7 @@ export function glassInputStyle(isDark: boolean): CSSProperties {
     width: '100%',
     height: '46px',
     padding: '0 14px',
-    fontSize: '15px',
+    fontSize: '16px',
     borderRadius: '14px',
     border: 'none',
     background: isDark ? 'rgba(120,120,128,0.22)' : 'rgba(120,120,128,0.12)',

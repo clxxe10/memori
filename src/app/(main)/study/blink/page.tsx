@@ -131,7 +131,7 @@ function BlinkContent() {
           style={{
             background: 'var(--color-surface)', border: '1px solid var(--color-border)',
             borderRadius: '12px', padding: '6px 10px',
-            fontSize: '13px', color: 'var(--color-text-primary)', cursor: 'pointer',
+            fontSize: '16px', color: 'var(--color-text-primary)', cursor: 'pointer',
           }}
         >
           <option value={3000}>{t.study.slow}</option>

@@ -638,13 +638,13 @@ export default function PublicFolderPage() {
                 value={commentText}
                 onChange={e => setCommentText(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleComment()}
-                placeholder={t.search.searchPlaceholder}
+                placeholder={t.search.commentPlaceholder}
                 style={{
                   flex: 1, height: '46px',
                   background: 'var(--color-surface-2)',
                   border: '1px solid var(--color-border)',
                   borderRadius: '14px', padding: '0 16px',
-                  fontSize: '15px', color: 'var(--color-text-primary)',
+                  fontSize: '16px', color: 'var(--color-text-primary)',
                   outline: 'none', boxSizing: 'border-box',
                 }}
               />

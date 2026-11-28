@@ -87,6 +87,13 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
 }
 
+/* Prevent iOS focus zoom (triggers when font-size < 16px) */
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
 html, body {
   height: 100%;
 }

@@ -157,7 +157,7 @@ export default function SupportPage() {
                   background: 'var(--color-surface)',
                   border: '1px solid var(--color-border)',
                   borderRadius: '14px', padding: '0 16px',
-                  fontSize: '14px', color: 'var(--color-text-primary)',
+                  fontSize: '16px', color: 'var(--color-text-primary)',
                   outline: 'none', boxSizing: 'border-box' as const,
                 }}
               />
@@ -175,7 +175,7 @@ export default function SupportPage() {
               value={content}
               onChange={e => setContent(e.target.value)}
               placeholder={lang === 'en' ? 'Describe your inquiry...' : '문의 내용을 입력해주세요...'}
-              style={{ width: '100%', height: '140px', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '14px', padding: '14px 16px', fontSize: '14px', color: 'var(--color-text-primary)', outline: 'none', resize: 'none' as const, boxSizing: 'border-box' as const, lineHeight: 1.6 }}
+              style={{ width: '100%', height: '140px', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '14px', padding: '14px 16px', fontSize: '16px', color: 'var(--color-text-primary)', outline: 'none', resize: 'none' as const, boxSizing: 'border-box' as const, lineHeight: 1.6 }}
             />
             </div>
             <button

@@ -295,7 +295,7 @@ export default function VocabularyPage() {
               flex: 1,
               border: 'none',
               outline: 'none',
-              fontSize: '14px',
+              fontSize: '16px',
               color: 'var(--color-text-primary)',
               background: 'transparent',
             }}

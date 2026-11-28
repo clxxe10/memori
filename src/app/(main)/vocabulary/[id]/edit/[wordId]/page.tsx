@@ -87,7 +87,7 @@ export default function EditWordPage() {
     border: '1.5px solid var(--color-border)',
     borderRadius: '14px',
     padding: '0 16px',
-    fontSize: '15px', color: 'var(--color-text-primary)',
+    fontSize: '16px', color: 'var(--color-text-primary)',
     outline: 'none', boxSizing: 'border-box' as const,
   }
 

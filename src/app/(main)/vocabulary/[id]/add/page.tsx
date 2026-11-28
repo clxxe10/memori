@@ -114,7 +114,7 @@ export default function AddWordPage() {
     border: '1.5px solid var(--color-border)',
     borderRadius: '14px',
     padding: '0 16px',
-    fontSize: '15px',
+    fontSize: '16px',
     color: 'var(--color-text-primary)',
     outline: 'none',
     boxSizing: 'border-box' as const,

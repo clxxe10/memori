@@ -285,7 +285,7 @@ function SearchPageContent() {
             onChange={e => setQuery(e.target.value)}
             style={{
               flex: 1, border: 'none', outline: 'none',
-              fontSize: '14px', color: 'var(--color-text-primary)', background: 'transparent',
+              fontSize: '16px', color: 'var(--color-text-primary)', background: 'transparent',
             }}
           />
           {query && (
