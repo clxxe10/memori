@@ -1,21 +1,57 @@
+import { requireUser } from '@/lib/server/requireUser'
+
 export const maxDuration = 30
 
+const MAX_WORD = 100
+const MAX_MEANING = 200
+
 export async function POST(request: Request) {
+  const auth = await requireUser(request)
+  if (auth.response) return auth.response
+
   try {
-    const { word, meaning } = await request.json()
-    if (!word) {
-      return Response.json({ error: '단어가 없어요' }, { status: 400 })
+    let payload: unknown
+    try {
+      payload = await request.json()
+    } catch {
+      return Response.json({ error: 'Invalid request' }, { status: 400 })
     }
 
-    if (!process.env.ANTHROPIC_API_KEY) {
-      return Response.json({ error: 'API 키가 설정되지 않았어요' }, { status: 500 })
+    const body = payload as { word?: unknown; meaning?: unknown }
+    const word = typeof body.word === 'string' ? body.word.trim() : ''
+    if (!word) {
+      return Response.json({ error: 'Word required' }, { status: 400 })
+    }
+    if (word.length > MAX_WORD) {
+      return Response.json({ error: 'Word too long' }, { status: 400 })
+    }
+
+    let meaning: string | undefined
+    if (body.meaning !== undefined && body.meaning !== null) {
+      if (typeof body.meaning !== 'string') {
+        return Response.json({ error: 'Invalid meaning' }, { status: 400 })
+      }
+      const trimmed = body.meaning.trim()
+      // empty meaning is treated as omitted (client often sends "")
+      if (trimmed) {
+        if (trimmed.length > MAX_MEANING) {
+          return Response.json({ error: 'Meaning too long' }, { status: 400 })
+        }
+        meaning = trimmed
+      }
+    }
+
+    const apiKey = process.env.ANTHROPIC_API_KEY
+    if (!apiKey) {
+      console.error('generate-word-info: ANTHROPIC_API_KEY missing')
+      return Response.json({ error: 'Server error' }, { status: 500 })
     }
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
@@ -35,9 +71,8 @@ export async function POST(request: Request) {
     })
 
     if (!response.ok) {
-      const errorData = await response.text()
-      console.error('Anthropic API 오류:', response.status, errorData)
-      return Response.json({ error: 'AI API 오류: ' + response.status }, { status: 500 })
+      console.error('generate-word-info: Anthropic status', response.status)
+      return Response.json({ error: 'AI request failed' }, { status: 500 })
     }
 
     const data = await response.json()
@@ -45,13 +80,12 @@ export async function POST(request: Request) {
     const clean = text.replace(/```json|```/g, '').trim()
     const jsonMatch = clean.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
-      return Response.json({ error: 'JSON 파싱 실패' }, { status: 500 })
+      return Response.json({ error: 'AI response invalid' }, { status: 500 })
     }
     const result = JSON.parse(jsonMatch[0])
     return Response.json(result)
   } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : '알 수 없는 오류'
-    console.error('generate-word-info 오류:', e)
-    return Response.json({ error: message }, { status: 500 })
+    console.error('generate-word-info 오류:', e instanceof Error ? e.message : e)
+    return Response.json({ error: 'Request failed' }, { status: 500 })
   }
 }

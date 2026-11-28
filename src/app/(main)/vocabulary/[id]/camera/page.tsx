@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import { detectLanguage } from '@/lib/detectLanguage'
 import { showToast } from '@/components/ui/Toast'
 import { showAlert } from '@/components/ui/AlertHost'
+import { fetchAiApi } from '@/lib/aiApiFetch'
 import { addExtractBonus, canUsePhotoExtract, incrementExtractCount } from '@/lib/premium'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
@@ -161,15 +162,22 @@ export default function CameraPage() {
     try {
       const base64 = await compressImage(imageFile)
 
-      const response = await fetch('/api/extract-words', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: base64 }),
+      const result = await fetchAiApi('/api/extract-words', {
+        image: base64,
+        media_type: 'image/jpeg',
       })
 
-      const data = await response.json()
+      if (!result.ok) {
+        if (result.reason === 'too_large' || result.reason === 'bad_request') {
+          showToast('사진이 너무 커요', 'error')
+        } else if (result.reason !== 'no_session' && result.reason !== 'unauthorized') {
+          showToast(t.alert.aiFailed, 'error')
+        }
+        return
+      }
 
-      if (!response.ok || data.error) {
+      const data = await result.response.json()
+      if (data.error || !Array.isArray(data.words)) {
         showToast(t.alert.aiFailed, 'error')
         return
       }

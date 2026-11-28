@@ -7,6 +7,7 @@ import { ArrowLeft, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { detectLanguage } from '@/lib/detectLanguage'
 import { showToast } from '@/components/ui/Toast'
+import { fetchAiApi } from '@/lib/aiApiFetch'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useKeyboard } from '@/hooks/useKeyboard'
 import { useTranslation } from '@/lib/i18n'
@@ -39,19 +40,28 @@ export default function AddWordPage() {
   const padding = usePagePadding('100px')
   const { keyboardHeight, isKeyboardOpen } = useKeyboard()
 
+  const runGenerateWordInfo = async (payload: { word: string; meaning?: string }) => {
+    const result = await fetchAiApi('/api/generate-word-info', payload)
+    if (!result.ok) {
+      if (result.reason === 'too_large' || result.reason === 'bad_request') {
+        setError('입력이 너무 길어요')
+      } else if (result.reason !== 'no_session' && result.reason !== 'unauthorized') {
+        setError(t.alert.aiFailed)
+      }
+      return null
+    }
+    return result.response.json()
+  }
+
   const handleGenerate = async () => {
     if (!word.trim()) return
     setIsGenerating(true)
     setError('')
     try {
-      const res = await fetch('/api/generate-word-info', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ word: word.trim(), meaning: meaning.trim() }),
-      })
-      if (!res.ok) throw new Error('API 오류')
-      const data = await res.json()
-      setGenerated(data)
+      const body: { word: string; meaning?: string } = { word: word.trim() }
+      if (meaning.trim()) body.meaning = meaning.trim()
+      const data = await runGenerateWordInfo(body)
+      if (data) setGenerated(data)
     } catch {
       setError(t.alert.aiFailed)
     } finally {
@@ -175,15 +185,11 @@ export default function AddWordPage() {
               setIsGeneratingAll(true)
               setError('')
               try {
-                const res = await fetch('/api/generate-word-info', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ word: word.trim() }),
-                })
-                if (!res.ok) throw new Error('API 오류')
-                const data = await res.json()
-                setGenerated(data)
-                if (data.meaning) setMeaning(data.meaning)
+                const data = await runGenerateWordInfo({ word: word.trim() })
+                if (data) {
+                  setGenerated(data)
+                  if (data.meaning) setMeaning(data.meaning)
+                }
               } catch {
                 setError(t.alert.aiFailed)
               } finally {
