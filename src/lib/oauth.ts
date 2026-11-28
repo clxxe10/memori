@@ -3,10 +3,13 @@ import { createClient } from '@/lib/supabase/client'
 export type OAuthProvider = 'google' | 'kakao' | 'apple'
 
 const NATIVE_REDIRECT = 'com.oneidea.memori://auth/callback'
+/** HTTPS callback for App Store 1.0 binaries without App/Browser plugins */
+const LEGACY_NATIVE_REDIRECT = 'https://memori-seven.vercel.app/auth/callback'
 
 /**
  * Start OAuth for web or native Capacitor.
- * - Native: custom URL scheme redirect + Browser.open (PKCE stays in WebView)
+ * - Native (new): custom URL scheme + Browser.open
+ * - Native (1.0 / no App plugin): HTTPS callback + window.location
  * - Web: normal redirect to /auth/callback
  */
 export async function signInWithProvider(provider: OAuthProvider): Promise<void> {
@@ -14,18 +17,24 @@ export async function signInWithProvider(provider: OAuthProvider): Promise<void>
 
   const { Capacitor } = await import('@capacitor/core')
   const isNative = typeof window !== 'undefined' && Capacitor.isNativePlatform()
+  const hasAppPlugin = isNative && Capacitor.isPluginAvailable('App')
+  const hasBrowserPlugin = isNative && Capacitor.isPluginAvailable('Browser')
+  const useNativeDeepLink = hasAppPlugin && hasBrowserPlugin
 
   const options: {
     redirectTo: string
     skipBrowserRedirect?: boolean
     scopes?: string
   } = {
-    redirectTo: isNative
+    redirectTo: useNativeDeepLink
       ? NATIVE_REDIRECT
-      : `${window.location.origin}/auth/callback`,
+      : isNative
+        ? LEGACY_NATIVE_REDIRECT
+        : `${window.location.origin}/auth/callback`,
   }
 
-  if (isNative) {
+  if (useNativeDeepLink || isNative) {
+    // Control navigation ourselves (Browser.open or window.location)
     options.skipBrowserRedirect = true
   }
 
@@ -42,12 +51,21 @@ export async function signInWithProvider(provider: OAuthProvider): Promise<void>
     throw error
   }
 
-  if (isNative) {
-    if (!data?.url) {
-      throw new Error('OAuth URL을 받지 못했어요')
-    }
+  if (!data?.url) {
+    throw new Error('OAuth URL을 받지 못했어요')
+  }
+
+  if (useNativeDeepLink) {
     const { Browser } = await import('@capacitor/browser')
     await Browser.open({ url: data.url })
+    return
   }
-  // Web: Supabase redirects the page automatically when skipBrowserRedirect is unset
+
+  if (isNative) {
+    // Old binary: no App/Browser — navigate in the WebView
+    window.location.href = data.url
+    return
+  }
+  // Web: Supabase redirects when skipBrowserRedirect is unset;
+  // if we set it above only for native, web uses automatic redirect.
 }

@@ -14,6 +14,7 @@ function isNewUser(user: { created_at: string; last_sign_in_at?: string | null }
 
 /**
  * Listens for OAuth deep links on native iOS/Android.
+ * Skipped on old binaries without the App plugin.
  * Must exchange the code in the WebView so PKCE code_verifier is available.
  */
 export default function NativeAuthListener() {
@@ -31,17 +32,25 @@ export default function NativeAuthListener() {
       const { Capacitor } = await import('@capacitor/core')
       if (!Capacitor.isNativePlatform() || cancelled) return
 
+      // App Store 1.0 binary has no @capacitor/app — skip quietly
+      if (!Capacitor.isPluginAvailable('App')) return
+
       attached.current = true
       const { App } = await import('@capacitor/app')
-      const { Browser } = await import('@capacitor/browser')
+      const hasBrowser = Capacitor.isPluginAvailable('Browser')
+      const Browser = hasBrowser
+        ? (await import('@capacitor/browser')).Browser
+        : null
 
       const handle = await App.addListener('appUrlOpen', async ({ url }) => {
         if (!url?.startsWith(NATIVE_CALLBACK_PREFIX)) return
 
-        try {
-          await Browser.close()
-        } catch {
-          // Browser may already be closed
+        if (Browser) {
+          try {
+            await Browser.close()
+          } catch {
+            // Browser may already be closed
+          }
         }
 
         let parsed: URL

@@ -65,7 +65,7 @@ async function speakNative(text: string, langCode: string): Promise<void> {
   })
 }
 
-/** App-wide TTS: native iOS voice on device, enhanced web voices in browser */
+/** App-wide TTS: native iOS voice on device, enhanced web voices in browser / old binaries */
 export async function speak(text: string): Promise<void> {
   const trimmed = text?.trim()
   if (!trimmed) return
@@ -74,9 +74,13 @@ export async function speak(text: string): Promise<void> {
 
   if (typeof window !== 'undefined') {
     const { Capacitor } = await import('@capacitor/core')
-    if (Capacitor.isNativePlatform()) {
-      await speakNative(trimmed, langCode)
-      return
+    if (Capacitor.isNativePlatform() && Capacitor.isPluginAvailable('TextToSpeech')) {
+      try {
+        await speakNative(trimmed, langCode)
+        return
+      } catch (e) {
+        console.warn('Native TTS failed, falling back to web:', e)
+      }
     }
   }
 
@@ -86,7 +90,7 @@ export async function speak(text: string): Promise<void> {
 export async function stopSpeaking(): Promise<void> {
   if (typeof window !== 'undefined') {
     const { Capacitor } = await import('@capacitor/core')
-    if (Capacitor.isNativePlatform()) {
+    if (Capacitor.isNativePlatform() && Capacitor.isPluginAvailable('TextToSpeech')) {
       try {
         const { TextToSpeech } = await import('@capacitor-community/text-to-speech')
         await TextToSpeech.stop()
