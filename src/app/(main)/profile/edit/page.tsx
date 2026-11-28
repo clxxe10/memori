@@ -20,6 +20,7 @@ import { createClient } from '@/lib/supabase/client'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
 import { showAlert } from '@/components/ui/AlertHost'
+import { invalidateTabCache } from '@/lib/tabCache'
 
 export default function ProfileEditPage() {
   const { t, lang } = useTranslation()
@@ -89,6 +90,7 @@ export default function ProfileEditPage() {
         return
       }
 
+      invalidateTabCache(['home', 'profile'])
       setAvatarUrl(publicUrl)
     } catch (e) {
       console.error('프로필 사진 오류:', e)
@@ -116,6 +118,7 @@ export default function ProfileEditPage() {
         .eq('user_id', user.id)
     }
 
+    invalidateTabCache(['home', 'profile'])
     setSaving(false)
     router.back()
   }

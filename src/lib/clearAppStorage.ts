@@ -1,6 +1,9 @@
+import { clearAllTabCache } from '@/lib/tabCache'
+
 /** Clear Memori app keys from localStorage (call after account deletion). */
 export function clearAppLocalStorage(): void {
   if (typeof window === 'undefined') return
+  clearAllTabCache()
 
   const exactKeys = [
     'daily_goal',

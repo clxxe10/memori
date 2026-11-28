@@ -8,6 +8,7 @@ import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
 import { showAlert, showConfirm } from '@/components/ui/AlertHost'
 import { showToast } from '@/components/ui/Toast'
+import { invalidateTabCache } from '@/lib/tabCache'
 
 export default function EditWordPage() {
   const { t } = useTranslation()
@@ -49,6 +50,7 @@ export default function EditWordPage() {
         await showAlert(t.alert.saveFailed)
         return
       }
+      invalidateTabCache(['home', 'vocabulary', 'study', 'profile'])
       showToast(t.common.save)
       router.back()
     } catch (e) {
@@ -73,6 +75,7 @@ export default function EditWordPage() {
         await showAlert(t.alert.deleteFailed)
         return
       }
+      invalidateTabCache(['home', 'vocabulary', 'study', 'profile'])
       showToast(t.common.delete)
       router.back()
     } catch (e) {

@@ -16,6 +16,21 @@ import CenterModal from '@/components/ui/CenterModal'
 import { useIsDark } from '@/hooks/useIsDark'
 import { glassButtonSecondary } from '@/lib/glassModalStyles'
 import { attachDebouncedFocusRefresh } from '@/lib/focusRefresh'
+import { getTabCache, invalidateTabCache, setTabCache, tabCacheKey } from '@/lib/tabCache'
+
+type HomeFolder = { id: string; name: string; icon: string; color?: string; word_count: number }
+
+type HomeTabCache = {
+  user: any
+  reviewCount: number
+  totalWords: number
+  masteredWords: number
+  todayWordsStudied: number
+  dailyGoal: number | null
+  streakDays: number
+  folders: HomeFolder[]
+  todayWord: any
+}
 
 export default function HomePage() {
   const router = useRouter()
@@ -30,9 +45,9 @@ export default function HomePage() {
   const [dailyGoal, setDailyGoal] = useState<number | null>(null)
   const [showGoalModal, setShowGoalModal] = useState(false)
   const [streakDays, setStreakDays] = useState(0)
-  const [folders, setFolders] = useState<Array<{ id: string; name: string; icon: string; color?: string; word_count: number }>>([])
+  const [folders, setFolders] = useState<HomeFolder[]>([])
   const [showSpeedSheet, setShowSpeedSheet] = useState(false)
-  const [speedFolders, setSpeedFolders] = useState<Array<{ id: string; name: string; icon: string; color?: string; word_count: number }>>([])
+  const [speedFolders, setSpeedFolders] = useState<HomeFolder[]>([])
   const [calendarMonth, setCalendarMonth] = useState(new Date())
   const [monthlyData, setMonthlyData] = useState<Record<string, number>>({})
   const [todayWord, setTodayWord] = useState<any>(null)
@@ -47,67 +62,79 @@ export default function HomePage() {
   const animatedStreakDays = useCountUp(streakDays)
   const animatedTodayWords = useCountUp(todayWordsStudied)
 
+  const applyHomeCache = useCallback((data: HomeTabCache) => {
+    setUser(data.user)
+    setReviewCount(data.reviewCount)
+    setTotalWords(data.totalWords)
+    setMasteredWords(data.masteredWords)
+    setTodayWordsStudied(data.todayWordsStudied)
+    setDailyGoal(data.dailyGoal)
+    setStreakDays(data.streakDays)
+    setFolders(data.folders)
+    setTodayWord(data.todayWord)
+  }, [])
+
   const fetchData = useCallback(async () => {
     try {
       const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
       const user = session?.user
-      if (!user) return
-      setUser(user)
+      if (!user) {
+        setLoading(false)
+        return
+      }
 
+      let nextUser = user
+      let nextDailyGoal: number | null = null
       const rawGoal = user.user_metadata?.daily_goal
       const parsedGoal = typeof rawGoal === 'number' ? rawGoal : Number(rawGoal)
       if (Number.isFinite(parsedGoal) && parsedGoal > 0) {
-        setDailyGoal(parsedGoal)
+        nextDailyGoal = parsedGoal
         localStorage.removeItem('daily_goal')
       } else {
         const savedLocal = localStorage.getItem('daily_goal')
         const localGoal = Number(savedLocal)
         if (savedLocal && Number.isFinite(localGoal) && localGoal > 0) {
-          setDailyGoal(localGoal)
+          nextDailyGoal = localGoal
           const { data } = await supabase.auth.updateUser({ data: { daily_goal: localGoal } })
-          if (data.user) setUser(data.user)
+          if (data.user) nextUser = data.user
           localStorage.removeItem('daily_goal')
-        } else {
-          setDailyGoal(null)
         }
       }
 
       const today = new Date().toLocaleDateString('en-CA')
+      let nextTotalWords = 0
+      let nextMasteredWords = 0
+      let nextReviewCount = 0
+      let nextTodayWord: any = null
 
-      // 전체 단어 통계
       const { data: words } = await supabase
         .from('words')
         .select('correct_count, next_review_date, difficulty, created_at, word, meaning, part_of_speech, pronunciation')
         .eq('user_id', user.id)
 
       if (words) {
-        setTotalWords(words.length)
-        setMasteredWords(words.filter(w => (w.correct_count || 0) >= 1).length)
-
-        const reviewWords = words.filter(w => {
+        nextTotalWords = words.length
+        nextMasteredWords = words.filter(w => (w.correct_count || 0) >= 1).length
+        nextReviewCount = words.filter(w => {
           if (w.difficulty === 'hard') return true
           if (!w.next_review_date) return false
           return w.next_review_date <= today
-        })
-        setReviewCount(reviewWords.length)
-
-        const latestWord = words.sort((a, b) =>
+        }).length
+        nextTodayWord = words.sort((a, b) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        )[0]
-        if (latestWord) setTodayWord(latestWord)
+        )[0] || null
       }
 
-      {
-        const { data: todayStudy } = await supabase
-          .from('user_daily_study')
-          .select('words_studied')
-          .eq('user_id', user.id)
-          .eq('study_date', today)
-          .maybeSingle()
-        setTodayWordsStudied(todayStudy?.words_studied || 0)
-      }
+      const { data: todayStudy } = await supabase
+        .from('user_daily_study')
+        .select('words_studied')
+        .eq('user_id', user.id)
+        .eq('study_date', today)
+        .maybeSingle()
+      const nextTodayWordsStudied = todayStudy?.words_studied || 0
 
+      let nextFolders: HomeFolder[] = []
       const { data: folderData } = await supabase
         .from('folders')
         .select('id, name, icon, color')
@@ -116,7 +143,7 @@ export default function HomePage() {
         .limit(3)
 
       if (folderData) {
-        const foldersWithCount = await Promise.all(
+        nextFolders = await Promise.all(
           folderData.map(async (f) => {
             const { count } = await supabase
               .from('words')
@@ -125,31 +152,56 @@ export default function HomePage() {
             return { ...f, word_count: count || 0 }
           })
         )
-        setFolders(foldersWithCount)
       }
 
-      // 학습 통계
       const { data: stats } = await supabase
         .from('user_learning_stats')
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle()
+      const nextStreakDays = stats?.streak_days || 0
 
-      if (stats) {
-        setStreakDays(stats.streak_days || 0)
-      } else {
-        setStreakDays(0)
+      const payload: HomeTabCache = {
+        user: nextUser,
+        reviewCount: nextReviewCount,
+        totalWords: nextTotalWords,
+        masteredWords: nextMasteredWords,
+        todayWordsStudied: nextTodayWordsStudied,
+        dailyGoal: nextDailyGoal,
+        streakDays: nextStreakDays,
+        folders: nextFolders,
+        todayWord: nextTodayWord,
       }
+      applyHomeCache(payload)
+      setTabCache(tabCacheKey(user.id, 'home'), payload)
     } catch (e) {
       console.error('홈 데이터 로딩 오류:', e)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [applyHomeCache])
 
   useEffect(() => {
-    fetchData()
-  }, [fetchData])
+    let cancelled = false
+    const boot = async () => {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (cancelled) return
+      const uid = session?.user?.id
+      if (!uid) {
+        setLoading(false)
+        return
+      }
+      const cached = getTabCache<HomeTabCache>(tabCacheKey(uid, 'home'))
+      if (cached) {
+        applyHomeCache(cached)
+        setLoading(false)
+      }
+      await fetchData()
+    }
+    void boot()
+    return () => { cancelled = true }
+  }, [applyHomeCache, fetchData])
 
   useEffect(() => {
     if (!loading) {
@@ -220,6 +272,7 @@ export default function HomePage() {
     setDailyGoal(goal)
     if (data.user) setUser(data.user)
     localStorage.removeItem('daily_goal')
+    invalidateTabCache(['home', 'profile'])
     setShowGoalModal(false)
     showToast(t.home.goalSaveToast)
   }
@@ -234,6 +287,7 @@ export default function HomePage() {
     setDailyGoal(null)
     if (data.user) setUser(data.user)
     localStorage.removeItem('daily_goal')
+    invalidateTabCache(['home', 'profile'])
     setShowGoalModal(false)
   }
 

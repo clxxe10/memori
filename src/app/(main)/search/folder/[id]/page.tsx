@@ -59,6 +59,7 @@ import {
 } from '@/lib/glassModalStyles'
 import { useIsDark } from '@/hooks/useIsDark'
 import { findBlockedContent } from '@/lib/contentFilter'
+import { invalidateTabCache } from '@/lib/tabCache'
 
 type Folder = {
   id: string
@@ -271,6 +272,7 @@ export default function PublicFolderPage() {
         }))
       )
     }
+    invalidateTabCache(['home', 'vocabulary', 'study'])
     setIsImported(true)
     setImporting(false)
     showToast('내 단어장에 추가됐어요!')

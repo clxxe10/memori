@@ -6,6 +6,7 @@ import { ArrowLeft, Volume2, RotateCcw, ChevronLeft, ChevronRight } from 'lucide
 import { createClient } from '@/lib/supabase/client'
 import { calculateNextReview } from '@/lib/srs'
 import { recordStudyProgress } from '@/lib/studyTracker'
+import { invalidateTabCache } from '@/lib/tabCache'
 import { usePagePadding } from '@/lib/responsive'
 import { useSwipe } from '@/hooks/useSwipe'
 import { haptics } from '@/lib/haptics'
@@ -150,6 +151,7 @@ function FlashcardContent() {
       review_interval: nextInterval,
       ease_factor: nextEaseFactor,
     }).eq('id', word.id)
+    invalidateTabCache(['home', 'profile', 'vocabulary'])
 
     if (!know) setWrongWords(prev => [...prev, word])
 

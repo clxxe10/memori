@@ -6,6 +6,7 @@ import { ArrowLeft, Volume2, RotateCcw } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { calculateNextReview } from '@/lib/srs'
 import { recordStudyProgress } from '@/lib/studyTracker'
+import { invalidateTabCache } from '@/lib/tabCache'
 import { usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
 import { speak as speakWord } from '@/lib/tts'
@@ -125,6 +126,7 @@ function ReviewContent() {
       review_interval: nextInterval,
       ease_factor: nextEaseFactor,
     }).eq('id', word.id)
+    invalidateTabCache(['home', 'profile', 'vocabulary'])
 
     setStats(prev => ({
       know: know ? prev.know + 1 : prev.know,
@@ -172,6 +174,7 @@ function ReviewContent() {
       review_interval: nextInterval,
       ease_factor: nextEaseFactor,
     }).eq('id', word.id)
+    invalidateTabCache(['home', 'profile', 'vocabulary'])
 
     setStats(prev => ({
       know: isCorrect ? prev.know + 1 : prev.know,

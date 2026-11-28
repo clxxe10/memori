@@ -40,6 +40,7 @@ import {
   glassSheetTitleStyle,
 } from '@/lib/glassModalStyles'
 import { attachDebouncedFocusRefresh } from '@/lib/focusRefresh'
+import { getTabCache, invalidateTabCache, setTabCache, tabCacheKey } from '@/lib/tabCache'
 
 type Folder = {
   id: string
@@ -51,6 +52,11 @@ type Folder = {
   is_public?: boolean
   word_count?: number
   mastered_count?: number
+}
+
+type VocabTabCache = {
+  user: any
+  folders: Folder[]
 }
 
 export default function VocabularyPage() {
@@ -78,7 +84,6 @@ export default function VocabularyPage() {
       const { data: { session } } = await supabase.auth.getSession()
       const user = session?.user
       if (!user) { setLoading(false); return }
-      setUser(user)
 
       const { data: folderData } = await supabase
         .from('folders')
@@ -86,7 +91,14 @@ export default function VocabularyPage() {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-      if (!folderData) { setLoading(false); return }
+      if (!folderData) {
+        const payload: VocabTabCache = { user, folders: [] }
+        setUser(user)
+        setFolders([])
+        setTabCache(tabCacheKey(user.id, 'vocabulary'), payload)
+        setLoading(false)
+        return
+      }
 
       const foldersWithCount = await Promise.all(
         folderData.map(async (folder) => {
@@ -99,7 +111,10 @@ export default function VocabularyPage() {
           return { ...folder, word_count: total, mastered_count: mastered }
         })
       )
+      const payload: VocabTabCache = { user, folders: foldersWithCount }
+      setUser(user)
       setFolders(foldersWithCount)
+      setTabCache(tabCacheKey(user.id, 'vocabulary'), payload)
       setLoading(false)
     } catch (e) {
       console.error('폴더 로딩 오류:', e)
@@ -109,7 +124,25 @@ export default function VocabularyPage() {
   }
 
   useEffect(() => {
-    fetchFolders()
+    let cancelled = false
+    const boot = async () => {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (cancelled) return
+      const uid = session?.user?.id
+      if (!uid) {
+        setLoading(false)
+        return
+      }
+      const cached = getTabCache<VocabTabCache>(tabCacheKey(uid, 'vocabulary'))
+      if (cached) {
+        setUser(cached.user)
+        setFolders(cached.folders)
+        setLoading(false)
+      }
+      await fetchFolders()
+    }
+    void boot()
     return attachDebouncedFocusRefresh(() => { void fetchFolders() })
   }, [])
 
@@ -191,6 +224,7 @@ export default function VocabularyPage() {
         setFolders((prev) => [data, ...prev])
       }
 
+      invalidateTabCache(['home', 'vocabulary', 'study'])
       setNewFolder({
         name: '',
         description: '',

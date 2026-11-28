@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { applyMyColor } from '@/lib/colorUtils'
 import { modalCard, modalPrimaryBtn } from '@/lib/modalStyles'
+import { clearAllTabCache } from '@/lib/tabCache'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -33,6 +34,7 @@ export default function LoginPage() {
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) { setError('이메일 또는 비밀번호가 올바르지 않아요'); setLoading(false); return }
+    clearAllTabCache()
     router.push('/home')
   }
 

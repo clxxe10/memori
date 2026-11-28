@@ -3,6 +3,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { ChevronLeft, ChevronRight, Eye, EyeOff, Mail } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { signInWithProvider } from '@/lib/oauth'
+import { clearAllTabCache } from '@/lib/tabCache'
 import { useTranslation } from '@/lib/i18n'
 import { useKeyboard } from '@/hooks/useKeyboard'
 import {
@@ -208,6 +209,7 @@ export default function Slide2({
       const supabase = createClient()
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
       if (signInError) { setError(t.alert.loginFailed); return }
+      clearAllTabCache()
       onLogin()
     } finally { setLoading(false) }
   }

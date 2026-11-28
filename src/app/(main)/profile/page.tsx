@@ -21,6 +21,14 @@ import { showToast } from '@/components/ui/Toast'
 import { useIsDark } from '@/hooks/useIsDark'
 import { useTranslation } from '@/lib/i18n'
 import { glassInputStyle } from '@/lib/glassModalStyles'
+import { clearAllTabCache, getTabCache, invalidateTabCache, setTabCache, tabCacheKey } from '@/lib/tabCache'
+
+type ProfileTabCache = {
+  user: any
+  stats: { mastered: number; streak: number; total: number }
+  nickname: string
+  dailyGoal: number | null
+}
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -50,33 +58,9 @@ export default function ProfilePage() {
   const [nickname, setNickname] = useState('')
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-      const supabase = createClient()
-      const { data: { session } } = await supabase.auth.getSession()
-      const user = session?.user ?? null
+    let cancelled = false
 
-      if (!user) { setLoading(false); return }
-      setUser(user)
-      const name = user.user_metadata?.nickname
-        || user.user_metadata?.full_name
-        || user.user_metadata?.name
-        || user.user_metadata?.preferred_username
-        || user.email?.split('@')[0]
-        || (lang === 'en' ? 'User' : '사용자')
-      setNickname(name)
-
-      const { data: words } = await supabase
-        .from('words').select('correct_count').eq('user_id', user.id)
-      const { data: statsData } = await supabase
-        .from('user_learning_stats').select('*').eq('user_id', user.id).single()
-
-      setStats({
-        mastered: words?.filter(w => (w.correct_count || 0) >= 1).length || 0,
-        streak: statsData?.streak_days || 0,
-        total: words?.length || 0,
-      })
-
+    const applyLocalPrefs = () => {
       migrateLegacyDefaultTheme()
       const savedTheme = localStorage.getItem('app_theme') || '시스템'
       const savedNotif = localStorage.getItem('notification_enabled')
@@ -87,33 +71,97 @@ export default function ProfilePage() {
       refreshMyColor()
       if (savedNotif !== null) setNotificationEnabled(savedNotif === 'true')
       if (savedNotifTime) setNotificationTime(savedNotifTime)
+    }
 
-      // Unify daily goal to user_metadata.daily_goal (one-time migrate from localStorage)
-      const rawMeta = user.user_metadata?.daily_goal
-      const metaGoal = Number(rawMeta)
-      if (Number.isFinite(metaGoal) && metaGoal > 0) {
-        setDailyGoal(metaGoal)
-        localStorage.removeItem('daily_goal')
-      } else {
-        const savedGoal = localStorage.getItem('daily_goal')
-        const localGoal = Number(savedGoal)
-        if (savedGoal && Number.isFinite(localGoal) && localGoal > 0) {
-          setDailyGoal(localGoal)
-          const { data } = await supabase.auth.updateUser({ data: { daily_goal: localGoal } })
-          if (data.user) setUser(data.user)
+    const applyCache = (data: ProfileTabCache) => {
+      setUser(data.user)
+      setStats(data.stats)
+      setNickname(data.nickname)
+      setDailyGoal(data.dailyGoal)
+      applyLocalPrefs()
+    }
+
+    const fetchData = async () => {
+      try {
+        const supabase = createClient()
+        const { data: { session } } = await supabase.auth.getSession()
+        const user = session?.user ?? null
+
+        if (!user) { setLoading(false); return }
+
+        const name = user.user_metadata?.nickname
+          || user.user_metadata?.full_name
+          || user.user_metadata?.name
+          || user.user_metadata?.preferred_username
+          || user.email?.split('@')[0]
+          || (lang === 'en' ? 'User' : '사용자')
+
+        const { data: words } = await supabase
+          .from('words').select('correct_count').eq('user_id', user.id)
+        const { data: statsData } = await supabase
+          .from('user_learning_stats').select('*').eq('user_id', user.id).single()
+
+        const nextStats = {
+          mastered: words?.filter(w => (w.correct_count || 0) >= 1).length || 0,
+          streak: statsData?.streak_days || 0,
+          total: words?.length || 0,
+        }
+
+        applyLocalPrefs()
+
+        let nextUser = user
+        let nextDailyGoal: number | null = null
+        const rawMeta = user.user_metadata?.daily_goal
+        const metaGoal = Number(rawMeta)
+        if (Number.isFinite(metaGoal) && metaGoal > 0) {
+          nextDailyGoal = metaGoal
           localStorage.removeItem('daily_goal')
         } else {
-          setDailyGoal(null)
+          const savedGoal = localStorage.getItem('daily_goal')
+          const localGoal = Number(savedGoal)
+          if (savedGoal && Number.isFinite(localGoal) && localGoal > 0) {
+            nextDailyGoal = localGoal
+            const { data } = await supabase.auth.updateUser({ data: { daily_goal: localGoal } })
+            if (data.user) nextUser = data.user
+            localStorage.removeItem('daily_goal')
+          }
         }
-      }
-      setLoading(false)
+
+        if (cancelled) return
+        const payload: ProfileTabCache = {
+          user: nextUser,
+          stats: nextStats,
+          nickname: name,
+          dailyGoal: nextDailyGoal,
+        }
+        applyCache(payload)
+        setTabCache(tabCacheKey(user.id, 'profile'), payload)
+        setLoading(false)
       } catch (e) {
         console.error('프로필 로딩 오류:', e)
       } finally {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
       }
     }
-    fetchData()
+
+    const boot = async () => {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (cancelled) return
+      const uid = session?.user?.id
+      if (!uid) {
+        setLoading(false)
+        return
+      }
+      const cached = getTabCache<ProfileTabCache>(tabCacheKey(uid, 'profile'))
+      if (cached) {
+        applyCache(cached)
+        setLoading(false)
+      }
+      await fetchData()
+    }
+    void boot()
+    return () => { cancelled = true }
   }, [])
 
   const handleThemeChange = (t: string) => {
@@ -156,6 +204,7 @@ export default function ProfilePage() {
   const handleLogout = async () => {
     try {
       const supabase = createClient()
+      clearAllTabCache()
       await supabase.auth.signOut()
       router.push('/onboarding')
     } catch (e) {
@@ -443,6 +492,7 @@ export default function ProfilePage() {
             setDailyGoal(goal)
             if (data.user) setUser(data.user)
             localStorage.removeItem('daily_goal')
+            invalidateTabCache(['home', 'profile'])
             setShowGoalModal(false)
             showToast(lang === 'en' ? 'Daily goal saved' : '목표가 저장됐어요')
           }}
@@ -456,6 +506,7 @@ export default function ProfilePage() {
             setDailyGoal(null)
             if (data.user) setUser(data.user)
             localStorage.removeItem('daily_goal')
+            invalidateTabCache(['home', 'profile'])
             setShowGoalModal(false)
           }}
           onCancel={() => setShowGoalModal(false)}
@@ -652,6 +703,7 @@ export default function ProfilePage() {
                 return
               }
               clearAppLocalStorage()
+              clearAllTabCache()
               await supabase.auth.signOut()
               setShowDeleteSheet(false)
               router.push('/onboarding')

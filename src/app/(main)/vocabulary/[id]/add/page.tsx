@@ -10,6 +10,7 @@ import { showToast } from '@/components/ui/Toast'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useKeyboard } from '@/hooks/useKeyboard'
 import { useTranslation } from '@/lib/i18n'
+import { invalidateTabCache } from '@/lib/tabCache'
 
 export default function AddWordPage() {
   const { t, lang } = useTranslation()
@@ -98,6 +99,7 @@ export default function AddWordPage() {
         .from('folders')
         .update({ language: detectedLang })
         .eq('id', folderId)
+      invalidateTabCache(['home', 'vocabulary', 'study', 'profile'])
       showToast(lang === 'en' ? 'Word added!' : '단어가 추가됐어요!')
       router.back()
     } catch {

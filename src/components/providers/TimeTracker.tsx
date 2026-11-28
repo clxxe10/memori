@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { invalidateTabCache } from '@/lib/tabCache'
 
 function getLocalToday(): string {
   const now = new Date()
@@ -114,6 +115,8 @@ export default function TimeTracker() {
             total_words: 0,
           })
       }
+
+      invalidateTabCache(['home', 'profile'])
     } catch (e: any) {
       if (
         e?.message?.includes('fetch') ||

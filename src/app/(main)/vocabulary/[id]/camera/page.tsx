@@ -11,6 +11,7 @@ import { showAlert } from '@/components/ui/AlertHost'
 import { addExtractBonus, canUsePhotoExtract, incrementExtractCount } from '@/lib/premium'
 import { CONTENT_MAX_WIDTH, usePagePadding } from '@/lib/responsive'
 import { useTranslation } from '@/lib/i18n'
+import { invalidateTabCache } from '@/lib/tabCache'
 import { ADMOB_REWARD_PHOTO_EXTRACT } from '@/lib/adConfig'
 import { showRewardAd } from '@/lib/rewardAd'
 import CenterModal from '@/components/ui/CenterModal'
@@ -214,6 +215,7 @@ export default function CameraPage() {
           .update({ language: detectedLang })
           .eq('id', folderId)
       }
+      invalidateTabCache(['home', 'vocabulary', 'study', 'profile'])
       showToast('단어장에 추가됐어요!')
       router.back()
     } catch {

@@ -27,6 +27,7 @@ import {
   glassInputStyle,
 } from '@/lib/glassModalStyles'
 import { attachDebouncedFocusRefresh } from '@/lib/focusRefresh'
+import { invalidateTabCache } from '@/lib/tabCache'
 
 function addRowStyle(isDark: boolean, marginBottom: string): CSSProperties {
   return {
@@ -281,6 +282,7 @@ export default function VocabularyDetailPage() {
 
       setFolder(prev => prev ? { ...prev, ...editForm, name: trimmedName, is_public: data.is_public } : prev)
       setEditForm(f => ({ ...f, name: trimmedName, is_public: !!data.is_public }))
+      invalidateTabCache(['home', 'vocabulary', 'study'])
       setShowEditSheet(false)
       showToast(
         data.is_public
@@ -311,6 +313,7 @@ export default function VocabularyDetailPage() {
       const supabase = createClient()
       await supabase.from('words').delete().eq('folder_id', folderId)
       await supabase.from('folders').delete().eq('id', folderId)
+      invalidateTabCache(['home', 'vocabulary', 'study', 'profile'])
       router.back()
     } catch (e) {
       console.error('삭제 오류:', e)
@@ -325,6 +328,7 @@ export default function VocabularyDetailPage() {
     const { error } = await supabase.from('words').update({ is_bookmarked: !word.is_bookmarked }).eq('id', word.id)
     if (error) { await showAlert(t.alert.saveFailed); return }
     setWords(prev => prev.map(w => w.id === word.id ? { ...w, is_bookmarked: !w.is_bookmarked } : w))
+    invalidateTabCache(['home', 'vocabulary', 'study', 'profile'])
   }
 
   const handleDeleteWord = async (wordId: string) => {
@@ -332,6 +336,7 @@ export default function VocabularyDetailPage() {
     const { error } = await supabase.from('words').delete().eq('id', wordId)
     if (error) { await showAlert(t.alert.deleteFailed); return }
     setWords(prev => prev.filter(w => w.id !== wordId))
+    invalidateTabCache(['home', 'vocabulary', 'study', 'profile'])
     showToast(lang === 'en' ? 'Deleted' : '삭제되었습니다', 'success')
   }
 

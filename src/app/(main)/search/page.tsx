@@ -56,6 +56,7 @@ import { FolderSkeleton } from '@/components/ui/Skeleton'
 import PullToRefresh from '@/components/ui/PullToRefresh'
 import Coachmark from '@/components/ui/Coachmark'
 import { showAlert } from '@/components/ui/AlertHost'
+import { invalidateTabCache } from '@/lib/tabCache'
 
 type PublicFolder = {
   id: string
@@ -241,6 +242,7 @@ function SearchPageContent() {
         )
       }
 
+      invalidateTabCache(['home', 'vocabulary', 'study'])
       setImportedIds(prev => new Set([...prev, folder.id]))
     } catch (e) {
       console.error('가져오기 오류:', e)

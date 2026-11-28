@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
+import { clearAllTabCache } from '@/lib/tabCache'
 
 export type OAuthProvider = 'google' | 'kakao' | 'apple'
 
@@ -13,6 +14,7 @@ const LEGACY_NATIVE_REDIRECT = 'https://memori-seven.vercel.app/auth/callback'
  * - Web: normal redirect to /auth/callback
  */
 export async function signInWithProvider(provider: OAuthProvider): Promise<void> {
+  clearAllTabCache()
   const supabase = createClient()
 
   const { Capacitor } = await import('@capacitor/core')

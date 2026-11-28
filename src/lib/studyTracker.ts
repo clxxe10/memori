@@ -7,6 +7,7 @@
 // alter table user_learning_stats add column if not exists total_words int default 0;
 
 import { createClient } from '@/lib/supabase/client'
+import { invalidateTabCache } from '@/lib/tabCache'
 
 function getLocalToday(): string {
   const now = new Date()
@@ -94,6 +95,8 @@ export async function recordStudyProgress(wordsStudied: number) {
         })
       if (error) console.error('stats insert 오류:', error)
     }
+
+    invalidateTabCache(['home', 'profile'])
   } catch (e) {
     console.error('recordStudyProgress 오류:', e)
   }

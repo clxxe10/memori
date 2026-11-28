@@ -13,6 +13,14 @@ import { showAlert } from '@/components/ui/AlertHost'
 import CenterModal from '@/components/ui/CenterModal'
 import { useIsDark } from '@/hooks/useIsDark'
 import { glassButtonSecondary } from '@/lib/glassModalStyles'
+import { getTabCache, setTabCache, tabCacheKey } from '@/lib/tabCache'
+
+type StudyFolder = { id: string; name: string; icon: string; word_count?: number; color?: string }
+
+type StudyTabCache = {
+  user: any
+  folders: StudyFolder[]
+}
 
 export default function StudyPage() {
   const router = useRouter()
@@ -23,7 +31,7 @@ export default function StudyPage() {
   const [showFolderSheet, setShowFolderSheet] = useState(false)
   const [selectedMode, setSelectedMode] = useState<string | null>(null)
   const [direction, setDirection] = useState<'word-to-meaning' | 'meaning-to-word'>('word-to-meaning')
-  const [folders, setFolders] = useState<Array<{ id: string; name: string; icon: string; word_count?: number; color?: string }>>([])
+  const [folders, setFolders] = useState<StudyFolder[]>([])
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [loadingFolders, setLoadingFolders] = useState(false)
@@ -112,22 +120,21 @@ export default function StudyPage() {
   }, [])
 
   useEffect(() => {
-    const load = async () => {
+    let cancelled = false
+    const loadFolders = async (sessionUser: { id: string }) => {
       const supabase = createClient()
-      const { data: { session } } = await supabase.auth.getSession()
-      const user = session?.user
-      if (user) setUser(user)
-      setLoading(false)
-
-      if (!user) return
-
-      setLoadingFolders(true)
+      const uid = sessionUser.id
       try {
         const { data: folderData } = await supabase
           .from('folders').select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', uid)
           .order('created_at', { ascending: false })
-        if (!folderData) return
+        if (cancelled) return
+        if (!folderData) {
+          setFolders([])
+          setTabCache(tabCacheKey(uid, 'study'), { user: sessionUser, folders: [] })
+          return
+        }
         const foldersWithCount = await Promise.all(
           folderData.map(async (folder) => {
             const { count } = await supabase
@@ -137,14 +144,37 @@ export default function StudyPage() {
             return { ...folder, word_count: count || 0 }
           })
         )
+        if (cancelled) return
         setFolders(foldersWithCount)
+        setTabCache(tabCacheKey(uid, 'study'), { user: sessionUser, folders: foldersWithCount })
       } catch (e) {
         console.error('폴더 로딩 오류:', e)
       } finally {
-        setLoadingFolders(false)
+        if (!cancelled) setLoadingFolders(false)
       }
     }
-    void load()
+
+    const boot = async () => {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (cancelled) return
+      const nextUser = session?.user
+      if (nextUser) setUser(nextUser)
+      setLoading(false)
+
+      if (!nextUser) return
+
+      const cached = getTabCache<StudyTabCache>(tabCacheKey(nextUser.id, 'study'))
+      if (cached) {
+        setFolders(cached.folders)
+        setLoadingFolders(false)
+      } else {
+        setLoadingFolders(true)
+      }
+      await loadFolders(nextUser)
+    }
+    void boot()
+    return () => { cancelled = true }
   }, [])
 
   const toggleFavorite = (id: string, e: React.MouseEvent) => {
