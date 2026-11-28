@@ -1,13 +1,14 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { applyMyColor } from '@/lib/colorUtils'
+import { applyMyColor, refreshMyColor } from '@/lib/colorUtils'
 import { useTranslation } from '@/lib/i18n'
 import { onboardingColorCta, onboardingCtaRow } from '@/lib/onboardingBtnStyles'
 
 export default function Slide4({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
   const { t } = useTranslation()
   const [myColor, setMyColor] = useState('#007AFF')
+  const [useDefault, setUseDefault] = useState(false)
   const [saving, setSaving] = useState(false)
   const [isDark, setIsDark] = useState(false)
 
@@ -46,8 +47,13 @@ export default function Slide4({ onNext, onBack }: { onNext: () => void; onBack:
           notification_time: '오전 8:00',
         }, { onConflict: 'user_id' })
       }
-      localStorage.setItem('app_my_color', myColor)
-      applyMyColor(myColor)
+      if (useDefault) {
+        localStorage.removeItem('app_my_color')
+        refreshMyColor()
+      } else {
+        localStorage.setItem('app_my_color', myColor)
+        applyMyColor(myColor)
+      }
     } catch (e) {
       console.error('설정 저장 실패:', e)
     } finally {
@@ -137,7 +143,10 @@ export default function Slide4({ onNext, onBack }: { onNext: () => void; onBack:
             <input
               type="color"
               value={myColor}
-              onChange={e => setMyColor(e.target.value)}
+              onChange={e => {
+                setUseDefault(false)
+                setMyColor(e.target.value)
+              }}
               style={{
                 width: '160px', height: '160px', borderRadius: '50%',
                 border: 'none', cursor: 'pointer', padding: 0,
@@ -171,8 +180,8 @@ export default function Slide4({ onNext, onBack }: { onNext: () => void; onBack:
           {/* 기본 테마 버튼 */}
           <button
             onClick={() => {
-              const defaultColor = isDark ? '#FFFFFF' : '#1C1C1E'
-              setMyColor(defaultColor)
+              setUseDefault(true)
+              setMyColor(isDark ? '#FFFFFF' : '#1C1C1E')
             }}
             style={{
               padding: '10px 20px',

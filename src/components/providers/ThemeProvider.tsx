@@ -2,13 +2,14 @@
 
 import { useEffect } from 'react'
 import { AdMob } from '@capacitor-community/admob'
-import { applyMyColor } from '@/lib/colorUtils'
+import { migrateLegacyDefaultTheme, refreshMyColor } from '@/lib/colorUtils'
 import { createClient } from '@/lib/supabase/client'
 import { initRevenueCat } from '@/lib/revenuecat'
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    // 테마 적용
+    migrateLegacyDefaultTheme()
+
     const applyTheme = (savedTheme: string) => {
       if (savedTheme === '다크') {
         document.documentElement.classList.add('dark')
@@ -23,27 +24,14 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     }
 
     const savedTheme = localStorage.getItem('app_theme') || '시스템'
-    const savedColor = localStorage.getItem('app_my_color') || '#1C1C1E'
     applyTheme(savedTheme)
+    refreshMyColor()
 
-    if (savedTheme === '기본') {
-      const isDark = document.documentElement.classList.contains('dark')
-      applyMyColor(isDark ? '#FFFFFF' : '#1C1C1E')
-    } else {
-      applyMyColor(savedColor)
-    }
-
-    // 시스템 테마 변경 감지
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     const handleChange = () => {
       if (localStorage.getItem('app_theme') === '시스템') {
         applyTheme('시스템')
-        applyMyColor(localStorage.getItem('app_my_color') || '#1C1C1E')
-      }
-      if (localStorage.getItem('app_theme') === '기본') {
-        applyTheme('기본')
-        const isDark = document.documentElement.classList.contains('dark')
-        applyMyColor(isDark ? '#FFFFFF' : '#1C1C1E')
+        refreshMyColor()
       }
     }
     mediaQuery.addEventListener('change', handleChange)

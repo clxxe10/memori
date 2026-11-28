@@ -35,7 +35,8 @@ export default function SplashPage() {
     `
     document.head.appendChild(style)
 
-    const theme = localStorage.getItem('app_theme') || '시스템'
+    const rawTheme = localStorage.getItem('app_theme') || '시스템'
+    const theme = rawTheme === '기본' ? '시스템' : rawTheme
     const isDark = theme === '다크' ||
       (theme === '시스템' && window.matchMedia('(prefers-color-scheme: dark)').matches)
 

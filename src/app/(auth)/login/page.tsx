@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { applyMyColor } from '@/lib/colorUtils'
 import { modalCard, modalPrimaryBtn } from '@/lib/modalStyles'
 
 export default function LoginPage() {
@@ -21,10 +22,9 @@ export default function LoginPage() {
   }, [])
 
   useEffect(() => {
-    // 로그인 페이지에서는 마이컬러를 기본값으로 리셋
+    // 로그인 페이지에서는 마이컬러를 테마 기본값으로만 표시 (저장값 무시)
     const isDark = document.documentElement.classList.contains('dark')
-    document.documentElement.style.setProperty('--color-my', isDark ? '#FFFFFF' : '#1C1C1E')
-    document.documentElement.style.setProperty('--color-my-contrast', isDark ? '#000000' : '#FFFFFF')
+    applyMyColor(isDark ? '#FFFFFF' : '#1C1C1E')
   }, [])
 
   const handleLogin = async () => {

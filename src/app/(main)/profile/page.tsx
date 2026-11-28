@@ -4,7 +4,12 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronRight, Check } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { applyMyColor } from '@/lib/colorUtils'
+import {
+  getEffectiveMyColor,
+  isDefaultMyColor,
+  migrateLegacyDefaultTheme,
+  refreshMyColor,
+} from '@/lib/colorUtils'
 import { usePagePadding } from '@/lib/responsive'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import AlertModal from '@/components/AlertModal'
@@ -30,8 +35,7 @@ export default function ProfilePage() {
   const [myColor, setMyColor] = useState('#1C1C1E')
   const [useDefaultColor, setUseDefaultColor] = useState(() => {
     if (typeof window === 'undefined') return false
-    return localStorage.getItem('app_my_color') === null ||
-      !localStorage.getItem('app_my_color')
+    return isDefaultMyColor()
   })
   const [showThemeSheet, setShowThemeSheet] = useState(false)
   const [showColorSheet, setShowColorSheet] = useState(false)
@@ -73,13 +77,14 @@ export default function ProfilePage() {
         total: words?.length || 0,
       })
 
+      migrateLegacyDefaultTheme()
       const savedTheme = localStorage.getItem('app_theme') || '시스템'
-      const savedColor = localStorage.getItem('app_my_color') || '#1C1C1E'
       const savedNotif = localStorage.getItem('notification_enabled')
       const savedNotifTime = localStorage.getItem('notification_time')
       setTheme(savedTheme)
-      setMyColor(savedColor)
-      applyMyColor(savedColor)
+      setUseDefaultColor(isDefaultMyColor())
+      setMyColor(getEffectiveMyColor())
+      refreshMyColor()
       if (savedNotif !== null) setNotificationEnabled(savedNotif === 'true')
       if (savedNotifTime) setNotificationTime(savedNotifTime)
 
@@ -122,26 +127,29 @@ export default function ProfilePage() {
         ? document.documentElement.classList.add('dark')
         : document.documentElement.classList.remove('dark')
     }
-    applyMyColor(myColor)
+    refreshMyColor()
+    if (isDefaultMyColor()) setMyColor(getEffectiveMyColor())
   }
 
   const handleColorChange = (color: string) => {
+    setUseDefaultColor(false)
     setMyColor(color)
     localStorage.setItem('app_my_color', color)
-    applyMyColor(color)
+    refreshMyColor()
   }
 
   const handleDefaultToggle = () => {
     const next = !useDefaultColor
     setUseDefaultColor(next)
     if (next) {
-      const isDark = document.documentElement.classList.contains('dark')
-      const defaultColor = isDark ? '#FFFFFF' : '#1C1C1E'
-      handleColorChange(defaultColor)
-      localStorage.setItem('app_theme', '기본')
+      localStorage.removeItem('app_my_color')
+      refreshMyColor()
+      setMyColor(getEffectiveMyColor())
     } else {
-      localStorage.setItem('app_theme', theme)
-      handleColorChange(myColor)
+      const color = getEffectiveMyColor()
+      localStorage.setItem('app_my_color', color)
+      setMyColor(color)
+      refreshMyColor()
     }
   }
 
